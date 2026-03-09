@@ -46,6 +46,7 @@ Before you begin, ensure you have the following:
    export SUBSCRIPTION_ID="<subscription-id>"
    export TENANT_ID="<tenant-id>"
    export GITHUB_ORG="<github-org-or-username>"
+   export REPO_NAME="<repository-name>"
    ```
 
 4. ### Create an App Registration
@@ -74,35 +75,42 @@ Before you begin, ensure you have the following:
 
 6. ### Add a Federated Credential
 
-   Create the federated credential configuration:
-
-   :::note
-   Replace `GITHUB_ORG` with your GitHub organization name or username. This is case-sensitive.
-   :::
+   Get the App Registration's object ID (different from the client/app ID):
 
    ```sh
-   cat > federated-credential.json << EOF
-   {
-     "name": "terrateam-github",
-     "issuer": "https://token.actions.githubusercontent.com",
-     "subject": "repo:${GITHUB_ORG}/*",
-     "audiences": ["api://AzureADTokenExchange"],
-     "description": "Terrateam GitHub Actions OIDC"
-   }
-   EOF
-
-   az ad app federated-credential create \
-     --id "$CLIENT_ID" \
-     --parameters federated-credential.json
+   APP_OBJECT_ID=$(az ad app show --id "$CLIENT_ID" --query "id" -o tsv)
    ```
 
-   :::tip[Subject Matching]
-   The `subject` field controls which repositories can authenticate. Examples:
-   - `repo:org/repo:ref:refs/heads/main` - specific branch
-   - `repo:org/repo:*` - any branch in a specific repo
-   - `repo:org/*` - any repo in the organization
+   Create a flexible federated credential using the Microsoft Graph beta API. This uses `claimsMatchingExpression` with the `matches` operator and `*` wildcard to allow authentication from any branch, tag, or pull request in your repository:
 
-   Azure also supports wildcard matching in federated credential subjects via the Microsoft Graph beta API. See the [Azure documentation](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-considerations) for details.
+   ```sh
+   az rest --method POST \
+     --uri "https://graph.microsoft.com/beta/applications/${APP_OBJECT_ID}/federatedIdentityCredentials" \
+     --headers "Content-Type=application/json" \
+     --body "{'name': 'terrateam-github', 'issuer': 'https://token.actions.githubusercontent.com', 'audiences': ['api://AzureADTokenExchange'], 'description': 'Terrateam GitHub Actions OIDC', 'claimsMatchingExpression': {'value': 'claims[\'sub\'] matches \'repo:${GITHUB_ORG}/${REPO_NAME}:*\'', 'languageVersion': 1}}"
+   ```
+
+   :::note
+   Replace `GITHUB_ORG` and `REPO_NAME` with your GitHub organization (or username) and repository name. These are case-sensitive.
+   :::
+
+   Verify the credential was created:
+
+   ```sh
+   az rest --method GET \
+     --uri "https://graph.microsoft.com/beta/applications/${APP_OBJECT_ID}/federatedIdentityCredentials" \
+     --query "value[].{name:name, expression:claimsMatchingExpression.value}" -o table
+   ```
+
+   :::tip[Why claimsMatchingExpression?]
+   Terrateam runs on branches and pull requests, so the federated credential must match any ref in your repository. Azure's standard `subject` field requires an exact match and does not support wildcards. The `claimsMatchingExpression` property with the `matches` operator supports `*` (multi-character) and `?` (single-character) wildcards against the `sub` claim. This is a preview feature called [Flexible Federated Identity Credentials](https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-flexible-federated-identity-credentials).
+
+   The expression `claims['sub'] matches 'repo:org/repo:*'` matches any subject starting with your repository, including all branches, tags, and pull requests.
+
+   Other useful patterns:
+   - `claims['sub'] matches 'repo:org/repo:ref:refs/heads/*'` - any branch only
+   - `claims['sub'] matches 'repo:org/repo:ref:refs/tags/*'` - any tag only
+   - `claims['sub'] eq 'repo:org/repo:ref:refs/heads/main'` - specific branch only
    :::
 
 7. ### Assign RBAC Role
