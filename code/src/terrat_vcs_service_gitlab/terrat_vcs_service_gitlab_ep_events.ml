@@ -151,7 +151,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         {
           Mrce.project = { Pr.id = repo_id; path_with_namespace; _ };
           object_attributes =
-            { Mrceoa.action = Some "create"; id = Some comment_id; note = Some comment_body; _ };
+            { Mrceoa.action = Some `Create; id = Some comment_id; note = Some comment_body; _ };
           user = { User.username; _ };
           merge_request = { Mr.iid = Some pull_request_id; _ };
           _;
@@ -197,7 +197,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         let repo = P.Api.Repo.make ~id:repo_id ~name ~owner () in
         let user = P.Api.User.make username in
         match action with
-        | "open" | "reopen" ->
+        | `Open | `Reopen ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : OPEN : owner=%s : repo=%s : pull_number=%d : sender=%s"
@@ -217,7 +217,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Open
-        | "update" ->
+        | `Update ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : SYNC : owner=%s : repo=%s : pull_number=%d : sender=%s"
@@ -237,7 +237,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Sync
-        | "merge" | "close" ->
+        | `Merge | `Close ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : CLOSE : owner=%s : repo=%s : pull_number=%d : \
@@ -258,7 +258,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Close
-        | any -> raise (Failure "nyi"))
+        | _ -> raise (Failure "nyi"))
     | E.Pipeline_event _ -> Abb.Future.return (Ok ())
     | E.Job_event
         {

@@ -284,7 +284,7 @@ let fetch_file ~request_id client repo ref_ path =
     >>= fun resp ->
     let module OK = Gl.Responses.OK in
     match Openapi.Response.value resp with
-    | `OK { OK.content; encoding = Some "base64"; _ } ->
+    | `OK { OK.content; encoding = Some `Base64; _ } ->
         Abb.Future.return
           (Ok (Some (Base64.decode_exn (CCString.replace ~sub:"\n" ~by:"" content))))
     | `OK { OK.content; _ } -> Abb.Future.return (Ok (Some content))
@@ -714,11 +714,11 @@ let create_commit_checks ~request_id client repo ref_ checks =
             ref_ = None;
             state =
               (match status with
-              | C.Status.Queued -> "pending"
-              | C.Status.Running -> "running"
-              | C.Status.Completed -> "success"
-              | C.Status.Failed -> "failed"
-              | C.Status.Canceled -> "canceled");
+              | C.Status.Queued -> `Pending
+              | C.Status.Running -> `Running
+              | C.Status.Completed -> `Success
+              | C.Status.Failed -> `Failed
+              | C.Status.Canceled -> `Canceled);
             target_url = None;
           }
         in

@@ -238,10 +238,10 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
       P.make
         {
           (CCResult.get_or_failwith @@ P.Primary.of_yojson (`Assoc [])) with
-          P.Primary.contents = Some "read";
-          issues = Some "write";
-          pull_requests = Some "write";
-          statuses = Some "write";
+          P.Primary.contents = Some `Read;
+          issues = Some `Write;
+          pull_requests = Some `Write;
+          statuses = Some `Write;
         }
 
     let post config storage work_manifest_id =

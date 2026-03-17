@@ -554,7 +554,7 @@ let minimize_comment ~owner ~repo ~comment_id client =
           | `Not_found -> Abb.Future.return (Error `Not_found)))
   | `Not_found _ -> Abb.Future.return (Error `Not_found)
 
-let react_to_comment ?(content = "rocket") ~owner ~repo ~comment_id client =
+let react_to_comment ?(content = `Rocket) ~owner ~repo ~comment_id client =
   Prmths.Counter.inc_one (Metrics.fn_call_total "react_to_comment");
   let open Abbs_future_combinators.Infix_result_monad in
   call
@@ -648,7 +648,7 @@ let get_team_membership_in_org ~org ~team ~user client =
   >>= fun resp ->
   match Openapi.Response.value resp with
   | `Not_found -> Abb.Future.return (Ok false)
-  | `OK Team.{ primary = Primary.{ state; _ }; _ } -> Abb.Future.return (Ok (state = "active"))
+  | `OK Team.{ primary = Primary.{ state; _ }; _ } -> Abb.Future.return (Ok (state = `Active))
 
 let get_repo_collaborator_permission ~org ~repo ~user client =
   Prmths.Counter.inc_one (Metrics.fn_call_total "get_repo_collaborator_permission");
@@ -674,8 +674,8 @@ let get_org_membership ~org ~user client =
   | `Not_found _ -> Abb.Future.return (Ok None)
   | `Forbidden _ -> Abb.Future.return (Ok None)
   | `OK Membership.{ primary = Primary.{ role; state; _ }; _ } ->
-      if state = "active" then
-        Abb.Future.return (Ok (Some (if role = "admin" then `Admin else `User)))
+      if state = `Active then
+        Abb.Future.return (Ok (Some (if role = `Admin then `Admin else `User)))
       else Abb.Future.return (Ok None)
 
 module Commit_status = struct
@@ -694,7 +694,7 @@ module Commit_status = struct
         target_url : string option;
         description : string option;
         context : string option;
-        state : string;
+        state : Githubc2_repos.Create_commit_status.Request_body.Primary.State.t;
       }
       [@@deriving show]
 

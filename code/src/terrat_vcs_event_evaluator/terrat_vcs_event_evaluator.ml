@@ -3206,7 +3206,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           in
           let response =
             Terrat_api_components.Work_manifest.Work_manifest_index
-              { I.dirs; base_ref = S.Api.Ref.to_string base_ref'; token; type_ = "index"; config }
+              { I.dirs; base_ref = S.Api.Ref.to_string base_ref'; token; type_ = `Index; config }
           in
           Abb.Future.return (Ok (Some response))
       | Some _ | None -> Abb.Future.return (Ok None)
@@ -4311,7 +4311,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                             dirspaces;
                             run_kind = run_kind_str;
                             run_kind_data;
-                            type_ = "plan";
+                            type_ = `Plan;
                             result_version;
                             protocol_version = Some protocol_version;
                             config =
@@ -4390,7 +4390,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                             changed_dirspaces = changed_dirspaces config changes;
                             run_kind = run_kind_str;
                             run_kind_data;
-                            type_ = "apply";
+                            type_ = `Apply;
                             result_version;
                             protocol_version = Some protocol_version;
                             config =
@@ -5120,7 +5120,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           Some work_manifest_id ) ->
           let module D = Terrat_api_components.Work_manifest_done in
           let response =
-            Terrat_api_components.Work_manifest.Work_manifest_done { D.type_ = "done" }
+            Terrat_api_components.Work_manifest.Work_manifest_done { D.type_ = `Done }
           in
           let open Abb.Future.Infix_monad in
           Abb.Future.Promise.set p (Ok (Some response))
@@ -6436,7 +6436,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   {
                     B.base_ref = S.Api.Ref.to_string base_branch_name';
                     token;
-                    type_ = "build-tree";
+                    type_ = `Build_tree;
                     config;
                   }
               in
@@ -6760,7 +6760,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   {
                     B.base_ref = S.Api.Ref.to_string base_branch_name;
                     token;
-                    type_ = "build-config";
+                    type_ = `Build_config;
                     config;
                   }
               in

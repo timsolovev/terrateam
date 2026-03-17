@@ -2830,7 +2830,7 @@ module Comment = struct
            | Output.Workflow_output_run
                Run.
                  {
-                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   workflow_step = Workflow_step.{ type_ = `Run; cmd; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
@@ -2841,42 +2841,60 @@ module Comment = struct
                      key = output_key;
                      text;
                      success;
-                     step_type = type_;
+                     step_type = "run";
                      details = Some (CCString.concat " " cmd);
                    }
            | Output.Workflow_output_oidc
                Oidc.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Oidc; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
-                 }
+                 } ->
+               Some
+                 Workflow_step_output.
+                   { key = output_key; text; success; step_type = "oidc"; details = None }
            | Output.Workflow_output_checkout
                Checkout.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Checkout; _ };
                    outputs = Text.{ text; output_key };
                    success;
-                 }
+                 } ->
+               Some
+                 Workflow_step_output.
+                   { key = output_key; text; success; step_type = "checkout"; details = None }
            | Output.Workflow_output_cost_estimation
                Ce.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Cost_estimation; _ };
                    outputs = Outputs.Output_text Text.{ text; output_key };
                    success;
                    _;
                  } ->
                Some
                  Workflow_step_output.
-                   { key = output_key; text; success; step_type = type_; details = None }
+                   {
+                     key = output_key;
+                     text;
+                     success;
+                     step_type = "cost-estimation";
+                     details = None;
+                   }
            | Output.Workflow_output_run
-               Run.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
-           | Output.Workflow_output_oidc
-               Oidc.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ } ->
+               Run.{ workflow_step = Workflow_step.{ type_ = `Run; _ }; outputs = None; success; _ }
+             ->
                Some
                  Workflow_step_output.
-                   { key = None; text = ""; success; step_type = type_; details = None }
+                   { key = None; text = ""; success; step_type = "run"; details = None }
+           | Output.Workflow_output_oidc
+               Oidc.
+                 { workflow_step = Workflow_step.{ type_ = `Oidc; _ }; outputs = None; success; _ }
+             ->
+               Some
+                 Workflow_step_output.
+                   { key = None; text = ""; success; step_type = "oidc"; details = None }
            | Output.Workflow_output_env _
            | Output.Workflow_output_cost_estimation
                Ce.{ outputs = Outputs.Output_cost_estimation _; _ } -> None)
@@ -2892,7 +2910,7 @@ module Comment = struct
            | Output.Workflow_output_run
                Run.
                  {
-                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   workflow_step = Workflow_step.{ type_ = `Run; cmd; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
@@ -2903,38 +2921,67 @@ module Comment = struct
                      key = output_key;
                      text;
                      success;
-                     step_type = type_;
+                     step_type = "run";
                      details = Some (CCString.concat " " cmd);
                    }
            | Output.Workflow_output_oidc
                Oidc.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
-                   outputs = Some Text.{ text; output_key };
-                   success;
-                   _;
-                 }
-           | Output.Workflow_output_drift_create_issue
-               Drift_create_issue.
-                 {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Oidc; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
                  } ->
                Some
                  Workflow_step_output.
-                   { key = output_key; text; success; step_type = type_; details = None }
-           | Output.Workflow_output_run
-               Run.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
-           | Output.Workflow_output_oidc
-               Oidc.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
+                   { key = output_key; text; success; step_type = "oidc"; details = None }
            | Output.Workflow_output_drift_create_issue
                Drift_create_issue.
-                 { workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ } ->
+                 {
+                   workflow_step = Workflow_step.{ type_ = `Drift_create_issue; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
                Some
                  Workflow_step_output.
-                   { key = None; text = ""; success; step_type = type_; details = None }
+                   {
+                     key = output_key;
+                     text;
+                     success;
+                     step_type = "drift-create-issue";
+                     details = None;
+                   }
+           | Output.Workflow_output_run
+               Run.{ workflow_step = Workflow_step.{ type_ = `Run; _ }; outputs = None; success; _ }
+             ->
+               Some
+                 Workflow_step_output.
+                   { key = None; text = ""; success; step_type = "run"; details = None }
+           | Output.Workflow_output_oidc
+               Oidc.
+                 { workflow_step = Workflow_step.{ type_ = `Oidc; _ }; outputs = None; success; _ }
+             ->
+               Some
+                 Workflow_step_output.
+                   { key = None; text = ""; success; step_type = "oidc"; details = None }
+           | Output.Workflow_output_drift_create_issue
+               Drift_create_issue.
+                 {
+                   workflow_step = Workflow_step.{ type_ = `Drift_create_issue; _ };
+                   outputs = None;
+                   success;
+                   _;
+                 } ->
+               Some
+                 Workflow_step_output.
+                   {
+                     key = None;
+                     text = "";
+                     success;
+                     step_type = "drift-create-issue";
+                     details = None;
+                   }
            | Output.Workflow_output_env _ -> None)
 
     let workflow_output_texts outputs =
@@ -2951,7 +2998,7 @@ module Comment = struct
            | Output.Workflow_output_run
                Run.
                  {
-                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   workflow_step = Workflow_step.{ type_ = `Run; cmd; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
@@ -2962,50 +3009,62 @@ module Comment = struct
                      key = output_key;
                      text;
                      success;
-                     step_type = type_;
+                     step_type = "run";
                      details = Some (CCString.concat " " cmd);
                    };
                ]
            | Output.Workflow_output_oidc
                Oidc.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
-                   outputs = Some Text.{ text; output_key };
-                   success;
-                   _;
-                 }
-           | Output.Workflow_output_init
-               Init.
-                 {
-                   workflow_step = Workflow_step.{ type_; _ };
-                   outputs = Some Text.{ text; output_key };
-                   success;
-                   _;
-                 }
-           | Output.Workflow_output_plan
-               Plan.
-                 {
-                   workflow_step = Workflow_step.{ type_; _ };
-                   outputs = Some (Plan.Outputs.Output_text Text.{ text; output_key });
-                   success;
-                   _;
-                 }
-           | Output.Workflow_output_apply
-               Apply.
-                 {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Oidc; _ };
                    outputs = Some Text.{ text; output_key };
                    success;
                    _;
                  } ->
                [
                  Workflow_step_output.
-                   { step_type = type_; text; key = output_key; success; details = None };
+                   { step_type = "oidc"; text; key = output_key; success; details = None };
+               ]
+           | Output.Workflow_output_init
+               Init.
+                 {
+                   workflow_step = Workflow_step.{ type_ = `Init; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   { step_type = "init"; text; key = output_key; success; details = None };
                ]
            | Output.Workflow_output_plan
                Plan.
                  {
-                   workflow_step = Workflow_step.{ type_; _ };
+                   workflow_step = Workflow_step.{ type_ = `Plan; _ };
+                   outputs = Some (Plan.Outputs.Output_text Text.{ text; output_key });
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   { step_type = "plan"; text; key = output_key; success; details = None };
+               ]
+           | Output.Workflow_output_apply
+               Apply.
+                 {
+                   workflow_step = Workflow_step.{ type_ = `Apply; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   { step_type = "apply"; text; key = output_key; success; details = None };
+               ]
+           | Output.Workflow_output_plan
+               Plan.
+                 {
+                   workflow_step = Workflow_step.{ type_ = `Plan; _ };
                    outputs = Some (Plan.Outputs.Output_plan Output_plan.{ plan; plan_text; _ });
                    success;
                    _;
@@ -3013,14 +3072,14 @@ module Comment = struct
                [
                  Workflow_step_output.
                    {
-                     step_type = type_;
+                     step_type = "plan";
                      text = plan_text;
                      key = Some "plan_text";
                      success;
                      details = None;
                    };
                  Workflow_step_output.
-                   { step_type = type_; text = plan; key = Some "plan"; success; details = None };
+                   { step_type = "plan"; text = plan; key = Some "plan"; success; details = None };
                ]
            | Output.Workflow_output_run _
            | Output.Workflow_output_oidc _
@@ -3506,16 +3565,6 @@ module Comment = struct
              "DRIFT_TAG_QUERY_ERR"
              Tmpl.repo_config_err_depends_on_err
              kv
-    | `Drift_schedule_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("schedule", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "DRIFT_SCHEDULE_ERR"
-             Tmpl.repo_config_err_drift_schedule_err
-             kv
     | `Drift_tag_query_err (q, err) ->
         let kv = Snabela.Kv.(Map.of_list [ ("query", string q); ("error", string err) ]) in
         Abbs_future_combinators.Result.ignore
@@ -3536,36 +3585,6 @@ module Comment = struct
              "GLOB_PARSE_ERR"
              Tmpl.repo_config_err_glob_parse_err
              kv
-    | `Hooks_unknown_run_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "HOOKS_UNKNOWN_RUN_ON_ERR"
-             Tmpl.repo_config_err_hooks_unknown_run_on_err
-             kv
-    | `Hooks_unknown_visible_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "HOOKS_UNKNOWN_VISIBLE_ON_ERR"
-             Tmpl.repo_config_err_hooks_unknown_visible_on_err
-             kv
-    | `Merge_strategy_parse_err s ->
-        let kv = `Assoc [ ("strategy", `String s) ] in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish_jinja
-             ~request_id
-             client
-             pull_request
-             "MERGE_STRATEGY_PARSE_ERR"
-             Tmpl.merge_strategy_parse_err
-             kv
     | `Pattern_parse_err s ->
         let kv = Snabela.Kv.(Map.of_list [ ("pattern", string s) ]) in
         Abbs_future_combinators.Result.ignore
@@ -3576,17 +3595,6 @@ module Comment = struct
              "PATTERN_PARSE_ERR"
              Tmpl.repo_config_err_pattern_parse_err
              kv
-    | `Unknown_lock_policy_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("lock_policy", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "UNKNOWN_LOCK_POLICY_ERR"
-             Tmpl.repo_config_err_unknown_lock_policy_err
-             kv
-    | `Unknown_plan_mode_err s -> assert false
     | `Window_parse_timezone_err tz ->
         let kv = Snabela.Kv.(Map.of_list [ ("tz", string tz) ]) in
         Abbs_future_combinators.Result.ignore
@@ -3596,46 +3604,6 @@ module Comment = struct
              pull_request
              "WINDOW_PARSE_TIMEZONE_ERR"
              Tmpl.repo_config_err_window_parse_timezone_err
-             kv
-    | `Workflows_apply_unknown_run_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "WORKFLOWS_APPLY_UNKNOWN_RUN_ON_ERR"
-             Tmpl.repo_config_err_workflows_apply_unknown_run_on_err
-             kv
-    | `Workflows_apply_unknown_visible_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "WORKFLOWS_APPLY_UNKNOWN_VISIBLE_ON_ERR"
-             Tmpl.repo_config_err_workflows_apply_unknown_visible_on_err
-             kv
-    | `Workflows_plan_unknown_run_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "WORKFLOWS_PLAN_UNKNOWN_RUN_ON_ERR"
-             Tmpl.repo_config_err_workflows_plan_unknown_run_on_err
-             kv
-    | `Workflows_plan_unknown_visible_on_err s ->
-        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
-        Abbs_future_combinators.Result.ignore
-        @@ Gcm_api.apply_template_and_publish
-             ~request_id
-             client
-             pull_request
-             "WORKFLOWS_PLAN_UNKNOWN_VISIBLE_ON_ERR"
-             Tmpl.repo_config_err_workflows_plan_unknown_visible_on_err
              kv
     | `Workflows_tag_query_parse_err (q, err) ->
         let kv = Snabela.Kv.(Map.of_list [ ("query", string q); ("error", string err) ]) in
@@ -5761,6 +5729,9 @@ module Stacks = struct
         db
         (Sql.select_dirspace_states ())
         ~f:(fun dir workspace state ->
+          let state =
+            CCResult.get_or_failwith @@ Terrat_api_components_stack_state.of_yojson (`String state)
+          in
           { Terrat_vcs_stacks.Dirspace_state.dirspace = { Terrat_dirspace.dir; workspace }; state })
         (CCInt64.of_int repo_id)
         (CCInt64.of_int pull_request_id)
@@ -5874,7 +5845,7 @@ module Job_context = struct
         let module O = Terrat_job_type_kind in
         let module Kd = Terrat_job_type_kind_drift in
         CCOption.map (function K.Drift { reconcile } ->
-            O.Kind_drift { Kd.reconcile; type_ = "drift" })
+            O.Kind_drift { Kd.reconcile; type_ = `Drift })
 
       let json_to_kind =
         let module K = Terrat_job_context.Job.Type_.Kind in
@@ -5890,28 +5861,28 @@ module Job_context = struct
           | T.Apply { tag_query; kind; force } ->
               Jt.Type.Apply
                 {
-                  Jt.Apply.type_ = "apply";
+                  Jt.Apply.type_ = `Apply;
                   tag_query = Some (Terrat_tag_query.to_string tag_query);
                   kind = kind_to_json kind;
                   force;
                 }
           | T.Autoapply ->
               Jt.Type.Apply
-                { Jt.Apply.type_ = "apply"; tag_query = None; kind = None; force = false }
-          | T.Autoplan -> Jt.Type.Plan { Jt.Plan.type_ = "plan"; tag_query = None; kind = None }
+                { Jt.Apply.type_ = `Apply; tag_query = None; kind = None; force = false }
+          | T.Autoplan -> Jt.Type.Plan { Jt.Plan.type_ = `Plan; tag_query = None; kind = None }
           | T.Plan { tag_query; kind } ->
               Jt.Type.Plan
                 {
-                  Jt.Plan.type_ = "plan";
+                  Jt.Plan.type_ = `Plan;
                   tag_query = Some (Terrat_tag_query.to_string tag_query);
                   kind = kind_to_json kind;
                 }
           | T.Gate_approval { tokens } ->
-              Jt.Type.Gate_approval { Jt.Gate_approval.type_ = "gate-approval"; tokens }
-          | T.Index -> Jt.Type.Index { Jt.Index.type_ = "index" }
-          | T.Repo_config -> Jt.Type.Repo_config { Jt.Repo_config.type_ = "repo-config" }
-          | T.Unlock unlocks -> Jt.Type.Unlock { Jt.Unlock.type_ = "unlock"; ids = unlocks }
-          | T.Push -> Jt.Type.Push { Jt.Push.type_ = "push" })
+              Jt.Type.Gate_approval { Jt.Gate_approval.type_ = `Gate_approval; tokens }
+          | T.Index -> Jt.Type.Index { Jt.Index.type_ = `Index }
+          | T.Repo_config -> Jt.Type.Repo_config { Jt.Repo_config.type_ = `Repo_config }
+          | T.Unlock unlocks -> Jt.Type.Unlock { Jt.Unlock.type_ = `Unlock; ids = unlocks }
+          | T.Push -> Jt.Type.Push { Jt.Push.type_ = `Push })
           %> Jt.Type.to_yojson)
 
       let of_json =
