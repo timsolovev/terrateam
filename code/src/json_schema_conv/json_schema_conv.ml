@@ -276,7 +276,16 @@ module Gen = struct
     let is_valid c =
       (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c = '_'
     in
-    s |> CCString.map (fun c -> if is_valid c then c else '_') |> CCString.capitalize_ascii
+    let name =
+      s |> CCString.map (fun c -> if is_valid c then c else '_') |> CCString.capitalize_ascii
+    in
+    let name =
+      if CCString.length name = 0 then "Empty"
+      else if CCString.for_all (fun c -> c = '_') name then "V_" ^ name
+      else if name.[0] >= '0' && name.[0] <= '9' then "V_" ^ name
+      else name
+    in
+    name
 
   (* It is possible that we will have variant names that conflict when we apply
      [variant_name_of_enum] we might have duplicates, for example foo_bar and
@@ -296,6 +305,11 @@ module Gen = struct
             Hashtbl.replace counts name (c + 1);
             (orig, name ^ "_" ^ string_of_int (c + 1)))
       names
+
+  let variant_name_of_default enum_json s =
+    let enum_strings = Yojson.Safe.Util.filter_string enum_json in
+    let variant_map = unique_variant_names enum_strings in
+    CCList.assoc_opt ~eq:CCString.equal s variant_map
 
   let yojson_key_name name =
     [
