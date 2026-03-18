@@ -159,8 +159,8 @@
       let linkHeaders = api.getLastLinkHeaders();
       while (linkHeaders?.next) {
         const nextUrl = linkHeaders.next.replace('//api/', '/api/');
-        const pageResponse = await api.getFromUrl<{ outputs: unknown[] }>(nextUrl);
-        allStepOutputs = allStepOutputs.concat(pageResponse.outputs || []);
+        const pageResponse = await api.getFromUrl<{ steps: unknown[] }>(nextUrl);
+        allStepOutputs = allStepOutputs.concat(pageResponse.steps || []);
         linkHeaders = api.getLastLinkHeaders();
       }
 
@@ -182,7 +182,7 @@
       // Filter out steps that shouldn't be visible based on visible_on property
       const visibleSteps = (allStepsResponse.outputs || []).filter((output: unknown) => {
         const step = output as OutputItem;
-        
+
         // Apply visibility filtering
         const shouldShow = shouldShowStep(step);
 
@@ -254,13 +254,25 @@
     if (!$selectedInstallation || !run || !output.payload?._originalStep) return;
     
     try {
-      const fullResponse = await api.getWorkManifestOutputs(
+      // Fetch all pages for this step name to find the exact output by idx
+      let allFullOutputs: unknown[] = [];
+      const firstFullResponse = await api.getWorkManifestOutputs(
         $selectedInstallation.id,
         run.id,
-        { q: `step:${output.payload._originalStep}`, lite: false }
+        { q: `step:${output.payload._originalStep}`, limit: 100, lite: false }
       );
-      
-      if (fullResponse.outputs && fullResponse.outputs.length > 0) {
+      allFullOutputs = firstFullResponse.outputs || [];
+
+      // Follow pagination
+      let fullLinkHeaders = api.getLastLinkHeaders();
+      while (fullLinkHeaders?.next) {
+        const nextUrl = fullLinkHeaders.next.replace('//api/', '/api/');
+        const pageResponse = await api.getFromUrl<{ steps: unknown[] }>(nextUrl);
+        allFullOutputs = allFullOutputs.concat(pageResponse.steps || []);
+        fullLinkHeaders = api.getLastLinkHeaders();
+      }
+
+      if (allFullOutputs.length > 0) {
         // Find the specific output that matches the one we clicked on
         interface OutputMatch {
           idx?: number;
@@ -270,15 +282,15 @@
             workspace?: string;
           };
         }
-        
-        const matchingOutput = fullResponse.outputs.find((o: unknown) => {
+
+        const matchingOutput = allFullOutputs.find((o: unknown) => {
           const out = o as OutputMatch;
-          return out.idx === output.idx && 
+          return out.idx === output.idx &&
             out.step === output.step &&
             out.scope?.dir === output.scope?.dir &&
             out.scope?.workspace === output.scope?.workspace;
         });
-        
+
         if (!matchingOutput) {
           console.error('Could not find matching output for the selected step');
           return;
