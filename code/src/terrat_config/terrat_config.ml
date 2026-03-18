@@ -97,6 +97,7 @@ type t = {
   db_host : string;
   db_port : int;
   db_idle_tx_timeout : string;
+  db_lock_timeout : string;
   db_max_pool_size : int;
   db_password : (string[@opaque]);
   db_user : string;
@@ -277,6 +278,7 @@ let create () =
     (CCInt.of_string (CCOption.get_or ~default:"5432" (Sys.getenv_opt "DB_PORT")))
   >>= fun db_port ->
   let db_idle_tx_timeout = CCOption.get_or ~default:"180s" (Sys.getenv_opt "DB_IDLE_TX_TIMEOUT") in
+  let db_lock_timeout = CCOption.get_or ~default:"120s" (Sys.getenv_opt "DB_LOCK_TIMEOUT") in
   env_str "DB_USER"
   >>= fun db_user ->
   env_str "DB_PASS"
@@ -341,6 +343,7 @@ let create () =
       db_host;
       db_port;
       db_idle_tx_timeout;
+      db_lock_timeout;
       db_max_pool_size;
       db_password;
       db_user;
@@ -365,6 +368,7 @@ let db_connect_timeout t = t.db_connect_timeout
 let db_host t = t.db_host
 let db_port t = t.db_port
 let db_idle_tx_timeout t = t.db_idle_tx_timeout
+let db_lock_timeout t = t.db_lock_timeout
 let db_max_pool_size t = t.db_max_pool_size
 let db_password t = t.db_password
 let db_user t = t.db_user

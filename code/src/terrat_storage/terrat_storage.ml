@@ -32,7 +32,7 @@ let metrics Pgsql_pool.Metrics.{ num_conns; idle_conns; queue_time } =
   CCOption.iter (Queue_time_histogram.observe Metrics.queue_time) queue_time;
   Abbs_future_combinators.unit
 
-let on_connect idle_tx_timeout conn =
+let on_connect idle_tx_timeout lock_timeout conn =
   Abbs_future_combinators.ignore
     (let go () =
        let open Fc.Infix_result_monad in
@@ -41,7 +41,9 @@ let on_connect idle_tx_timeout conn =
          Pgsql_io.Typed_sql.(
            sql /^ Printf.sprintf "set idle_in_transaction_session_timeout='%s'" idle_tx_timeout)
        >>= fun () ->
-       Pgsql_io.Prepared_stmt.execute conn Pgsql_io.Typed_sql.(sql /^ "set lock_timeout='60s'")
+       Pgsql_io.Prepared_stmt.execute
+         conn
+         Pgsql_io.Typed_sql.(sql /^ Printf.sprintf "set lock_timeout='%s'" lock_timeout)
        >>= fun () ->
        Pgsql_io.Prepared_stmt.execute
          conn
@@ -73,7 +75,8 @@ let create config =
     ~port:(Terrat_config.db_port config)
     ~max_conns:(Terrat_config.db_max_pool_size config)
     ~connect_timeout:(Terrat_config.db_connect_timeout config)
-    ~on_connect:(on_connect (Terrat_config.db_idle_tx_timeout config))
+    ~on_connect:
+      (on_connect (Terrat_config.db_idle_tx_timeout config) (Terrat_config.db_lock_timeout config))
     (Terrat_config.db config)
   >>= fun storage ->
   Pgsql_pool.with_conn storage ~f:(fun db ->
