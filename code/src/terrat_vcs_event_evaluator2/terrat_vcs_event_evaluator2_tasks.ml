@@ -742,7 +742,7 @@ struct
                   (CCList.length tree));
             let to_yojson = [%to_yojson: string list] in
             let kv = { Terrat_kv_store.db; user_caps = [] } in
-            let chunks = CCList.chunks 5000 tree in
+            let chunks = CCList.chunks 10000 tree in
             Fc.List_result.iter
               ~f:(fun (idx, files) ->
                 let json = to_yojson files in
@@ -803,7 +803,16 @@ struct
                 ^ "."
                 ^ S.Api.Ref.to_string branch_ref )
             in
-            load_cache_repo_tree cache_key s
+            time_it
+              s
+              (fun m log_id time ->
+                m
+                  "%s : LOAD_CACHE_REPO_TREE : repo = %s : branch = %s : time=%f"
+                  log_id
+                  (S.Api.Repo.to_string repo)
+                  (S.Api.Ref.to_string branch_ref)
+                  time)
+              (fun () -> load_cache_repo_tree cache_key s)
             >>= function
             | Some repo_tree -> Abb.Future.return (Ok repo_tree)
             | None ->
