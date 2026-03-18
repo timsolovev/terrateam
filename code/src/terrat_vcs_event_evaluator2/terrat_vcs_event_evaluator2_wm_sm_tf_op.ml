@@ -635,7 +635,7 @@ struct
               dirspaces;
               run_kind = run_kind_str;
               run_kind_data;
-              type_ = "plan";
+              type_ = `Plan;
               result_version;
               protocol_version = Some protocol_version;
               config =
@@ -946,7 +946,7 @@ struct
               changed_dirspaces = changed_dirspaces synthesized_config changes;
               run_kind = run_kind_str;
               run_kind_data;
-              type_ = "apply";
+              type_ = `Apply;
               result_version;
               protocol_version = Some protocol_version;
               config =

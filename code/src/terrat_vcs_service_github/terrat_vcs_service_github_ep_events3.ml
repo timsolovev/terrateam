@@ -154,7 +154,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
                       (Int64.of_int installation.Gw.Installation.id)
                       installation.Gw.Installation.account.Gw.User.login
                       org_id
-                      installation.Gw.Installation.account.Gw.User.type_
+                      (Gw.User.Type.show installation.Gw.Installation.account.Gw.User.type_)
                       (Terrat_config.default_tier @@ P.Api.Config.config config)
                       created.Gw.Installation_created.sender.Gw.User.login
                 | [] -> assert false)

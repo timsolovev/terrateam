@@ -2211,11 +2211,11 @@ struct
                       ~compute_node_id:compute_node.C.id
                       db
                       C.State.Terminated))
-            >>= fun () -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))
+            >>= fun () -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))
         | None -> (
             match work_manifest with
             | { Wm.state = Wm.State.(Completed | Aborted); _ } ->
-                Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))
+                Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))
             | work_manifest -> (
                 let open Abb.Future.Infix_monad in
                 let work_manifest_event =
@@ -2250,12 +2250,11 @@ struct
                               db))
                     >>= function
                     | Some { Cw.work = wm_response; _ } -> Abb.Future.return (Ok wm_response)
-                    | None -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))
-                    )
+                    | None -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done })))
                 | Error (#Builder.err as err) ->
                     (* If anything failed, be sure to return to the querying node to give up. *)
                     Logs.info (fun m -> m "%s : %a" (Builder.log_id s) Builder.pp_err err);
-                    Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))))
+                    Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))))
       in
       let abort_work_manifest s db work_manifest_id run_id =
         let open Irm in
@@ -2353,7 +2352,7 @@ struct
                   context.Tjc.Context.id
                   log_id);
             Fc.to_result @@ Fc.ignore @@ Builder.eval s' Keys.iter_job
-            >>= fun () -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))
+            >>= fun () -> Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))
         | None ->
             Logs.err (fun m -> m "%s : JOB_NOT_FOUND" (Builder.log_id s));
             assert false
@@ -2368,7 +2367,7 @@ struct
           fetch Keys.compute_node
           >>= function
           | { C.state = C.State.Terminated; _ } ->
-              Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))
+              Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))
           | compute_node -> (
               (* TODO: Decouple compute node id and work manifest id *)
               let work_manifest_id = compute_node.C.id in
@@ -2439,7 +2438,7 @@ struct
               | None ->
                   (* If anything failed, be sure to return to the querying node to give up. *)
                   Logs.info (fun m -> m "%s : UNKNOWN_WORK_MANIFEST" (Builder.log_id s));
-                  Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = "done" }))))
+                  Abb.Future.return (Ok (Wmc.Work_manifest_done { Wmd.type_ = `Done }))))
 
     let work_manifest_event_job =
       run ~name:"work_manifest_event_job" (fun s { Bs.Fetcher.fetch } ->

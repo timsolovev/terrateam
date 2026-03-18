@@ -7,16 +7,6 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
   module Evaluator2 = Terrat_vcs_event_evaluator2.Make (P)
 
   module Sql = struct
-    let select_encryption_key () =
-      (* The hex conversion is so that there are no issues with escaping
-     the string *)
-      Pgsql_io.Typed_sql.(
-        sql
-        //
-        (* data *)
-        Ret.u Ret.text CCFun.(Cstruct.of_hex %> CCOption.return)
-        /^ "select encode(data, 'hex') from encryption_keys order by rank limit 1")
-
     let select_running_work_manifest () =
       Pgsql_io.Typed_sql.(
         sql
@@ -58,7 +48,6 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         initiate
 
     let post config storage exec work_manifest_id initiate =
-      let open Abbs_future_combinators.Infix_result_monad in
       Brtl_ep.run_result_json ~f:(fun ctx ->
           (* Initiate isn't called with any auth other than knowing what work
              manifest it's calling more, so enforce that they have access to the
