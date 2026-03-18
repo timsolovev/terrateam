@@ -561,6 +561,47 @@ module Make (S : Terrat_vcs_provider2.S) = struct
         @@ Abb.Future.fork
         @@ run_next_pending_compute ~request_id ~config ~storage ~exec ())
 
+  let run_missing_drift_schedules ?request_id ~config ~storage ~exec () =
+    let open Abb.Future.Infix_monad in
+    let request_id = CCOption.get_lazy CCFun.(Ouuid.v4 %> Uuidm.to_string) request_id in
+    Logs.info (fun m -> m "RUN_MISSING_DRIFT_SCHEDULES : %s" request_id);
+    let run =
+      match Sys.getenv_opt "TERRAT_EVENT_EVALUATOR_MODE" with
+      | None | Some ("" | "new-age") ->
+          let target = Keys.run_missing_drift_schedules in
+          let store = Hmap.empty in
+          with_conn storage ~f:(fun db ->
+              Fc.retry
+                ~f:(fun () ->
+                  Pgsql_io.tx db ~f:(fun () ->
+                      Builder.State.make
+                        ~log_id:request_id
+                        ~config
+                        ~store
+                        ~exec
+                        ~db
+                        ~tasks:(Tasks_branch.tasks tasks)
+                        ()
+                      >>= fun s ->
+                      Logs.info (fun m ->
+                          m "%s : target=%s" (Builder.log_id s) (Hmap.Key.info target));
+                      tx_safe ~request_id @@ Builder.eval s target))
+                ~while_:
+                  (Fc.finite_tries 50 (function
+                    | Ok (`Ok n) -> n > 0
+                    | Ok (`Noop | `Suspend_eval _) | Error _ -> true))
+                ~betwixt:(fun _ -> Fc.unit))
+      | Some _ ->
+          let ctx = Legacy.Ctx.make ~config ~storage ~request_id () in
+          Legacy.run_scheduled_drift ctx >>= fun _ -> Abb.Future.return (Ok (`Ok 0))
+    in
+    Fc.with_finally
+      (fun () -> Fc.ignore @@ log_err ~request_id run)
+      ~finally:(fun () ->
+        Fc.ignore
+        @@ Abb.Future.fork
+        @@ run_next_pending_compute ~request_id ~config ~storage ~exec ())
+
   let work_manifest_result ~request_id ~config ~storage ~exec ~work_manifest_id result =
     let query_work_manifest db =
       Abbs_time_it.run
@@ -815,48 +856,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
       ~finally:(fun () ->
         Fc.ignore
         @@ Abb.Future.fork
-        @@ run_next_pending_compute ~request_id ~config ~storage ~exec ())
-
-  let run_missing_drift_schedules ~config ~storage ~exec () =
-    let open Abb.Future.Infix_monad in
-    let request_id = Uuidm.to_string (Ouuid.v4 ()) in
-    Logs.info (fun m -> m "RUN_MISSING_DRIFT_SCHEDULES : %s" request_id);
-    let run =
-      match Sys.getenv_opt "TERRAT_EVENT_EVALUATOR_MODE" with
-      | None | Some ("" | "new-age") ->
-          let target = Keys.run_missing_drift_schedules in
-          let store = Hmap.empty in
-          with_conn storage ~f:(fun db ->
-              Fc.retry
-                ~f:(fun () ->
-                  Pgsql_io.tx db ~f:(fun () ->
-                      Builder.State.make
-                        ~log_id:request_id
-                        ~config
-                        ~store
-                        ~exec
-                        ~db
-                        ~tasks:(Tasks_branch.tasks tasks)
-                        ()
-                      >>= fun s ->
-                      Logs.info (fun m ->
-                          m "%s : target=%s" (Builder.log_id s) (Hmap.Key.info target));
-                      tx_safe ~request_id @@ Builder.eval s target))
-                ~while_:
-                  (Fc.finite_tries 50 (function
-                    | Ok (`Ok n) -> n > 0
-                    | Ok (`Noop | `Suspend_eval _) | Error _ -> true))
-                ~betwixt:(fun _ -> Fc.unit))
-      | Some _ ->
-          let ctx = Legacy.Ctx.make ~config ~storage ~request_id () in
-          Legacy.run_scheduled_drift ctx >>= fun _ -> Abb.Future.return (Ok (`Ok 0))
-    in
-    Fc.with_finally
-      (fun () -> Fc.ignore @@ log_err ~request_id run)
-      ~finally:(fun () ->
-        Fc.ignore
-        @@ Abb.Future.fork
-        @@ run_next_pending_compute ~request_id ~config ~storage ~exec ())
+        @@ run_missing_drift_schedules ~request_id ~config ~storage ~exec ())
 
   let push ~request_id ~config ~storage ~exec ~account ~repo ~branch ~user () =
     let run =
