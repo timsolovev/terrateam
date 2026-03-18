@@ -143,14 +143,29 @@
     
     try {
       // Load full step data for filtering (All Steps tab needs visible_on metadata)
-      
-      // First, load all step metadata (with full payload) to check visible_on for filtering
-      const allStepsResponse = await api.getWorkManifestOutputs(
-        $selectedInstallation.id, 
+
+      // Fetch all pages of step metadata (with full payload) to check visible_on for filtering
+      let allStepOutputs: unknown[] = [];
+
+      // First page via normal API method
+      const firstResponse = await api.getWorkManifestOutputs(
+        $selectedInstallation.id,
         runId,
         { q: 'not step:tf/cost-estimation', limit: 100, lite: false }
       );
-      
+      allStepOutputs = firstResponse.outputs || [];
+
+      // Follow pagination for remaining pages using full Link header URLs
+      let linkHeaders = api.getLastLinkHeaders();
+      while (linkHeaders?.next) {
+        const nextUrl = linkHeaders.next.replace('//api/', '/api/');
+        const pageResponse = await api.getFromUrl<{ outputs: unknown[] }>(nextUrl);
+        allStepOutputs = allStepOutputs.concat(pageResponse.outputs || []);
+        linkHeaders = api.getLastLinkHeaders();
+      }
+
+      const allStepsResponse = { outputs: allStepOutputs };
+
       interface StepOutput {
         step?: string;
         state?: string;
@@ -1204,7 +1219,7 @@
                       </div>
                     {:else}
                       <div class="p-4 space-y-3">
-                        {#each dirspaceOutputs as output ((output.step || 'unknown') + (output.payload?._loadTimestamp || ''))}
+                        {#each dirspaceOutputs as output (output.idx)}
                           {@const typedOutput = output}
                           {@const displayState = getDisplayState(typedOutput)}
                           <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-3">
@@ -1345,7 +1360,7 @@
                       </div>
                     {:else}
                       <div class="p-4 space-y-3">
-                        {#each dirspaceOutputs as output ((output.step || 'unknown') + (output.payload?._loadTimestamp || ''))}
+                        {#each dirspaceOutputs as output (output.idx)}
                           {@const typedOutput = output}
                           {@const displayState = getDisplayState(typedOutput)}
                           <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-3">
