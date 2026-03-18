@@ -14,31 +14,9 @@ module Metrics = struct
     let help = "Number of seconds that handling an incoming event takes" in
     DefaultHistogram.v ~help ~namespace ~subsystem "events_duration_seconds"
 
-  let events_total_family =
-    let help = "Number of events that the system has received" in
-    Prmths.Counter.v_labels
-      ~label_names:[ "type"; "action" ]
-      ~help
-      ~namespace
-      ~subsystem
-      "events_total"
-
-  let comment_events_total action = Prmths.Counter.labels events_total_family [ "comment"; action ]
-  let pr_events_total action = Prmths.Counter.labels events_total_family [ "pr"; action ]
-
-  let installation_events_total typ =
-    Prmths.Counter.labels events_total_family [ "installation"; typ ]
-
   let events_concurrent =
     let help = "Number of events being handled right now" in
     Prmths.Gauge.v ~help ~namespace ~subsystem "events_concurrent"
-
-  let pgsql_pool_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"pgsql_pool"
-  let pgsql_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"pgsql"
-  let gitlab_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"gitlab"
-
-  let gitlab_webhook_decode_errors_total =
-    Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"gitlab_webhook_decode"
 end
 
 module Sql = struct
@@ -71,15 +49,6 @@ module Sql = struct
       /% Var.bigint "installation_id"
       /% Var.text "owner"
       /% Var.text "name")
-
-  let select_work_manifest_by_run_id =
-    Pgsql_io.Typed_sql.(
-      sql
-      //
-      (* id *)
-      Ret.uuid
-      /^ "select id from work_manifests where run_id = $run_id"
-      /% Var.text "run_id")
 end
 
 module Make (P : Terrat_vcs_provider2_gitlab.S) = struct

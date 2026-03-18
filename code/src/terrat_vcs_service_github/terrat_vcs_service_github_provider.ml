@@ -2639,108 +2639,6 @@ end
 
 module Comment = struct
   module Result = struct
-    let steps_has_changes steps =
-      let module P = struct
-        type t = { has_changes : bool [@default false] } [@@deriving of_yojson { strict = false }]
-      end in
-      let module O = Terrat_api_components.Workflow_step_output in
-      match
-        CCList.find_map
-          (function
-            | {
-                O.step = "tf/plan" | "pulumi/plan" | "custom/plan" | "fly/plan";
-                payload;
-                success;
-                _;
-              } -> (
-                match P.of_yojson (O.Payload.to_yojson payload) with
-                | Ok { P.has_changes } -> Some has_changes
-                | _ -> None)
-            | _ -> None)
-          steps
-      with
-      | Some has_changes -> has_changes
-      | None -> false
-
-    let steps_success steps =
-      let module O = Terrat_api_components.Workflow_step_output in
-      CCList.for_all (fun { O.success; ignore_errors; _ } -> success || ignore_errors) steps
-
-    module Publisher2 = struct
-      let rec iterate_comment_posts
-          ?(view = `Full)
-          request_id
-          account_status
-          config
-          client
-          is_layered_run
-          remaining_layers
-          results
-          pull_request
-          work_manifest =
-        let module Wm = Terrat_work_manifest3 in
-        let module R2 = Terrat_api_components.Work_manifest_tf_operation_result2 in
-        let module Publisher_tools = Terrat_vcs_github_comment_publishers.Publisher_tools in
-        let module Comment_api = Terrat_vcs_github_comment_publishers.Comment_api in
-        let by_scope = By_scope.group results.R2.steps in
-        let gates = results.R2.gates in
-        let dirspaces =
-          CCList.filter
-            (function
-              | Scope.Dirspace _, _ -> true
-              | _ -> false)
-            by_scope
-        in
-        let output =
-          Publisher_tools.create_run_output
-            ~view
-            request_id
-            account_status
-            config
-            is_layered_run
-            remaining_layers
-            by_scope
-            gates
-            work_manifest
-        in
-        let open Abb.Future.Infix_monad in
-        Api.comment_on_pull_request ~request_id client pull_request output
-        >>= function
-        | Ok comment_id -> Abb.Future.return (Ok comment_id)
-        | Error `Error -> (
-            match (view, dirspaces) with
-            | _, [] -> assert false
-            | `Full, _ ->
-                iterate_comment_posts
-                  ~view:`Compact
-                  request_id
-                  account_status
-                  config
-                  client
-                  is_layered_run
-                  remaining_layers
-                  results
-                  pull_request
-                  work_manifest
-            | `Compact, _ ->
-                let kv =
-                  Snabela.Kv.(
-                    Map.of_list
-                      (CCOption.map_or
-                         ~default:[]
-                         (fun work_manifest_url ->
-                           [ ("work_manifest_url", string (Uri.to_string work_manifest_url)) ])
-                         (Ui.work_manifest_url config work_manifest.Wm.account work_manifest)))
-                in
-                Comment_api.apply_template_and_publish
-                  ~request_id
-                  client
-                  pull_request
-                  "ITERATE_COMMENT_POST2"
-                  Tmpl.comment_too_large
-                  kv)
-    end
-
     module Publisher3 = struct
       module Gcm = Terrat_vcs_comment.Make (Terrat_vcs_github_comment.S)
 
@@ -4956,15 +4854,6 @@ module Work_manifest = struct
              |> CCString.concat "\n")
            (Terrat_files_github_sql.read fname))
 
-    let policy =
-      let module P = struct
-        type t = Terrat_base_repo_config_v1.Access_control.Match_list.t [@@deriving yojson]
-      end in
-      CCFun.(
-        CCOption.wrap Yojson.Safe.from_string
-        %> CCOption.map P.of_yojson
-        %> CCOption.flat_map CCResult.to_opt)
-
     let insert_work_manifest_query = read "insert_work_manifest.sql"
 
     let insert_work_manifest () =
@@ -5747,18 +5636,6 @@ end
 
 module Job_context = struct
   module Tjc = Terrat_job_context
-
-  module Tag_query = struct
-    type t = Terrat_tag_query.t
-
-    let to_yojson = CCFun.(Terrat_tag_query.to_string %> [%to_yojson: string])
-
-    let of_yojson json =
-      let open CCResult.Infix in
-      [%of_yojson: string] json
-      >>= fun tag_query ->
-      CCResult.map_err Terrat_tag_query_ast.show_err (Terrat_tag_query.of_string tag_query)
-  end
 
   module Sql = struct
     let read fname =

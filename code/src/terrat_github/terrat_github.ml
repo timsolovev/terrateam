@@ -392,7 +392,6 @@ let get_installation_repos client =
 
 let list_workflows ~owner ~repo client =
   Prmths.Counter.inc_one (Metrics.fn_call_total "list_workflow");
-  let open Abbs_future_combinators.Infix_result_monad in
   Githubc2_abb.fold
     client
     ~init:[]

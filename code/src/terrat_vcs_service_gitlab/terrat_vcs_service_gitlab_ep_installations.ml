@@ -42,9 +42,6 @@ module Sql = struct
       fname
       (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
 
-  let select_user_installations () =
-    Pgsql_io.Typed_sql.(sql /^ read "select_user_installations.sql" /% Var.uuid "user_id")
-
   let upsert_user_installations () =
     Pgsql_io.Typed_sql.(
       sql

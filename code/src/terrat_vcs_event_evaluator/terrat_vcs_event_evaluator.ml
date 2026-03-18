@@ -1938,8 +1938,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   layer
                   |> CCList.filter (Terrat_change_match3.match_tag_query ~tag_query)
                   |> CCList.filter
-                       (fun
-                         ({ Dc.stack_config = { S.rules = { Oc.apply_after; _ }; _ }; _ } as dc) ->
+                       (fun { Dc.stack_config = { S.rules = { Oc.apply_after; _ }; _ }; _ } ->
                          not
                            (CCList.exists
                               (fun { Dc.stack_name; _ } ->
@@ -3971,7 +3970,6 @@ module Make (S : Terrat_vcs_provider2.S) = struct
         (Event.repo state.State.event)
         all_dirspaceflows
       >>= fun () ->
-      let all_dirspaceflows = strip_lock_branch_target all_dirspaceflows in
       Abb.Future.return (dirspaceflows_of_changes repo_config passed_dirspaces)
       >>= fun dirspaceflows ->
       let denied_dirspaces =
@@ -5317,7 +5315,6 @@ module Make (S : Terrat_vcs_provider2.S) = struct
             (Event.repo state.State.event)
             all_dirspaceflows
           >>= fun () ->
-          let all_dirspaceflows = H.strip_lock_branch_target all_dirspaceflows in
           Dv.client ctx state
           >>= fun client ->
           (if CCList.is_empty matches.Dv.Matches.all_unapplied_matches then
