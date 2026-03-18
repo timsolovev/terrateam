@@ -18,22 +18,23 @@ module Conn = struct
   type t = {
     conn : Pgsql_io.t;
     last_used : float;
+    uses : int;
   }
 end
 
 module Msg = struct
   type t =
     | Get of {
-        promise : (Pgsql_io.t, unit) result Abb.Future.Promise.t;
+        promise : (Conn.t, unit) result Abb.Future.Promise.t;
         queued_at : float;
       }
     | Conn_timeout_check
-    | Return of Pgsql_io.t
+    | Return of Conn.t
 end
 
 module Waiting = struct
   type t = {
-    promise : (Pgsql_io.t, unit) result Abb.Future.Promise.t;
+    promise : (Conn.t, unit) result Abb.Future.Promise.t;
     queued_at : float;
   }
 end
@@ -49,6 +50,7 @@ module Server = struct
     host : string;
     user : string;
     max_conns : int;
+    max_uses : int;
     connect_timeout : float;
     database : string;
     num_conns : int;
@@ -72,19 +74,21 @@ module Server = struct
      case a waiting future was terminated while waiting. *)
   let rec take_until_undet waiting =
     match Queue.take_opt waiting with
-    | Some { Waiting.promise; _ } as w when Abb.Future.(state (Promise.future promise)) = `Undet ->
+    | Some { Waiting.promise; queued_at = _ } as w
+      when Abb.Future.(state (Promise.future promise)) = `Undet ->
         w
     | Some _ -> take_until_undet waiting
     | None -> None
 
-  let verify_conn { Conn.conn; _ } =
+  let verify_conn { Conn.conn; last_used = _; uses } =
     let open Abb.Future.Infix_monad in
     (* Don't let a ping eat up the whole pool indefinitely, timeout so we can at
        least make progress, even if it's slow.  *)
     Abbs_future_combinators.timeout ~timeout:(Abb.Sys.sleep ping_timeout) (Pgsql_io.ping conn)
     >>= function
     | `Ok true ->
-        Abb.Sys.monotonic () >>= fun last_used -> Abb.Future.return (Some { Conn.conn; last_used })
+        Abb.Sys.monotonic ()
+        >>= fun last_used -> Abb.Future.return (Some { Conn.conn; last_used; uses })
     | `Ok false | `Timeout -> Pgsql_io.destroy conn >>= fun () -> Abb.Future.return None
 
   let verify_conns t =
@@ -130,13 +134,13 @@ module Server = struct
           }
         >>= fun () ->
         match t.conns with
-        | ({ Conn.conn; last_used } as c) :: cs
+        | ({ Conn.conn; last_used; uses = _ } as c) :: cs
           when Pgsql_io.connected conn && now -. last_used >= Duration.to_f t.idle_check -> (
             (* Verify the connection is still alive, and if so give it back.
                Otherwise, remove it and  handle the message again. *)
             verify_conn c
             >>= function
-            | Some { Conn.conn; _ } ->
+            | Some conn ->
                 Abb.Future.Promise.set promise (Ok conn)
                 >>= fun () -> loop { t with conns = cs } w r
             | None ->
@@ -145,8 +149,8 @@ module Server = struct
                   w
                   r
                   (`Ok (Msg.Get { promise; queued_at })))
-        | { Conn.conn; _ } :: cs when Pgsql_io.connected conn ->
-            Abb.Future.Promise.set promise (Ok conn) >>= fun () -> loop { t with conns = cs } w r
+        | ({ Conn.conn; last_used = _; uses = _ } as c) :: cs when Pgsql_io.connected conn ->
+            Abb.Future.Promise.set promise (Ok c) >>= fun () -> loop { t with conns = cs } w r
         | _ :: _ ->
             (* If one connection is disconnected, maybe all of them are, so
                verify all the connections before handing out the next one.
@@ -168,27 +172,47 @@ module Server = struct
             | `Ok (Ok conn) ->
                 t.on_connect conn
                 >>= fun () ->
-                Abb.Future.Promise.set promise (Ok conn)
+                Abb.Sys.monotonic ()
+                >>= fun last_used ->
+                let c = { Conn.conn; last_used; uses = 0 } in
+                Abb.Future.Promise.set promise (Ok c)
                 >>= fun () -> loop { t with num_conns = t.num_conns + 1 } w r
             | `Ok (Error (#Pgsql_io.create_err as err)) ->
                 Logs.err (fun m -> m "ERROR : %s" (Pgsql_io.show_create_err err));
                 Abb.Future.Promise.set promise (Error ()) >>= fun () -> loop t w r
             | `Timeout -> Abb.Future.Promise.set promise (Error ()) >>= fun () -> loop t w r))
-    | `Ok (Msg.Return conn) when Pgsql_io.connected conn -> (
+    | `Ok (Msg.Return conn) when Pgsql_io.connected conn.Conn.conn -> (
+        let conn = { conn with Conn.uses = conn.Conn.uses + 1 } in
+        let exceeded_max_uses = conn.Conn.uses >= t.max_uses in
         t.metrics
           { Metrics.num_conns = t.num_conns; idle_conns = CCList.length t.conns; queue_time = None }
         >>= fun () ->
-        match take_until_undet t.waiting with
-        | Some { Waiting.promise; _ } ->
-            Abb.Future.Promise.set promise (Ok conn) >>= fun () -> loop t w r
-        | None ->
-            Abb.Sys.monotonic ()
-            >>= fun last_used -> loop { t with conns = { Conn.conn; last_used } :: t.conns } w r)
+        if exceeded_max_uses then (
+          Logs.debug (fun m ->
+              m
+                "RECYCLE : %s : uses=%d"
+                (Uuidm.to_string @@ Pgsql_io.id conn.Conn.conn)
+                conn.Conn.uses);
+          Pgsql_io.destroy conn.Conn.conn
+          >>= fun () ->
+          let t = { t with num_conns = t.num_conns - 1 } in
+          match take_until_undet t.waiting with
+          | Some { Waiting.promise; queued_at } ->
+              handle_msg t w r (`Ok (Msg.Get { promise; queued_at }))
+          | None -> loop t w r)
+        else
+          match take_until_undet t.waiting with
+          | Some { Waiting.promise; queued_at = _ } ->
+              Abb.Future.Promise.set promise (Ok conn) >>= fun () -> loop t w r
+          | None ->
+              Abb.Sys.monotonic ()
+              >>= fun last_used ->
+              loop { t with conns = { conn with Conn.last_used } :: t.conns } w r)
     | `Ok (Msg.Return conn) -> (
         t.metrics
           { Metrics.num_conns = t.num_conns; idle_conns = CCList.length t.conns; queue_time = None }
         >>= fun () ->
-        Pgsql_io.destroy conn
+        Pgsql_io.destroy conn.Conn.conn
         >>= fun () ->
         verify_conns { t with num_conns = t.num_conns - 1 }
         >>= fun t ->
@@ -211,7 +235,7 @@ module Server = struct
         Abb.Sys.monotonic ()
         >>= fun now ->
         Abbs_future_combinators.List.fold_left
-          ~f:(fun t ({ Conn.conn; last_used } as c) ->
+          ~f:(fun t ({ Conn.conn; last_used; uses = _ } as c) ->
             let age = now -. last_used in
             Logs.debug (fun m -> m "CONN_TIMEOUT_CHECK : TEST : age=%0.0f" age);
             if age >= conn_timeout_check then
@@ -225,7 +249,8 @@ module Server = struct
         loop t w r
     | `Closed ->
         Abbs_future_combinators.List.iter
-          ~f:(fun { Conn.conn; _ } -> Abbs_future_combinators.ignore (Pgsql_io.destroy conn))
+          ~f:(fun { Conn.conn; last_used = _; uses = _ } ->
+            Abbs_future_combinators.ignore (Pgsql_io.destroy conn))
           t.conns
 
   let run t w r =
@@ -239,6 +264,7 @@ let create
     ?(metrics = fun _ -> Abbs_future_combinators.unit)
     ?(idle_check = Duration.of_min 5)
     ?(conn_timeout_check = Duration.of_min 1)
+    ?(max_uses = 10)
     ?tls_config
     ?passwd
     ?port
@@ -260,6 +286,7 @@ let create
       host;
       user;
       max_conns;
+      max_uses;
       connect_timeout;
       database;
       num_conns = 0;
@@ -285,14 +312,14 @@ let with_conn t ~f =
       | `Closed -> raise Pgsql_pool_closed)
     (function
       | Ok conn ->
-          Logs.debug (fun m -> m "GET : %s" (Uuidm.to_string @@ Pgsql_io.id conn));
-          f conn
+          Logs.debug (fun m -> m "GET : %s" (Uuidm.to_string @@ Pgsql_io.id conn.Conn.conn));
+          f conn.Conn.conn
       | Error () -> Abb.Future.return (Error `Pgsql_pool_error))
     ~finally:(function
       | Ok conn -> (
-          Logs.debug (fun m -> m "RETURN : %s" (Uuidm.to_string @@ Pgsql_io.id conn));
+          Logs.debug (fun m -> m "RETURN : %s" (Uuidm.to_string @@ Pgsql_io.id conn.Conn.conn));
           Abbs_channel.send t (Msg.Return conn)
           >>= function
           | `Ok () -> Abb.Future.return ()
-          | `Closed -> Abbs_future_combinators.ignore (Pgsql_io.destroy conn))
+          | `Closed -> Abbs_future_combinators.ignore (Pgsql_io.destroy conn.Conn.conn))
       | Error () -> Abb.Future.return ())
