@@ -251,9 +251,6 @@ module Make (S : Terrat_vcs_provider2.S) = struct
 
   let built_repo_tree_branch : string list Key.t = Hmap.Key.create "built_repo_tree_branch"
 
-  (* Repo tree dest branch *)
-  let repo_tree_dest_branch : string list Key.t = Hmap.Key.create "repo_tree_dest_branch"
-
   let repo_tree_dest_branch_wm_completed :
       ( S.Api.Account.t,
         ((unit, unit) S.Api.Pull_request.t, S.Api.Repo.t) Terrat_vcs_provider2.Target.t )
@@ -312,9 +309,6 @@ module Make (S : Terrat_vcs_provider2.S) = struct
 
   let synthesized_config : Terrat_change_match3.Config.t Key.t =
     Hmap.Key.create "synthesized_config"
-
-  let dest_branch_dirspaces : Terrat_api_components.Work_manifest_dir.t list Key.t =
-    Hmap.Key.create "dest_branch_dirspaces"
 
   let store_stacks : unit Key.t = Hmap.Key.create "store_stacks"
 
