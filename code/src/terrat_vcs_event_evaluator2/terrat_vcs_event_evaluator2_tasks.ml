@@ -93,16 +93,40 @@ struct
       let kv = { Terrat_kv_store.db; user_caps = [] } in
       Terrat_kv_store.get ~key:cache_key kv
       >>= function
-      | Ok _ as r -> Abb.Future.return r
+      | Ok (Some record) -> (
+          match Terrat_kv_store.Record.data record with
+          | `String sha256_hex -> (
+              let data_cache_key = (fst cache_key ^ ".data", sha256_hex) in
+              Terrat_kv_store.get ~key:data_cache_key kv
+              >>= function
+              | Ok _ as r -> Abb.Future.return r
+              | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
+          | _ -> Abb.Future.return (Ok None))
+      | Ok None -> Abb.Future.return (Ok None)
       | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err)
 
     let store ~cache_key v db =
       let open Abb.Future.Infix_monad in
       let kv = { Terrat_kv_store.db; user_caps = [] } in
-      Terrat_kv_store.set ~key:cache_key v kv
+      let json_str = Yojson.Safe.to_string (Yojson.Safe.sort v) in
+      let sha256_hex = Sha256.(to_hex (string json_str)) in
+      let data_cache_key = (fst cache_key ^ ".data", sha256_hex) in
+      Terrat_kv_store.get ~key:data_cache_key kv
+      >>= (function
+      | Ok (Some _) -> Abb.Future.return (Ok ())
+      | Ok None -> (
+          Terrat_kv_store.set ~key:data_cache_key v kv
+          >>= function
+          | Ok _ -> Abb.Future.return (Ok ())
+          | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
+      | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
       >>= function
-      | Ok _ as r -> Abb.Future.return r
-      | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err)
+      | Ok () -> (
+          Terrat_kv_store.set ~key:cache_key (`String sha256_hex) kv
+          >>= function
+          | Ok _ -> Abb.Future.return (Ok ())
+          | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
+      | Error _ as err -> Abb.Future.return err
 
     let derive
         ~cache_key
@@ -729,58 +753,101 @@ struct
             s
             fetcher)
 
+    let compute_data_cache_key tree =
+      let sorted_tree = CCList.sort CCString.compare tree in
+      let tree_str = CCString.concat "," sorted_tree in
+      let sha256_hex = Sha256.(to_hex (string tree_str)) in
+      (("cache2.repo_tree.data", sha256_hex), sha256_hex)
+
+    let store_data_chunks ~chunk_size kv data_cache_key tree =
+      let open Abb.Future.Infix_monad in
+      let to_yojson = [%to_yojson: string list] in
+      Terrat_kv_store.get ~key:data_cache_key kv
+      >>= function
+      | Ok (Some _) -> Abb.Future.return (Ok ())
+      | Ok None ->
+          let chunks = CCList.chunks chunk_size tree in
+          Fc.List_result.iter
+            ~f:(fun (idx, files) ->
+              let json = to_yojson files in
+              Fc.Result.ignore @@ Terrat_kv_store.set ~key:data_cache_key ~idx json kv
+              >>= function
+              | Ok _ as r -> Abb.Future.return r
+              | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
+            (CCList.combine (CCList.range' 0 (CCList.length chunks)) chunks)
+      | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err)
+
+    let store_ref_key kv cache_key sha256_hex =
+      let open Abb.Future.Infix_monad in
+      Fc.Result.ignore @@ Terrat_kv_store.set ~key:cache_key (`String sha256_hex) kv
+      >>= function
+      | Ok _ -> Abb.Future.return (Ok ())
+      | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err)
+
+    let load_data_chunks kv data_cache_key =
+      let open Abb.Future.Infix_monad in
+      Terrat_kv_store.iter ~prefix:true ~limit:100000 ~key:data_cache_key kv
+      >>= function
+      | Ok [] -> Abb.Future.return (Ok None)
+      | Ok records ->
+          Abb.Future.return
+            (Ok
+               (Some
+                  (CCList.flat_map
+                     (fun r ->
+                       CCResult.get_or_failwith
+                       @@ [%of_yojson: string list]
+                       @@ Terrat_kv_store.Record.data r)
+                     records)))
+      | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err)
+
+    let store_cache_repo_tree ~log_name ~chunk_size cache_key s tree =
+      Builder.run_db s ~f:(fun db ->
+          let open Abb.Future.Infix_monad in
+          let data_cache_key, sha256_hex = compute_data_cache_key tree in
+          Logs.info (fun m ->
+              m
+                "%s : %s : STORE : cache_key = %a : data_cache_key = %a : num_files=%d"
+                (Builder.log_id s)
+                log_name
+                Cache.Key.pp
+                cache_key
+                Cache.Key.pp
+                data_cache_key
+                (CCList.length tree));
+          let kv = { Terrat_kv_store.db; user_caps = [] } in
+          store_data_chunks ~chunk_size kv data_cache_key tree
+          >>= function
+          | Ok () -> store_ref_key kv cache_key sha256_hex
+          | Error _ as err -> Abb.Future.return err)
+
+    let load_cache_repo_tree ~log_name cache_key s =
+      let open Irm in
+      Builder.run_db s ~f:(fun db ->
+          let open Abb.Future.Infix_monad in
+          let kv = { Terrat_kv_store.db; user_caps = [] } in
+          Terrat_kv_store.get ~key:cache_key kv
+          >>= function
+          | Ok None -> Abb.Future.return (Ok None)
+          | Ok (Some record) -> (
+              match Terrat_kv_store.Record.data record with
+              | `String sha256_hex ->
+                  let data_cache_key = ("cache2.repo_tree.data", sha256_hex) in
+                  load_data_chunks kv data_cache_key
+              | _ -> Abb.Future.return (Ok None))
+          | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
+      >>= fun files ->
+      Logs.info (fun m ->
+          m
+            "%s : %s : LOAD : cache_key = %a : num_files=%d"
+            (Builder.log_id s)
+            log_name
+            Cache.Key.pp
+            cache_key
+            (CCOption.map_or ~default:0 CCList.length files));
+      Abb.Future.return (Ok files)
+
     let repo_tree_branch =
-      let store_cache_repo_tree cache_key s tree =
-        Builder.run_db s ~f:(fun db ->
-            let open Abb.Future.Infix_monad in
-            Logs.info (fun m ->
-                m
-                  "%s : CACHE_REPO_TREE : STORE : cache_key = %a : num_files=%d"
-                  (Builder.log_id s)
-                  Cache.Key.pp
-                  cache_key
-                  (CCList.length tree));
-            let to_yojson = [%to_yojson: string list] in
-            let kv = { Terrat_kv_store.db; user_caps = [] } in
-            let chunks = CCList.chunks 10000 tree in
-            Fc.List_result.iter
-              ~f:(fun (idx, files) ->
-                let json = to_yojson files in
-                Fc.Result.ignore @@ Terrat_kv_store.set ~key:cache_key ~idx json kv
-                >>= function
-                | Ok _ as r -> Abb.Future.return r
-                | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
-              (CCList.combine (CCList.range' 0 (CCList.length chunks)) chunks))
-      in
-      let load_cache_repo_tree cache_key s =
-        let open Irm in
-        Builder.run_db s ~f:(fun db ->
-            let open Abb.Future.Infix_monad in
-            let kv = { Terrat_kv_store.db; user_caps = [] } in
-            Terrat_kv_store.iter ~prefix:true ~limit:100000 ~key:cache_key kv
-            >>= function
-            | Ok [] -> Abb.Future.return (Ok None)
-            | Ok records ->
-                Abb.Future.return
-                  (Ok
-                     (Some
-                        (CCList.flat_map
-                           (fun r ->
-                             CCResult.get_or_failwith
-                             @@ [%of_yojson: string list]
-                             @@ Terrat_kv_store.Record.data r)
-                           records)))
-            | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
-        >>= fun files ->
-        Logs.info (fun m ->
-            m
-              "%s : CACHE_REPO_TREE : LOAD : cache_key = %a : num_files=%d"
-              (Builder.log_id s)
-              Cache.Key.pp
-              cache_key
-              (CCOption.map_or ~default:0 CCList.length files));
-        Abb.Future.return (Ok files)
-      in
       run ~name:"repo_tree_branch" (fun s { Bs.Fetcher.fetch } ->
           let open Irm in
           let module V1 = Terrat_base_repo_config_v1 in
@@ -796,7 +863,7 @@ struct
               (fetch Keys.branch_ref)
             >>= fun (client, account, repo, branch_ref) ->
             let cache_key =
-              ( "cache.repo_tree",
+              ( "cache2.repo_tree",
                 S.Api.Account.to_string account
                 ^ "."
                 ^ S.Api.Repo.to_string repo
@@ -812,7 +879,7 @@ struct
                   (S.Api.Repo.to_string repo)
                   (S.Api.Ref.to_string branch_ref)
                   time)
-              (fun () -> load_cache_repo_tree cache_key s)
+              (fun () -> load_cache_repo_tree ~log_name:"CACHE_REPO_TREE" cache_key s)
             >>= function
             | Some repo_tree -> Abb.Future.return (Ok repo_tree)
             | None ->
@@ -836,7 +903,13 @@ struct
                       (S.Api.Repo.to_string repo)
                       (S.Api.Ref.to_string branch_ref)
                       time)
-                  (fun () -> store_cache_repo_tree cache_key s repo_tree)
+                  (fun () ->
+                    store_cache_repo_tree
+                      ~log_name:"CACHE_REPO_TREE"
+                      ~chunk_size:10000
+                      cache_key
+                      s
+                      repo_tree)
                 >>= fun () -> Abb.Future.return (Ok repo_tree))
 
     let repo_tree_dest_branch_wm_completed =
@@ -937,57 +1010,6 @@ struct
           else Abb.Future.return (Ok None))
 
     let repo_tree_dest_branch =
-      let store_cache_repo_tree cache_key s tree =
-        Builder.run_db s ~f:(fun db ->
-            let open Abb.Future.Infix_monad in
-            Logs.info (fun m ->
-                m
-                  "%s : CACHE_REPO_TREE_DEST_BRANCH : STORE : cache_key = %a : num_files=%d"
-                  (Builder.log_id s)
-                  Cache.Key.pp
-                  cache_key
-                  (CCList.length tree));
-            let to_yojson = [%to_yojson: string list] in
-            let kv = { Terrat_kv_store.db; user_caps = [] } in
-            let chunks = CCList.chunks 5000 tree in
-            Fc.List_result.iter
-              ~f:(fun (idx, files) ->
-                let json = to_yojson files in
-                Fc.Result.ignore @@ Terrat_kv_store.set ~key:cache_key ~idx json kv
-                >>= function
-                | Ok _ as r -> Abb.Future.return r
-                | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
-              (CCList.combine (CCList.range' 0 (CCList.length chunks)) chunks))
-      in
-      let load_cache_repo_tree cache_key s =
-        let open Irm in
-        Builder.run_db s ~f:(fun db ->
-            let open Abb.Future.Infix_monad in
-            let kv = { Terrat_kv_store.db; user_caps = [] } in
-            Terrat_kv_store.iter ~prefix:true ~limit:100000 ~key:cache_key kv
-            >>= function
-            | Ok [] -> Abb.Future.return (Ok None)
-            | Ok records ->
-                Abb.Future.return
-                  (Ok
-                     (Some
-                        (CCList.flat_map
-                           (fun r ->
-                             CCResult.get_or_failwith
-                             @@ [%of_yojson: string list]
-                             @@ Terrat_kv_store.Record.data r)
-                           records)))
-            | Error (#Terrat_kv_store.err as err) -> Abb.Future.return (Error err))
-        >>= fun files ->
-        Logs.info (fun m ->
-            m
-              "%s : CACHE_REPO_TREE_DEST_BRANCH : LOAD : cache_key = %a : num_files=%d"
-              (Builder.log_id s)
-              Cache.Key.pp
-              cache_key
-              (CCOption.map_or ~default:0 CCList.length files));
-        Abb.Future.return (Ok files)
-      in
       run ~name:"repo_tree_dest_branch" (fun s { Bs.Fetcher.fetch } ->
           let open Irm in
           let module V1 = Terrat_base_repo_config_v1 in
@@ -1003,14 +1025,23 @@ struct
               (fetch Keys.dest_branch_ref)
             >>= fun (client, account, repo, dest_branch_ref) ->
             let cache_key =
-              ( "cache.repo_tree",
+              ( "cache2.repo_tree",
                 S.Api.Account.to_string account
                 ^ "."
                 ^ S.Api.Repo.to_string repo
                 ^ "."
                 ^ S.Api.Ref.to_string dest_branch_ref )
             in
-            load_cache_repo_tree cache_key s
+            time_it
+              s
+              (fun m log_id time ->
+                m
+                  "%s : LOAD_CACHE_REPO_TREE_DEST_BRANCH : repo = %s : branch = %s : time=%f"
+                  log_id
+                  (S.Api.Repo.to_string repo)
+                  (S.Api.Ref.to_string dest_branch_ref)
+                  time)
+              (fun () -> load_cache_repo_tree ~log_name:"CACHE_REPO_TREE_DEST_BRANCH" cache_key s)
             >>= function
             | Some repo_tree -> Abb.Future.return (Ok repo_tree)
             | None ->
@@ -1035,7 +1066,13 @@ struct
                       (S.Api.Repo.to_string repo)
                       (S.Api.Ref.to_string dest_branch_ref)
                       time)
-                  (fun () -> store_cache_repo_tree cache_key s repo_tree)
+                  (fun () ->
+                    store_cache_repo_tree
+                      ~log_name:"CACHE_REPO_TREE_DEST_BRANCH"
+                      ~chunk_size:10000
+                      cache_key
+                      s
+                      repo_tree)
                 >>= fun () -> Abb.Future.return (Ok repo_tree))
 
     let built_repo_config_branch =
@@ -1150,7 +1187,7 @@ struct
           fetch Keys.branch_ref
           >>= fun branch_ref ->
           let cache_key =
-            ( "cache.derived_repo_config_empty_index",
+            ( "cache2.derived_repo_config_empty_index",
               S.Api.Account.to_string account
               ^ "."
               ^ S.Api.Repo.to_string repo
@@ -1187,7 +1224,7 @@ struct
           fetch Keys.branch_ref
           >>= fun branch_ref ->
           let cache_key =
-            ( "cache.derived_repo_config",
+            ( "cache2.derived_repo_config",
               S.Api.Account.to_string account
               ^ "."
               ^ S.Api.Repo.to_string repo
@@ -1322,7 +1359,7 @@ struct
           fetch Keys.dest_branch_ref
           >>= fun dest_branch_ref ->
           let cache_key =
-            ( "cache.repo_config_empty_index",
+            ( "cache2.repo_config_empty_index",
               S.Api.Account.to_string account
               ^ "."
               ^ S.Api.Repo.to_string repo
@@ -1359,7 +1396,7 @@ struct
           fetch Keys.dest_branch_ref
           >>= fun dest_branch_ref ->
           let cache_key =
-            ( "cache.repo_config_empty_index",
+            ( "cache2.repo_config_empty_index",
               S.Api.Account.to_string account
               ^ "."
               ^ S.Api.Repo.to_string repo
@@ -2895,83 +2932,6 @@ struct
               create_commit_checks' create_commit_checks branch_ref checks
           | _ -> Abb.Future.return (Ok ()))
 
-    let maybe_automerge =
-      run ~name:"maybe_automerge" (fun s { Bs.Fetcher.fetch } ->
-          let module V1 = Terrat_base_repo_config_v1 in
-          let module Am = V1.Automerge in
-          let open Irm in
-          fetch Keys.all_matches
-          >>= function
-          | [] -> Abb.Future.return (Ok ())
-          | _ :: _ ->
-              fetch Keys.repo_config
-              >>= fun repo_config ->
-              let {
-                Am.enabled;
-                delete_branch = delete_branch';
-                merge_strategy;
-                require_explicit_apply;
-              } =
-                V1.automerge repo_config
-              in
-              fetch Keys.job
-              >>= fun job ->
-              let is_explicit_apply =
-                match job.Tjc.Job.type_ with
-                | Tjc.Job.Type_.Apply _ -> true
-                | _ -> false
-              in
-              if
-                enabled
-                && ((require_explicit_apply && is_explicit_apply) || not require_explicit_apply)
-              then (
-                fetch Keys.client
-                >>= fun client ->
-                fetch Keys.user
-                >>= fun user ->
-                fetch Keys.pull_request
-                >>= fun pull_request ->
-                let open Abb.Future.Infix_monad in
-                Logs.info (fun m ->
-                    m
-                      "%s : MERGE_PULL_REQUEST : METHOD=%s"
-                      (Builder.log_id s)
-                      (Am.Merge_strategy.to_string merge_strategy));
-                S.Api.merge_pull_request
-                  ~request_id:(Builder.log_id s)
-                  client
-                  pull_request
-                  merge_strategy
-                >>= function
-                | Ok () ->
-                    if delete_branch' then (
-                      let repo = S.Api.Pull_request.repo pull_request in
-                      let branch =
-                        S.Api.Ref.to_string (S.Api.Pull_request.branch_name pull_request)
-                      in
-                      Logs.info (fun m ->
-                          m
-                            "%s : DELETE_BRANCH : repo=%s : branch=%s"
-                            (Builder.log_id s)
-                            (S.Api.Repo.to_string repo)
-                            branch);
-                      S.Api.delete_branch ~request_id:(Builder.log_id s) client repo branch
-                      >>= fun _ -> Abb.Future.return (Ok ()))
-                    else Abb.Future.return (Ok ())
-                | Error (`Merge_err reason) ->
-                    let open Irm in
-                    fetch Keys.publish_comment
-                    >>= fun publish_comment ->
-                    publish_comment'
-                      publish_comment
-                      (Msg.Automerge_failure
-                         ( Terrat_pull_request.set_diff ()
-                           @@ Terrat_pull_request.set_checks ()
-                           @@ pull_request,
-                           reason ))
-                | Error `Error as err -> Abb.Future.return err)
-              else Abb.Future.return (Ok ()))
-
     let run_next_layer =
       run ~name:"run_next_layer" (fun s { Bs.Fetcher.fetch } ->
           let can_stack_auto_apply l =
@@ -3255,7 +3215,6 @@ struct
     |> Hmap.add (coerce Keys.initiator) Tasks.initiator
     |> Hmap.add (coerce Keys.iter_job) Tasks.iter_job
     |> Hmap.add (coerce Keys.matches) Tasks.matches
-    |> Hmap.add (coerce Keys.maybe_automerge) Tasks.maybe_automerge
     |> Hmap.add (coerce Keys.maybe_complete_job) Tasks.maybe_complete_job
     |> Hmap.add
          (coerce Keys.maybe_complete_job_from_work_manifest_event)

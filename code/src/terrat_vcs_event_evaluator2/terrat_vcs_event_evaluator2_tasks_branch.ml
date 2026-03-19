@@ -228,6 +228,8 @@ struct
           >>= fun working_set_matches ->
           let r = Terrat_access_control2.{ R.deny = []; pass = working_set_matches } in
           Abb.Future.return (Ok (Ok r)))
+
+    let maybe_automerge = run ~name:"maybe_automerge" (fun _s _fetcher -> Abb.Future.return (Ok ()))
   end
 
   let tasks tasks =
@@ -269,6 +271,7 @@ struct
     |> Hmap.add (coerce Keys.dest_branch_name) Tasks.dest_branch_name
     |> Hmap.add (coerce Keys.dest_branch_ref) Tasks.dest_branch_ref
     |> Hmap.add (coerce Keys.is_draft_pr) Tasks.is_draft_pr
+    |> Hmap.add (coerce Keys.maybe_automerge) Tasks.maybe_automerge
     |> Hmap.add (coerce Keys.missing_autoplan_matches) Tasks.missing_autoplan_matches
     |> Hmap.add (coerce Keys.out_of_change_applies) Tasks.out_of_change_applies
     |> Hmap.add (coerce Keys.publish_comment) Tasks.publish_comment

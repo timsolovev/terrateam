@@ -1484,6 +1484,83 @@ struct
                         tokens)
               | None -> assert false)
           | _ -> assert false)
+
+    let maybe_automerge =
+      run ~name:"maybe_automerge" (fun s { Bs.Fetcher.fetch } ->
+          let module V1 = Terrat_base_repo_config_v1 in
+          let module Am = V1.Automerge in
+          let open Irm in
+          fetch Keys.all_matches
+          >>= function
+          | [] -> Abb.Future.return (Ok ())
+          | _ :: _ ->
+              fetch Keys.repo_config
+              >>= fun repo_config ->
+              let {
+                Am.enabled;
+                delete_branch = delete_branch';
+                merge_strategy;
+                require_explicit_apply;
+              } =
+                V1.automerge repo_config
+              in
+              fetch Keys.job
+              >>= fun job ->
+              let is_explicit_apply =
+                match job.Tjc.Job.type_ with
+                | Tjc.Job.Type_.Apply _ -> true
+                | _ -> false
+              in
+              if
+                enabled
+                && ((require_explicit_apply && is_explicit_apply) || not require_explicit_apply)
+              then (
+                fetch Keys.client
+                >>= fun client ->
+                fetch Keys.user
+                >>= fun user ->
+                fetch Keys.pull_request
+                >>= fun pull_request ->
+                let open Abb.Future.Infix_monad in
+                Logs.info (fun m ->
+                    m
+                      "%s : MERGE_PULL_REQUEST : METHOD=%s"
+                      (Builder.log_id s)
+                      (Am.Merge_strategy.to_string merge_strategy));
+                S.Api.merge_pull_request
+                  ~request_id:(Builder.log_id s)
+                  client
+                  pull_request
+                  merge_strategy
+                >>= function
+                | Ok () ->
+                    if delete_branch' then (
+                      let repo = S.Api.Pull_request.repo pull_request in
+                      let branch =
+                        S.Api.Ref.to_string (S.Api.Pull_request.branch_name pull_request)
+                      in
+                      Logs.info (fun m ->
+                          m
+                            "%s : DELETE_BRANCH : repo=%s : branch=%s"
+                            (Builder.log_id s)
+                            (S.Api.Repo.to_string repo)
+                            branch);
+                      S.Api.delete_branch ~request_id:(Builder.log_id s) client repo branch
+                      >>= fun _ -> Abb.Future.return (Ok ()))
+                    else Abb.Future.return (Ok ())
+                | Error (`Merge_err reason) ->
+                    let open Irm in
+                    fetch Keys.publish_comment
+                    >>= fun publish_comment ->
+                    publish_comment'
+                      publish_comment
+                      (Msg.Automerge_failure
+                         ( Terrat_pull_request.set_diff ()
+                           @@ Terrat_pull_request.set_checks ()
+                           @@ pull_request,
+                           reason ))
+                | Error `Error as err -> Abb.Future.return err)
+              else Abb.Future.return (Ok ()))
   end
 
   let tasks tasks =
@@ -1527,6 +1604,7 @@ struct
     |> Hmap.add (coerce Keys.eval_pull_request_event) Tasks.eval_pull_request_event
     |> Hmap.add (coerce Keys.get_context_for_pull_request) Tasks.get_context_for_pull_request
     |> Hmap.add (coerce Keys.is_draft_pr) Tasks.is_draft_pr
+    |> Hmap.add (coerce Keys.maybe_automerge) Tasks.maybe_automerge
     |> Hmap.add (coerce Keys.missing_autoplan_matches) Tasks.missing_autoplan_matches
     |> Hmap.add (coerce Keys.out_of_change_applies) Tasks.out_of_change_applies
     |> Hmap.add (coerce Keys.publish_comment) Tasks.publish_comment
