@@ -61,47 +61,29 @@ module GetApiV4ProjectsIdReleases = struct
   module Parameters = struct
     module Order_by = struct
       let t_of_yojson = function
-        | `String "created_at" -> Ok `Created_at
-        | `String "released_at" -> Ok `Released_at
+        | `String "released_at" -> Ok "released_at"
+        | `String "created_at" -> Ok "created_at"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created_at -> `String "created_at"
-        | `Released_at -> `String "released_at"
-
-      type t =
-        ([ `Created_at
-         | `Released_at
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       id : string;
       include_html_description : bool option; [@default None]
-      order_by : Order_by.t; [@default `Released_at]
+      order_by : Order_by.t; [@default "released_at"]
       page : int; [@default 1]
       per_page : int; [@default 20]
-      sort : Sort.t; [@default `Desc]
+      sort : Sort.t; [@default "desc"]
       updated_after : string option; [@default None]
       updated_before : string option; [@default None]
     }
@@ -131,8 +113,8 @@ module GetApiV4ProjectsIdReleases = struct
          [
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));
-           ("order_by", Var (params.order_by, Enum Order_by.t_to_yojson));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("order_by", Var (params.order_by, String));
+           ("sort", Var (params.sort, String));
            ("include_html_description", Var (params.include_html_description, Option Bool));
            ("updated_before", Var (params.updated_before, Option String));
            ("updated_after", Var (params.updated_after, Option String));

@@ -1,13 +1,10 @@
 module Primary = struct
   module Action = struct
     let t_of_yojson = function
-      | `String "changed" -> Ok `Changed
+      | `String "changed" -> Ok "changed"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Changed -> `String "changed"
-
-    type t = ([ `Changed ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -36,22 +33,12 @@ module Primary = struct
 
           module Price_model = struct
             let t_of_yojson = function
-              | `String "FLAT_RATE" -> Ok `FLAT_RATE
-              | `String "FREE" -> Ok `FREE
-              | `String "PER_UNIT" -> Ok `PER_UNIT
+              | `String "FREE" -> Ok "FREE"
+              | `String "FLAT_RATE" -> Ok "FLAT_RATE"
+              | `String "PER_UNIT" -> Ok "PER_UNIT"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `FLAT_RATE -> `String "FLAT_RATE"
-              | `FREE -> `String "FREE"
-              | `PER_UNIT -> `String "PER_UNIT"
-
-            type t =
-              ([ `FLAT_RATE
-               | `FREE
-               | `PER_UNIT
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 

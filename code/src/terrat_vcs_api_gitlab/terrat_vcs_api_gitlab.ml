@@ -27,10 +27,16 @@ module Metrics = struct
   let rate_limit_remaining_count =
     let help = "Number of calls remaining in the rate limit window." in
     Rate_limit_remaining_histograph.v ~help ~namespace ~subsystem "rate_limit_remaining_count"
+
+  let fn_call_total =
+    let help = "Number of calls of a function" in
+    Prmths.Counter.v_label ~label_name:"fn" ~help ~namespace ~subsystem "fn_call_total"
 end
 
 let fetch_pull_request_tries = 6
 let one_minute = Duration.(to_f (of_min 1))
+let call_timeout = Duration.(to_f (of_sec 10))
+
 (* let log_call = function *)
 (*   | `Req req -> *)
 (*       Logs.debug (fun m -> *)
@@ -112,6 +118,13 @@ let call ?(tries = 3) t req =
                let open Abb.Future.Infix_monad in
                retry_wait n resp >>= Abb.Sys.sleep
            | Error _ -> Abb.Sys.sleep n))
+
+let create config auth =
+  Openapic_abb.create
+    ~base_url:(Terrat_config.Gitlab.api_base_url config)
+    ~user_agent:"Terrateam"
+    ~call_timeout
+    auth
 
 module Config = struct
   type t = {
@@ -271,7 +284,7 @@ let fetch_file ~request_id client repo ref_ path =
     >>= fun resp ->
     let module OK = Gl.Responses.OK in
     match Openapi.Response.value resp with
-    | `OK { OK.content; encoding = Some `Base64; _ } ->
+    | `OK { OK.content; encoding = Some "base64"; _ } ->
         Abb.Future.return
           (Ok (Some (Base64.decode_exn (CCString.replace ~sub:"\n" ~by:"" content))))
     | `OK { OK.content; _ } -> Abb.Future.return (Ok (Some content))
@@ -465,8 +478,13 @@ let comment_on_pull_request ~request_id client pull_request body =
           m "%s : COMMENT_ON_PULL_REQUEST : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let delete_pull_request_comment ~request_id client pull_request comment_id = raise (Failure "nyi")
-let minimize_pull_request_comment ~request_id client pull_request comment_id = raise (Failure "nyi")
+let delete_pull_request_comment ~request_id client pull_request comment_id =
+  let open Abb.Future.Infix_monad in
+  raise (Failure "nyi")
+
+let minimize_pull_request_comment ~request_id client pull_request comment_id =
+  let open Abb.Future.Infix_monad in
+  raise (Failure "nyi")
 
 let fetch_diff ~request_id ~client ~repo merge_request_iid =
   let module Gl =
@@ -696,11 +714,11 @@ let create_commit_checks ~request_id client repo ref_ checks =
             ref_ = None;
             state =
               (match status with
-              | C.Status.Queued -> `Pending
-              | C.Status.Running -> `Running
-              | C.Status.Completed -> `Success
-              | C.Status.Failed -> `Failed
-              | C.Status.Canceled -> `Canceled);
+              | C.Status.Queued -> "pending"
+              | C.Status.Running -> "running"
+              | C.Status.Completed -> "success"
+              | C.Status.Failed -> "failed"
+              | C.Status.Canceled -> "canceled");
             target_url = None;
           }
         in

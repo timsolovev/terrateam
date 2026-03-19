@@ -102,27 +102,14 @@ module Set_codespaces_access = struct
 
       module Visibility = struct
         let t_of_yojson = function
-          | `String "all_members" -> Ok `All_members
+          | `String "disabled" -> Ok "disabled"
+          | `String "selected_members" -> Ok "selected_members"
+          | `String "all_members" -> Ok "all_members"
           | `String "all_members_and_outside_collaborators" ->
-              Ok `All_members_and_outside_collaborators
-          | `String "disabled" -> Ok `Disabled
-          | `String "selected_members" -> Ok `Selected_members
+              Ok "all_members_and_outside_collaborators"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `All_members -> `String "all_members"
-          | `All_members_and_outside_collaborators ->
-              `String "all_members_and_outside_collaborators"
-          | `Disabled -> `String "disabled"
-          | `Selected_members -> `String "selected_members"
-
-        type t =
-          ([ `All_members
-           | `All_members_and_outside_collaborators
-           | `Disabled
-           | `Selected_members
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -499,22 +486,12 @@ module Create_or_update_org_secret = struct
 
       module Visibility = struct
         let t_of_yojson = function
-          | `String "all" -> Ok `All
-          | `String "private" -> Ok `Private
-          | `String "selected" -> Ok `Selected
+          | `String "all" -> Ok "all"
+          | `String "private" -> Ok "private"
+          | `String "selected" -> Ok "selected"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `All -> `String "all"
-          | `Private -> `String "private"
-          | `Selected -> `String "selected"
-
-        type t =
-          ([ `All
-           | `Private
-           | `Selected
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1135,25 +1112,13 @@ module Create_with_repo_for_authenticated_user = struct
     module Primary = struct
       module Geo = struct
         let t_of_yojson = function
-          | `String "EuropeWest" -> Ok `EuropeWest
-          | `String "SoutheastAsia" -> Ok `SoutheastAsia
-          | `String "UsEast" -> Ok `UsEast
-          | `String "UsWest" -> Ok `UsWest
+          | `String "EuropeWest" -> Ok "EuropeWest"
+          | `String "SoutheastAsia" -> Ok "SoutheastAsia"
+          | `String "UsEast" -> Ok "UsEast"
+          | `String "UsWest" -> Ok "UsWest"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `EuropeWest -> `String "EuropeWest"
-          | `SoutheastAsia -> `String "SoutheastAsia"
-          | `UsEast -> `String "UsEast"
-          | `UsWest -> `String "UsWest"
-
-        type t =
-          ([ `EuropeWest
-           | `SoutheastAsia
-           | `UsEast
-           | `UsWest
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1976,25 +1941,13 @@ module Create_with_pr_for_authenticated_user = struct
     module Primary = struct
       module Geo = struct
         let t_of_yojson = function
-          | `String "EuropeWest" -> Ok `EuropeWest
-          | `String "SoutheastAsia" -> Ok `SoutheastAsia
-          | `String "UsEast" -> Ok `UsEast
-          | `String "UsWest" -> Ok `UsWest
+          | `String "EuropeWest" -> Ok "EuropeWest"
+          | `String "SoutheastAsia" -> Ok "SoutheastAsia"
+          | `String "UsEast" -> Ok "UsEast"
+          | `String "UsWest" -> Ok "UsWest"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `EuropeWest -> `String "EuropeWest"
-          | `SoutheastAsia -> `String "SoutheastAsia"
-          | `UsEast -> `String "UsEast"
-          | `UsWest -> `String "UsWest"
-
-        type t =
-          ([ `EuropeWest
-           | `SoutheastAsia
-           | `UsEast
-           | `UsWest
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2105,25 +2058,13 @@ module Create_for_authenticated_user = struct
       module Primary = struct
         module Geo = struct
           let t_of_yojson = function
-            | `String "EuropeWest" -> Ok `EuropeWest
-            | `String "SoutheastAsia" -> Ok `SoutheastAsia
-            | `String "UsEast" -> Ok `UsEast
-            | `String "UsWest" -> Ok `UsWest
+            | `String "EuropeWest" -> Ok "EuropeWest"
+            | `String "SoutheastAsia" -> Ok "SoutheastAsia"
+            | `String "UsEast" -> Ok "UsEast"
+            | `String "UsWest" -> Ok "UsWest"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `EuropeWest -> `String "EuropeWest"
-            | `SoutheastAsia -> `String "SoutheastAsia"
-            | `UsEast -> `String "UsEast"
-            | `UsWest -> `String "UsWest"
-
-          type t =
-            ([ `EuropeWest
-             | `SoutheastAsia
-             | `UsEast
-             | `UsWest
-             ]
-            [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 
@@ -2151,25 +2092,13 @@ module Create_for_authenticated_user = struct
       module Primary = struct
         module Geo = struct
           let t_of_yojson = function
-            | `String "EuropeWest" -> Ok `EuropeWest
-            | `String "SoutheastAsia" -> Ok `SoutheastAsia
-            | `String "UsEast" -> Ok `UsEast
-            | `String "UsWest" -> Ok `UsWest
+            | `String "EuropeWest" -> Ok "EuropeWest"
+            | `String "SoutheastAsia" -> Ok "SoutheastAsia"
+            | `String "UsEast" -> Ok "UsEast"
+            | `String "UsWest" -> Ok "UsWest"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `EuropeWest -> `String "EuropeWest"
-            | `SoutheastAsia -> `String "SoutheastAsia"
-            | `UsEast -> `String "UsEast"
-            | `UsWest -> `String "UsWest"
-
-          type t =
-            ([ `EuropeWest
-             | `SoutheastAsia
-             | `UsEast
-             | `UsWest
-             ]
-            [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 

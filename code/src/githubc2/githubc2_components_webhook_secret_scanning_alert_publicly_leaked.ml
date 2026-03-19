@@ -1,13 +1,10 @@
 module Primary = struct
   module Action = struct
     let t_of_yojson = function
-      | `String "publicly_leaked" -> Ok `Publicly_leaked
+      | `String "publicly_leaked" -> Ok "publicly_leaked"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Publicly_leaked -> `String "publicly_leaked"
-
-    type t = ([ `Publicly_leaked ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

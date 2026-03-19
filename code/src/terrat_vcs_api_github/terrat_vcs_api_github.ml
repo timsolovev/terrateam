@@ -480,15 +480,15 @@ let diff_of_github_diff =
   CCList.map
     Githubc2_components.Diff_entry.(
       function
-      | { primary = { Primary.filename; status = `Added | `Copied; _ }; _ } ->
+      | { primary = { Primary.filename; status = "added" | "copied"; _ }; _ } ->
           Terrat_change.Diff.Add { filename }
-      | { primary = { Primary.filename; status = `Removed; _ }; _ } ->
+      | { primary = { Primary.filename; status = "removed"; _ }; _ } ->
           Terrat_change.Diff.Remove { filename }
-      | { primary = { Primary.filename; status = `Modified | `Changed | `Unchanged; _ }; _ } ->
+      | { primary = { Primary.filename; status = "modified" | "changed" | "unchanged"; _ }; _ } ->
           Terrat_change.Diff.Change { filename }
       | {
           primary =
-            { Primary.filename; status = `Renamed; previous_filename = Some previous_filename; _ };
+            { Primary.filename; status = "renamed"; previous_filename = Some previous_filename; _ };
           _;
         } -> Terrat_change.Diff.Move { filename; previous_filename }
       | _ -> assert false)
@@ -593,12 +593,12 @@ let fetch_pull_request' request_id account client repo pull_request_id =
            ~id:pull_request_id
            ~state:
              (match (merge_commit_sha, state, merged, merged_at) with
-             | Some _, `Open, _, _ -> Terrat_pull_request.State.(Open Open_status.Mergeable)
-             | None, `Open, _, _ -> Terrat_pull_request.State.(Open Open_status.Merge_conflict)
-             | Some merge_commit_sha, `Closed, true, Some merged_at ->
+             | Some _, "open", _, _ -> Terrat_pull_request.State.(Open Open_status.Mergeable)
+             | None, "open", _, _ -> Terrat_pull_request.State.(Open Open_status.Merge_conflict)
+             | Some merge_commit_sha, "closed", true, Some merged_at ->
                  Terrat_pull_request.State.(
                    Merged Merged.{ merged_hash = merge_commit_sha; merged_at })
-             | _, `Closed, false, _ -> Terrat_pull_request.State.Closed
+             | _, "closed", false, _ -> Terrat_pull_request.State.Closed
              | _, _, _, _ -> assert false)
            ~title:(Some title)
            ~user:(Some login)
@@ -803,10 +803,10 @@ let merge_pull_request' request_id client pull_request merge_strategy =
   let repo = Terrat_pull_request.repo pull_request in
   let merge_method =
     match merge_strategy with
-    | Ms.Auto -> `Merge
-    | Ms.Merge -> `Merge
-    | Ms.Squash -> `Squash
-    | Ms.Rebase -> `Rebase
+    | Ms.Auto -> "merge"
+    | Ms.Merge -> "merge"
+    | Ms.Squash -> "squash"
+    | Ms.Rebase -> "rebase"
   in
   Logs.info (fun m ->
       m
@@ -847,7 +847,7 @@ let merge_pull_request' request_id client pull_request merge_strategy =
           m
             "%s : MERGE_METHOD_NOT_ALLOWED : METHOD %s : %s : %s : %d"
             request_id
-            (Ms.to_string merge_strategy)
+            merge_method
             (Repo.owner repo)
             (Repo.name repo)
             (Terrat_pull_request.id pull_request));
@@ -855,7 +855,7 @@ let merge_pull_request' request_id client pull_request merge_strategy =
         client.Client.client
         Githubc2_pulls.Merge.(
           make
-            ~body:Request_body.(make Primary.(make ~merge_method:(Some `Squash) ()))
+            ~body:Request_body.(make Primary.(make ~merge_method:(Some "squash") ()))
             Parameters.(
               make
                 ~owner:repo.Repo.owner

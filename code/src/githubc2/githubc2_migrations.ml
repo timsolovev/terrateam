@@ -8,13 +8,10 @@ module Start_for_org = struct
       module Exclude = struct
         module Items = struct
           let t_of_yojson = function
-            | `String "repositories" -> Ok `Repositories
+            | `String "repositories" -> Ok "repositories"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `Repositories -> `String "repositories"
-
-          type t = ([ `Repositories ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 
@@ -96,14 +93,10 @@ module List_for_org = struct
     module Exclude = struct
       module Items = struct
         let t_of_yojson = function
-          | `String "repositories" -> Ok `Repositories
+          | `String "repositories" -> Ok "repositories"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Repositories -> `String "repositories"
-
-        type t = ([ `Repositories ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-        [@@deriving show, eq]
+        type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
       end
 
       type t = Items.t list [@@deriving show, eq]
@@ -144,7 +137,7 @@ module List_for_org = struct
          [
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
-           ("exclude", Var (params.exclude, Option (Array (Enum Exclude.Items.t_to_yojson))));
+           ("exclude", Var (params.exclude, Option (Array String)));
          ])
       ~url
       ~responses:Responses.t
@@ -156,14 +149,10 @@ module Get_status_for_org = struct
     module Exclude = struct
       module Items = struct
         let t_of_yojson = function
-          | `String "repositories" -> Ok `Repositories
+          | `String "repositories" -> Ok "repositories"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Repositories -> `String "repositories"
-
-        type t = ([ `Repositories ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-        [@@deriving show, eq]
+        type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
       end
 
       type t = Items.t list [@@deriving show, eq]
@@ -213,7 +202,7 @@ module Get_status_for_org = struct
       ~query_params:
         (let open Openapi.Request.Var in
          let open Parameters in
-         [ ("exclude", Var (params.exclude, Option (Array (Enum Exclude.Items.t_to_yojson)))) ])
+         [ ("exclude", Var (params.exclude, Option (Array String))) ])
       ~url
       ~responses:Responses.t
       `Get
@@ -425,25 +414,13 @@ module Update_import = struct
     module Primary = struct
       module Vcs = struct
         let t_of_yojson = function
-          | `String "git" -> Ok `Git
-          | `String "mercurial" -> Ok `Mercurial
-          | `String "subversion" -> Ok `Subversion
-          | `String "tfvc" -> Ok `Tfvc
+          | `String "subversion" -> Ok "subversion"
+          | `String "tfvc" -> Ok "tfvc"
+          | `String "git" -> Ok "git"
+          | `String "mercurial" -> Ok "mercurial"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Git -> `String "git"
-          | `Mercurial -> `String "mercurial"
-          | `Subversion -> `String "subversion"
-          | `Tfvc -> `String "tfvc"
-
-        type t =
-          ([ `Git
-           | `Mercurial
-           | `Subversion
-           | `Tfvc
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -558,25 +535,13 @@ module Start_import = struct
     module Primary = struct
       module Vcs = struct
         let t_of_yojson = function
-          | `String "git" -> Ok `Git
-          | `String "mercurial" -> Ok `Mercurial
-          | `String "subversion" -> Ok `Subversion
-          | `String "tfvc" -> Ok `Tfvc
+          | `String "subversion" -> Ok "subversion"
+          | `String "git" -> Ok "git"
+          | `String "mercurial" -> Ok "mercurial"
+          | `String "tfvc" -> Ok "tfvc"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Git -> `String "git"
-          | `Mercurial -> `String "mercurial"
-          | `Subversion -> `String "subversion"
-          | `Tfvc -> `String "tfvc"
-
-        type t =
-          ([ `Git
-           | `Mercurial
-           | `Subversion
-           | `Tfvc
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -902,19 +867,11 @@ module Set_lfs_preference = struct
     module Primary = struct
       module Use_lfs = struct
         let t_of_yojson = function
-          | `String "opt_in" -> Ok `Opt_in
-          | `String "opt_out" -> Ok `Opt_out
+          | `String "opt_in" -> Ok "opt_in"
+          | `String "opt_out" -> Ok "opt_out"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Opt_in -> `String "opt_in"
-          | `Opt_out -> `String "opt_out"
-
-        type t =
-          ([ `Opt_in
-           | `Opt_out
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -982,13 +939,10 @@ module Start_for_authenticated_user = struct
       module Exclude = struct
         module Items = struct
           let t_of_yojson = function
-            | `String "repositories" -> Ok `Repositories
+            | `String "repositories" -> Ok "repositories"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `Repositories -> `String "repositories"
-
-          type t = ([ `Repositories ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 

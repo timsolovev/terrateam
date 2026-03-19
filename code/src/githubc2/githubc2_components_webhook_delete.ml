@@ -1,19 +1,11 @@
 module Primary = struct
   module Ref_type = struct
     let t_of_yojson = function
-      | `String "branch" -> Ok `Branch
-      | `String "tag" -> Ok `Tag
+      | `String "tag" -> Ok "tag"
+      | `String "branch" -> Ok "branch"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Branch -> `String "branch"
-      | `Tag -> `String "tag"
-
-    type t =
-      ([ `Branch
-       | `Tag
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

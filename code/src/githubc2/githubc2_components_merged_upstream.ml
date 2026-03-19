@@ -1,22 +1,12 @@
 module Primary = struct
   module Merge_type = struct
     let t_of_yojson = function
-      | `String "fast-forward" -> Ok `Fast_forward
-      | `String "merge" -> Ok `Merge
-      | `String "none" -> Ok `None
+      | `String "merge" -> Ok "merge"
+      | `String "fast-forward" -> Ok "fast-forward"
+      | `String "none" -> Ok "none"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Fast_forward -> `String "fast-forward"
-      | `Merge -> `String "merge"
-      | `None -> `String "none"
-
-    type t =
-      ([ `Fast_forward
-       | `Merge
-       | `None
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

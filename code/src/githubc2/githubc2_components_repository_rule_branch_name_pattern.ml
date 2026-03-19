@@ -3,25 +3,13 @@ module Primary = struct
     module Primary = struct
       module Operator = struct
         let t_of_yojson = function
-          | `String "contains" -> Ok `Contains
-          | `String "ends_with" -> Ok `Ends_with
-          | `String "regex" -> Ok `Regex
-          | `String "starts_with" -> Ok `Starts_with
+          | `String "starts_with" -> Ok "starts_with"
+          | `String "ends_with" -> Ok "ends_with"
+          | `String "contains" -> Ok "contains"
+          | `String "regex" -> Ok "regex"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Contains -> `String "contains"
-          | `Ends_with -> `String "ends_with"
-          | `Regex -> `String "regex"
-          | `Starts_with -> `String "starts_with"
-
-        type t =
-          ([ `Contains
-           | `Ends_with
-           | `Regex
-           | `Starts_with
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -39,13 +27,10 @@ module Primary = struct
 
   module Type = struct
     let t_of_yojson = function
-      | `String "branch_name_pattern" -> Ok `Branch_name_pattern
+      | `String "branch_name_pattern" -> Ok "branch_name_pattern"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Branch_name_pattern -> `String "branch_name_pattern"
-
-    type t = ([ `Branch_name_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

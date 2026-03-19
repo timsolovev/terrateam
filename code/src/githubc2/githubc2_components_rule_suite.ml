@@ -1,43 +1,23 @@
 module Primary = struct
   module Evaluation_result = struct
     let t_of_yojson = function
-      | `String "bypass" -> Ok `Bypass
-      | `String "fail" -> Ok `Fail
-      | `String "pass" -> Ok `Pass
+      | `String "pass" -> Ok "pass"
+      | `String "fail" -> Ok "fail"
+      | `String "bypass" -> Ok "bypass"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Bypass -> `String "bypass"
-      | `Fail -> `String "fail"
-      | `Pass -> `String "pass"
-
-    type t =
-      ([ `Bypass
-       | `Fail
-       | `Pass
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Result = struct
     let t_of_yojson = function
-      | `String "bypass" -> Ok `Bypass
-      | `String "fail" -> Ok `Fail
-      | `String "pass" -> Ok `Pass
+      | `String "pass" -> Ok "pass"
+      | `String "fail" -> Ok "fail"
+      | `String "bypass" -> Ok "bypass"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Bypass -> `String "bypass"
-      | `Fail -> `String "fail"
-      | `Pass -> `String "pass"
-
-    type t =
-      ([ `Bypass
-       | `Fail
-       | `Pass
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -46,40 +26,22 @@ module Primary = struct
       module Primary = struct
         module Enforcement = struct
           let t_of_yojson = function
-            | `String "active" -> Ok `Active
-            | `String "deleted ruleset" -> Ok `Deleted_ruleset
-            | `String "evaluate" -> Ok `Evaluate
+            | `String "active" -> Ok "active"
+            | `String "evaluate" -> Ok "evaluate"
+            | `String "deleted ruleset" -> Ok "deleted ruleset"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `Active -> `String "active"
-            | `Deleted_ruleset -> `String "deleted ruleset"
-            | `Evaluate -> `String "evaluate"
-
-          type t =
-            ([ `Active
-             | `Deleted_ruleset
-             | `Evaluate
-             ]
-            [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 
         module Result = struct
           let t_of_yojson = function
-            | `String "fail" -> Ok `Fail
-            | `String "pass" -> Ok `Pass
+            | `String "pass" -> Ok "pass"
+            | `String "fail" -> Ok "fail"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `Fail -> `String "fail"
-            | `Pass -> `String "pass"
-
-          type t =
-            ([ `Fail
-             | `Pass
-             ]
-            [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 

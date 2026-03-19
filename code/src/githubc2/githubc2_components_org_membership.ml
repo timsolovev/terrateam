@@ -10,40 +10,22 @@ module Primary = struct
 
   module Role = struct
     let t_of_yojson = function
-      | `String "admin" -> Ok `Admin
-      | `String "billing_manager" -> Ok `Billing_manager
-      | `String "member" -> Ok `Member
+      | `String "admin" -> Ok "admin"
+      | `String "member" -> Ok "member"
+      | `String "billing_manager" -> Ok "billing_manager"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Admin -> `String "admin"
-      | `Billing_manager -> `String "billing_manager"
-      | `Member -> `String "member"
-
-    type t =
-      ([ `Admin
-       | `Billing_manager
-       | `Member
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module State = struct
     let t_of_yojson = function
-      | `String "active" -> Ok `Active
-      | `String "pending" -> Ok `Pending
+      | `String "active" -> Ok "active"
+      | `String "pending" -> Ok "pending"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Active -> `String "active"
-      | `Pending -> `String "pending"
-
-    type t =
-      ([ `Active
-       | `Pending
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

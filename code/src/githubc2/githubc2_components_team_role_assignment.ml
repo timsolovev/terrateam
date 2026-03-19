@@ -1,22 +1,12 @@
 module Primary = struct
   module Assignment = struct
     let t_of_yojson = function
-      | `String "direct" -> Ok `Direct
-      | `String "indirect" -> Ok `Indirect
-      | `String "mixed" -> Ok `Mixed
+      | `String "direct" -> Ok "direct"
+      | `String "indirect" -> Ok "indirect"
+      | `String "mixed" -> Ok "mixed"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Direct -> `String "direct"
-      | `Indirect -> `String "indirect"
-      | `Mixed -> `String "mixed"
-
-    type t =
-      ([ `Direct
-       | `Indirect
-       | `Mixed
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

@@ -1,21 +1,11 @@
 module State = struct
   let t_of_yojson = function
-    | `String "accepted" -> Ok `Accepted
-    | `String "declined" -> Ok `Declined
-    | `String "pending" -> Ok `Pending
+    | `String "accepted" -> Ok "accepted"
+    | `String "declined" -> Ok "declined"
+    | `String "pending" -> Ok "pending"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Accepted -> `String "accepted"
-    | `Declined -> `String "declined"
-    | `Pending -> `String "pending"
-
-  type t =
-    ([ `Accepted
-     | `Declined
-     | `Pending
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

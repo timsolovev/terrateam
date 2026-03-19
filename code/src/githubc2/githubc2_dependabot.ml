@@ -2,65 +2,36 @@ module List_alerts_for_enterprise = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Scope = struct
       let t_of_yojson = function
-        | `String "development" -> Ok `Development
-        | `String "runtime" -> Ok `Runtime
+        | `String "development" -> Ok "development"
+        | `String "runtime" -> Ok "runtime"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Development -> `String "development"
-        | `Runtime -> `String "runtime"
-
-      type t =
-        ([ `Development
-         | `Runtime
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created" -> Ok `Created
-        | `String "epss_percentage" -> Ok `Epss_percentage
-        | `String "updated" -> Ok `Updated
+        | `String "created" -> Ok "created"
+        | `String "updated" -> Ok "updated"
+        | `String "epss_percentage" -> Ok "epss_percentage"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created -> `String "created"
-        | `Epss_percentage -> `String "epss_percentage"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Created
-         | `Epss_percentage
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       after : string option; [@default None]
       before : string option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       ecosystem : string option; [@default None]
       enterprise : string;
       epss_percentage : string option; [@default None]
@@ -70,7 +41,7 @@ module List_alerts_for_enterprise = struct
       per_page : int; [@default 30]
       scope : Scope.t option; [@default None]
       severity : string option; [@default None]
-      sort : Sort.t; [@default `Created]
+      sort : Sort.t; [@default "created"]
       state : string option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -137,9 +108,9 @@ module List_alerts_for_enterprise = struct
            ("ecosystem", Var (params.ecosystem, Option String));
            ("package", Var (params.package, Option String));
            ("epss_percentage", Var (params.epss_percentage, Option String));
-           ("scope", Var (params.scope, Option (Enum Scope.t_to_yojson)));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("scope", Var (params.scope, Option String));
+           ("sort", Var (params.sort, String));
+           ("direction", Var (params.direction, String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
            ("first", Var (params.first, Int));
@@ -155,65 +126,36 @@ module List_alerts_for_org = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Scope = struct
       let t_of_yojson = function
-        | `String "development" -> Ok `Development
-        | `String "runtime" -> Ok `Runtime
+        | `String "development" -> Ok "development"
+        | `String "runtime" -> Ok "runtime"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Development -> `String "development"
-        | `Runtime -> `String "runtime"
-
-      type t =
-        ([ `Development
-         | `Runtime
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created" -> Ok `Created
-        | `String "epss_percentage" -> Ok `Epss_percentage
-        | `String "updated" -> Ok `Updated
+        | `String "created" -> Ok "created"
+        | `String "updated" -> Ok "updated"
+        | `String "epss_percentage" -> Ok "epss_percentage"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created -> `String "created"
-        | `Epss_percentage -> `String "epss_percentage"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Created
-         | `Epss_percentage
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       after : string option; [@default None]
       before : string option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       ecosystem : string option; [@default None]
       epss_percentage : string option; [@default None]
       first : int; [@default 30]
@@ -223,7 +165,7 @@ module List_alerts_for_org = struct
       per_page : int; [@default 30]
       scope : Scope.t option; [@default None]
       severity : string option; [@default None]
-      sort : Sort.t; [@default `Created]
+      sort : Sort.t; [@default "created"]
       state : string option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -297,9 +239,9 @@ module List_alerts_for_org = struct
            ("ecosystem", Var (params.ecosystem, Option String));
            ("package", Var (params.package, Option String));
            ("epss_percentage", Var (params.epss_percentage, Option String));
-           ("scope", Var (params.scope, Option (Enum Scope.t_to_yojson)));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("scope", Var (params.scope, Option String));
+           ("sort", Var (params.sort, String));
+           ("direction", Var (params.direction, String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
            ("first", Var (params.first, Int));
@@ -469,22 +411,12 @@ module Create_or_update_org_secret = struct
 
       module Visibility = struct
         let t_of_yojson = function
-          | `String "all" -> Ok `All
-          | `String "private" -> Ok `Private
-          | `String "selected" -> Ok `Selected
+          | `String "all" -> Ok "all"
+          | `String "private" -> Ok "private"
+          | `String "selected" -> Ok "selected"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `All -> `String "all"
-          | `Private -> `String "private"
-          | `Selected -> `String "selected"
-
-        type t =
-          ([ `All
-           | `Private
-           | `Selected
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -760,65 +692,36 @@ module List_alerts_for_repo = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Scope = struct
       let t_of_yojson = function
-        | `String "development" -> Ok `Development
-        | `String "runtime" -> Ok `Runtime
+        | `String "development" -> Ok "development"
+        | `String "runtime" -> Ok "runtime"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Development -> `String "development"
-        | `Runtime -> `String "runtime"
-
-      type t =
-        ([ `Development
-         | `Runtime
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created" -> Ok `Created
-        | `String "epss_percentage" -> Ok `Epss_percentage
-        | `String "updated" -> Ok `Updated
+        | `String "created" -> Ok "created"
+        | `String "updated" -> Ok "updated"
+        | `String "epss_percentage" -> Ok "epss_percentage"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created -> `String "created"
-        | `Epss_percentage -> `String "epss_percentage"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Created
-         | `Epss_percentage
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       after : string option; [@default None]
       before : string option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       ecosystem : string option; [@default None]
       epss_percentage : string option; [@default None]
       first : int; [@default 30]
@@ -831,7 +734,7 @@ module List_alerts_for_repo = struct
       repo : string;
       scope : Scope.t option; [@default None]
       severity : string option; [@default None]
-      sort : Sort.t; [@default `Created]
+      sort : Sort.t; [@default "created"]
       state : string option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -906,9 +809,9 @@ module List_alerts_for_repo = struct
            ("package", Var (params.package, Option String));
            ("manifest", Var (params.manifest, Option String));
            ("epss_percentage", Var (params.epss_percentage, Option String));
-           ("scope", Var (params.scope, Option (Enum Scope.t_to_yojson)));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("scope", Var (params.scope, Option String));
+           ("sort", Var (params.sort, String));
+           ("direction", Var (params.direction, String));
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));
            ("before", Var (params.before, Option String));
@@ -934,46 +837,24 @@ module Update_alert = struct
   module Request_body = struct
     module Dismissed_reason = struct
       let t_of_yojson = function
-        | `String "fix_started" -> Ok `Fix_started
-        | `String "inaccurate" -> Ok `Inaccurate
-        | `String "no_bandwidth" -> Ok `No_bandwidth
-        | `String "not_used" -> Ok `Not_used
-        | `String "tolerable_risk" -> Ok `Tolerable_risk
+        | `String "fix_started" -> Ok "fix_started"
+        | `String "inaccurate" -> Ok "inaccurate"
+        | `String "no_bandwidth" -> Ok "no_bandwidth"
+        | `String "not_used" -> Ok "not_used"
+        | `String "tolerable_risk" -> Ok "tolerable_risk"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Fix_started -> `String "fix_started"
-        | `Inaccurate -> `String "inaccurate"
-        | `No_bandwidth -> `String "no_bandwidth"
-        | `Not_used -> `String "not_used"
-        | `Tolerable_risk -> `String "tolerable_risk"
-
-      type t =
-        ([ `Fix_started
-         | `Inaccurate
-         | `No_bandwidth
-         | `Not_used
-         | `Tolerable_risk
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 
     module State = struct
       let t_of_yojson = function
-        | `String "dismissed" -> Ok `Dismissed
-        | `String "open" -> Ok `Open
+        | `String "dismissed" -> Ok "dismissed"
+        | `String "open" -> Ok "open"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Dismissed -> `String "dismissed"
-        | `Open -> `String "open"
-
-      type t =
-        ([ `Dismissed
-         | `Open
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 

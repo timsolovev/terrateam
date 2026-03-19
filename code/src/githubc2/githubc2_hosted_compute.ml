@@ -7,19 +7,11 @@ module Create_network_configuration_for_org = struct
     module Primary = struct
       module Compute_service = struct
         let t_of_yojson = function
-          | `String "actions" -> Ok `Actions
-          | `String "none" -> Ok `None
+          | `String "none" -> Ok "none"
+          | `String "actions" -> Ok "actions"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Actions -> `String "actions"
-          | `None -> `String "none"
-
-        type t =
-          ([ `Actions
-           | `None
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -130,19 +122,11 @@ module Update_network_configuration_for_org = struct
     module Primary = struct
       module Compute_service = struct
         let t_of_yojson = function
-          | `String "actions" -> Ok `Actions
-          | `String "none" -> Ok `None
+          | `String "none" -> Ok "none"
+          | `String "actions" -> Ok "actions"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Actions -> `String "actions"
-          | `None -> `String "none"
-
-        type t =
-          ([ `Actions
-           | `None
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

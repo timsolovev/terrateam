@@ -42,6 +42,9 @@ module Sql = struct
       fname
       (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
 
+  let select_user_installations () =
+    Pgsql_io.Typed_sql.(sql /^ read "select_user_installations.sql" /% Var.uuid "user_id")
+
   let upsert_user_installations () =
     Pgsql_io.Typed_sql.(
       sql
@@ -77,7 +80,7 @@ let update_user_installations ~config ~storage ~user () =
   Openapic_abb.collect_all
     ~page:Openapic_abb.Page.gitlab
     client
-    Groups.(make (Parameters.make ~order_by:`Name ()))
+    Groups.(make (Parameters.make ~order_by:"name" ()))
   >>= fun groups ->
   let module G = Gitlabc_components_api_entities_group in
   let group_ids = CCList.map (fun { G.id; _ } -> CCInt64.of_int id) groups in
@@ -650,8 +653,8 @@ module Make (S : S with type Account_id.t = int) = struct
                           id = Uuidm.to_string id;
                           kind =
                             (match (run_kind, pull_number) with
-                            | "drift", _ -> Ds.Kind.Kind_drift `Drift
-                            | "index", _ -> Ds.Kind.Kind_index `Index
+                            | "drift", _ -> Ds.Kind.Kind_drift "drift"
+                            | "index", _ -> Ds.Kind.Kind_index "index"
                             | "pr", Some pull_number ->
                                 Ds.Kind.Kind_pull_request
                                   { P.pull_number = CCInt64.to_int pull_number; pull_request_title }
@@ -659,13 +662,8 @@ module Make (S : S with type Account_id.t = int) = struct
                           owner;
                           repo;
                           run_id;
-                          run_type =
-                            CCResult.get_or_failwith
-                            @@ Terrat_api_components_run_type.of_yojson
-                                 (`String (Terrat_work_manifest3.Step.to_string run_type));
-                          state =
-                            CCResult.get_or_failwith
-                            @@ Terrat_api_components_dirspace_state.of_yojson (`String state);
+                          run_type = Terrat_work_manifest3.Step.to_string run_type;
+                          state;
                           tag_query = Terrat_tag_query.to_string tag_query;
                           user;
                           workspace;
@@ -1304,8 +1302,8 @@ module Make (S : S with type Account_id.t = int) = struct
                           id = Uuidm.to_string id;
                           kind =
                             (match (run_kind, pull_number) with
-                            | "drift", _ -> Wm.Kind.Kind_drift `Drift
-                            | "index", _ -> Wm.Kind.Kind_index `Index
+                            | "drift", _ -> Wm.Kind.Kind_drift "drift"
+                            | "index", _ -> Wm.Kind.Kind_index "index"
                             | "pr", Some pull_number ->
                                 Wm.Kind.Kind_pull_request
                                   { P.pull_number = CCInt64.to_int pull_number; pull_request_title }
@@ -1314,14 +1312,8 @@ module Make (S : S with type Account_id.t = int) = struct
                           repo;
                           repo_id = CCInt64.to_string repo_id;
                           run_id;
-                          run_type =
-                            CCResult.get_or_failwith
-                            @@ Terrat_api_components_run_type.of_yojson
-                                 (`String (Terrat_work_manifest3.Step.to_string run_type));
-                          state =
-                            CCResult.get_or_failwith
-                            @@ Terrat_api_components_work_manifest_state.of_yojson
-                                 (`String (Terrat_work_manifest3.State.to_string state));
+                          run_type = Terrat_work_manifest3.Step.to_string run_type;
+                          state = Terrat_work_manifest3.State.to_string state;
                           tag_query = Terrat_tag_query.to_string tag_query;
                           user;
                         })

@@ -32,92 +32,44 @@ module List_global_advisories = struct
 
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Severity = struct
       let t_of_yojson = function
-        | `String "critical" -> Ok `Critical
-        | `String "high" -> Ok `High
-        | `String "low" -> Ok `Low
-        | `String "medium" -> Ok `Medium
-        | `String "unknown" -> Ok `Unknown
+        | `String "unknown" -> Ok "unknown"
+        | `String "low" -> Ok "low"
+        | `String "medium" -> Ok "medium"
+        | `String "high" -> Ok "high"
+        | `String "critical" -> Ok "critical"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Critical -> `String "critical"
-        | `High -> `String "high"
-        | `Low -> `String "low"
-        | `Medium -> `String "medium"
-        | `Unknown -> `String "unknown"
-
-      type t =
-        ([ `Critical
-         | `High
-         | `Low
-         | `Medium
-         | `Unknown
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "epss_percentage" -> Ok `Epss_percentage
-        | `String "epss_percentile" -> Ok `Epss_percentile
-        | `String "published" -> Ok `Published
-        | `String "updated" -> Ok `Updated
+        | `String "updated" -> Ok "updated"
+        | `String "published" -> Ok "published"
+        | `String "epss_percentage" -> Ok "epss_percentage"
+        | `String "epss_percentile" -> Ok "epss_percentile"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Epss_percentage -> `String "epss_percentage"
-        | `Epss_percentile -> `String "epss_percentile"
-        | `Published -> `String "published"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Epss_percentage
-         | `Epss_percentile
-         | `Published
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Type = struct
       let t_of_yojson = function
-        | `String "malware" -> Ok `Malware
-        | `String "reviewed" -> Ok `Reviewed
-        | `String "unreviewed" -> Ok `Unreviewed
+        | `String "reviewed" -> Ok "reviewed"
+        | `String "malware" -> Ok "malware"
+        | `String "unreviewed" -> Ok "unreviewed"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Malware -> `String "malware"
-        | `Reviewed -> `String "reviewed"
-        | `Unreviewed -> `String "unreviewed"
-
-      type t =
-        ([ `Malware
-         | `Reviewed
-         | `Unreviewed
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -126,7 +78,7 @@ module List_global_advisories = struct
       before : string option; [@default None]
       cve_id : string option; [@default None]
       cwes : Cwes.t option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       ecosystem : Githubc2_components.Security_advisory_ecosystems.t option; [@default None]
       epss_percentage : string option; [@default None]
       epss_percentile : string option; [@default None]
@@ -136,8 +88,8 @@ module List_global_advisories = struct
       per_page : int; [@default 30]
       published : string option; [@default None]
       severity : Severity.t option; [@default None]
-      sort : Sort.t; [@default `Published]
-      type_ : Type.t; [@default `Reviewed] [@key "type"]
+      sort : Sort.t; [@default "published"]
+      type_ : Type.t; [@default "reviewed"] [@key "type"]
       updated : string option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -186,13 +138,10 @@ module List_global_advisories = struct
          let open Parameters in
          [
            ("ghsa_id", Var (params.ghsa_id, Option String));
-           ("type", Var (params.type_, Enum Type.t_to_yojson));
+           ("type", Var (params.type_, String));
            ("cve_id", Var (params.cve_id, Option String));
-           ( "ecosystem",
-             Var
-               ( params.ecosystem,
-                 Option (Enum Githubc2_components.Security_advisory_ecosystems.t_to_yojson) ) );
-           ("severity", Var (params.severity, Option (Enum Severity.t_to_yojson)));
+           ("ecosystem", Var (params.ecosystem, Option String));
+           ("severity", Var (params.severity, Option String));
            ( "cwes",
              match params.cwes with
              | Some (Cwes.V0 v) -> Var (v, String)
@@ -211,9 +160,9 @@ module List_global_advisories = struct
            ("epss_percentile", Var (params.epss_percentile, Option String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("direction", Var (params.direction, String));
            ("per_page", Var (params.per_page, Int));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("sort", Var (params.sort, String));
          ])
       ~url
       ~responses:Responses.t
@@ -268,74 +217,41 @@ module List_org_repository_advisories = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created" -> Ok `Created
-        | `String "published" -> Ok `Published
-        | `String "updated" -> Ok `Updated
+        | `String "created" -> Ok "created"
+        | `String "updated" -> Ok "updated"
+        | `String "published" -> Ok "published"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created -> `String "created"
-        | `Published -> `String "published"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Created
-         | `Published
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module State = struct
       let t_of_yojson = function
-        | `String "closed" -> Ok `Closed
-        | `String "draft" -> Ok `Draft
-        | `String "published" -> Ok `Published
-        | `String "triage" -> Ok `Triage
+        | `String "triage" -> Ok "triage"
+        | `String "draft" -> Ok "draft"
+        | `String "published" -> Ok "published"
+        | `String "closed" -> Ok "closed"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Closed -> `String "closed"
-        | `Draft -> `String "draft"
-        | `Published -> `String "published"
-        | `Triage -> `String "triage"
-
-      type t =
-        ([ `Closed
-         | `Draft
-         | `Published
-         | `Triage
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       after : string option; [@default None]
       before : string option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       org : string;
       per_page : int; [@default 30]
-      sort : Sort.t; [@default `Created]
+      sort : Sort.t; [@default "created"]
       state : State.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -385,12 +301,12 @@ module List_org_repository_advisories = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("direction", Var (params.direction, String));
+           ("sort", Var (params.sort, String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
            ("per_page", Var (params.per_page, Int));
-           ("state", Var (params.state, Option (Enum State.t_to_yojson)));
+           ("state", Var (params.state, Option String));
          ])
       ~url
       ~responses:Responses.t
@@ -471,75 +387,42 @@ module List_repository_advisories = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created" -> Ok `Created
-        | `String "published" -> Ok `Published
-        | `String "updated" -> Ok `Updated
+        | `String "created" -> Ok "created"
+        | `String "updated" -> Ok "updated"
+        | `String "published" -> Ok "published"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created -> `String "created"
-        | `Published -> `String "published"
-        | `Updated -> `String "updated"
-
-      type t =
-        ([ `Created
-         | `Published
-         | `Updated
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module State = struct
       let t_of_yojson = function
-        | `String "closed" -> Ok `Closed
-        | `String "draft" -> Ok `Draft
-        | `String "published" -> Ok `Published
-        | `String "triage" -> Ok `Triage
+        | `String "triage" -> Ok "triage"
+        | `String "draft" -> Ok "draft"
+        | `String "published" -> Ok "published"
+        | `String "closed" -> Ok "closed"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Closed -> `String "closed"
-        | `Draft -> `String "draft"
-        | `Published -> `String "published"
-        | `Triage -> `String "triage"
-
-      type t =
-        ([ `Closed
-         | `Draft
-         | `Published
-         | `Triage
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       after : string option; [@default None]
       before : string option; [@default None]
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       owner : string;
       per_page : int; [@default 30]
       repo : string;
-      sort : Sort.t; [@default `Created]
+      sort : Sort.t; [@default "created"]
       state : State.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -589,12 +472,12 @@ module List_repository_advisories = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("direction", Var (params.direction, String));
+           ("sort", Var (params.sort, String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
            ("per_page", Var (params.per_page, Int));
-           ("state", Var (params.state, Option (Enum State.t_to_yojson)));
+           ("state", Var (params.state, Option String));
          ])
       ~url
       ~responses:Responses.t

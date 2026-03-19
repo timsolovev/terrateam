@@ -1938,7 +1938,8 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   layer
                   |> CCList.filter (Terrat_change_match3.match_tag_query ~tag_query)
                   |> CCList.filter
-                       (fun { Dc.stack_config = { S.rules = { Oc.apply_after; _ }; _ }; _ } ->
+                       (fun
+                         ({ Dc.stack_config = { S.rules = { Oc.apply_after; _ }; _ }; _ } as dc) ->
                          not
                            (CCList.exists
                               (fun { Dc.stack_name; _ } ->
@@ -3205,7 +3206,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           in
           let response =
             Terrat_api_components.Work_manifest.Work_manifest_index
-              { I.dirs; base_ref = S.Api.Ref.to_string base_ref'; token; type_ = `Index; config }
+              { I.dirs; base_ref = S.Api.Ref.to_string base_ref'; token; type_ = "index"; config }
           in
           Abb.Future.return (Ok (Some response))
       | Some _ | None -> Abb.Future.return (Ok None)
@@ -3970,6 +3971,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
         (Event.repo state.State.event)
         all_dirspaceflows
       >>= fun () ->
+      let all_dirspaceflows = strip_lock_branch_target all_dirspaceflows in
       Abb.Future.return (dirspaceflows_of_changes repo_config passed_dirspaces)
       >>= fun dirspaceflows ->
       let denied_dirspaces =
@@ -4309,7 +4311,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                             dirspaces;
                             run_kind = run_kind_str;
                             run_kind_data;
-                            type_ = `Plan;
+                            type_ = "plan";
                             result_version;
                             protocol_version = Some protocol_version;
                             config =
@@ -4388,7 +4390,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                             changed_dirspaces = changed_dirspaces config changes;
                             run_kind = run_kind_str;
                             run_kind_data;
-                            type_ = `Apply;
+                            type_ = "apply";
                             result_version;
                             protocol_version = Some protocol_version;
                             config =
@@ -5118,7 +5120,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           Some work_manifest_id ) ->
           let module D = Terrat_api_components.Work_manifest_done in
           let response =
-            Terrat_api_components.Work_manifest.Work_manifest_done { D.type_ = `Done }
+            Terrat_api_components.Work_manifest.Work_manifest_done { D.type_ = "done" }
           in
           let open Abb.Future.Infix_monad in
           Abb.Future.Promise.set p (Ok (Some response))
@@ -5315,6 +5317,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
             (Event.repo state.State.event)
             all_dirspaceflows
           >>= fun () ->
+          let all_dirspaceflows = H.strip_lock_branch_target all_dirspaceflows in
           Dv.client ctx state
           >>= fun client ->
           (if CCList.is_empty matches.Dv.Matches.all_unapplied_matches then
@@ -6433,7 +6436,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   {
                     B.base_ref = S.Api.Ref.to_string base_branch_name';
                     token;
-                    type_ = `Build_tree;
+                    type_ = "build-tree";
                     config;
                   }
               in
@@ -6757,7 +6760,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                   {
                     B.base_ref = S.Api.Ref.to_string base_branch_name;
                     token;
-                    type_ = `Build_config;
+                    type_ = "build-config";
                     config;
                   }
               in

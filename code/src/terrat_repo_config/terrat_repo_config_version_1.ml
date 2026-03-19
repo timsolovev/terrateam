@@ -1,38 +1,27 @@
 module Checkout_strategy = struct
   let t_of_yojson = function
-    | `String "checkout" -> Ok `Checkout
-    | `String "merge" -> Ok `Merge
+    | `String "merge" -> Ok "merge"
+    | `String "checkout" -> Ok "checkout"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Checkout -> `String "checkout"
-    | `Merge -> `String "merge"
-
-  type t =
-    ([ `Checkout
-     | `Merge
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
 module Cost_estimation = struct
   module Provider = struct
     let t_of_yojson = function
-      | `String "infracost" -> Ok `Infracost
+      | `String "infracost" -> Ok "infracost"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Infracost -> `String "infracost"
-
-    type t = ([ `Infracost ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   type t = {
     currency : string; [@default "USD"]
     enabled : bool; [@default true]
-    provider : Provider.t; [@default `Infracost]
+    provider : Provider.t; [@default "infracost"]
   }
   [@@deriving yojson { strict = true; meta = true }, make, show, eq]
 end
@@ -144,13 +133,10 @@ end
 
 module Version = struct
   let t_of_yojson = function
-    | `String "1" -> Ok `V_1
+    | `String "1" -> Ok "1"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `V_1 -> `String "1"
-
-  type t = ([ `V_1 ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
@@ -164,7 +150,7 @@ type t = {
   apply_requirements : Terrat_repo_config_apply_requirements.t option; [@default None]
   automerge : Terrat_repo_config_automerge.t option; [@default None]
   batch_runs : Terrat_repo_config_batch_runs.t option; [@default None]
-  checkout_strategy : Checkout_strategy.t; [@default `Merge]
+  checkout_strategy : Checkout_strategy.t; [@default "merge"]
   config_builder : Terrat_repo_config_config_builder.t option; [@default None]
   cost_estimation : Cost_estimation.t option; [@default None]
   create_and_select_workspace : bool; [@default true]
@@ -185,7 +171,7 @@ type t = {
   storage : Storage.t option; [@default None]
   tags : Terrat_repo_config_custom_tags.t option; [@default None]
   tree_builder : Terrat_repo_config_tree_builder.t option; [@default None]
-  version : Version.t; [@default `V_1]
+  version : Version.t; [@default "1"]
   when_modified : Terrat_repo_config_when_modified.t option; [@default None]
   workflows : Workflows.t option; [@default None]
 }

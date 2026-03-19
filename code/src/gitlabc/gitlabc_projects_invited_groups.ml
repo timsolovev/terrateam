@@ -3,20 +3,11 @@ module GetApiV4ProjectsIdInvitedGroups = struct
     module Relation = struct
       module Items = struct
         let t_of_yojson = function
-          | `String "direct" -> Ok `Direct
-          | `String "inherited" -> Ok `Inherited
+          | `String "direct" -> Ok "direct"
+          | `String "inherited" -> Ok "inherited"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Direct -> `String "direct"
-          | `Inherited -> `String "inherited"
-
-        type t =
-          ([ `Direct
-           | `Inherited
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-        [@@deriving show, eq]
+        type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
       end
 
       type t = Items.t list [@@deriving show, eq]
@@ -55,7 +46,7 @@ module GetApiV4ProjectsIdInvitedGroups = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("relation", Var (params.relation, Option (Array (Enum Relation.Items.t_to_yojson))));
+           ("relation", Var (params.relation, Option (Array String)));
            ("search", Var (params.search, Option String));
            ("min_access_level", Var (params.min_access_level, Option Int));
            ("page", Var (params.page, Int));

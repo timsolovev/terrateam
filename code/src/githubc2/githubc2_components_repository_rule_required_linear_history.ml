@@ -1,13 +1,10 @@
 module Primary = struct
   module Type = struct
     let t_of_yojson = function
-      | `String "required_linear_history" -> Ok `Required_linear_history
+      | `String "required_linear_history" -> Ok "required_linear_history"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Required_linear_history -> `String "required_linear_history"
-
-    type t = ([ `Required_linear_history ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

@@ -1,34 +1,21 @@
 module Primary = struct
   module Action = struct
     let t_of_yojson = function
-      | `String "destroyed" -> Ok `Destroyed
+      | `String "destroyed" -> Ok "destroyed"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Destroyed -> `String "destroyed"
-
-    type t = ([ `Destroyed ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Reason = struct
     let t_of_yojson = function
-      | `String "dequeued" -> Ok `Dequeued
-      | `String "invalidated" -> Ok `Invalidated
-      | `String "merged" -> Ok `Merged
+      | `String "merged" -> Ok "merged"
+      | `String "invalidated" -> Ok "invalidated"
+      | `String "dequeued" -> Ok "dequeued"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Dequeued -> `String "dequeued"
-      | `Invalidated -> `String "invalidated"
-      | `Merged -> `String "merged"
-
-    type t =
-      ([ `Dequeued
-       | `Invalidated
-       | `Merged
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

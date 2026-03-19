@@ -3,19 +3,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -30,19 +22,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -57,19 +41,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -84,19 +60,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -111,19 +79,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -138,19 +98,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -165,19 +117,11 @@ module Primary = struct
     module Primary = struct
       module Status_ = struct
         let t_of_yojson = function
-          | `String "disabled" -> Ok `Disabled
-          | `String "enabled" -> Ok `Enabled
+          | `String "enabled" -> Ok "enabled"
+          | `String "disabled" -> Ok "disabled"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Disabled -> `String "disabled"
-          | `Enabled -> `String "enabled"
-
-        type t =
-          ([ `Disabled
-           | `Enabled
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

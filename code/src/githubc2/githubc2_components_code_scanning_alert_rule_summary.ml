@@ -1,49 +1,25 @@
 module Primary = struct
   module Security_severity_level = struct
     let t_of_yojson = function
-      | `String "critical" -> Ok `Critical
-      | `String "high" -> Ok `High
-      | `String "low" -> Ok `Low
-      | `String "medium" -> Ok `Medium
+      | `String "low" -> Ok "low"
+      | `String "medium" -> Ok "medium"
+      | `String "high" -> Ok "high"
+      | `String "critical" -> Ok "critical"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Critical -> `String "critical"
-      | `High -> `String "high"
-      | `Low -> `String "low"
-      | `Medium -> `String "medium"
-
-    type t =
-      ([ `Critical
-       | `High
-       | `Low
-       | `Medium
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Severity = struct
     let t_of_yojson = function
-      | `String "error" -> Ok `Error
-      | `String "none" -> Ok `None
-      | `String "note" -> Ok `Note
-      | `String "warning" -> Ok `Warning
+      | `String "none" -> Ok "none"
+      | `String "note" -> Ok "note"
+      | `String "warning" -> Ok "warning"
+      | `String "error" -> Ok "error"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Error -> `String "error"
-      | `None -> `String "none"
-      | `Note -> `String "note"
-      | `Warning -> `String "warning"
-
-    type t =
-      ([ `Error
-       | `None
-       | `Note
-       | `Warning
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

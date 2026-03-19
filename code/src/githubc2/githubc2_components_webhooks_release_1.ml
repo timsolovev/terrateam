@@ -4,13 +4,10 @@ module Primary = struct
       module Primary = struct
         module State = struct
           let t_of_yojson = function
-            | `String "uploaded" -> Ok `Uploaded
+            | `String "uploaded" -> Ok "uploaded"
             | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-          let t_to_yojson = function
-            | `Uploaded -> `String "uploaded"
-
-          type t = ([ `Uploaded ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+          type t = (string[@of_yojson t_of_yojson])
           [@@deriving yojson { strict = false; meta = true }, show, eq]
         end
 
@@ -18,22 +15,12 @@ module Primary = struct
           module Primary = struct
             module Type = struct
               let t_of_yojson = function
-                | `String "Bot" -> Ok `Bot
-                | `String "Organization" -> Ok `Organization
-                | `String "User" -> Ok `User
+                | `String "Bot" -> Ok "Bot"
+                | `String "User" -> Ok "User"
+                | `String "Organization" -> Ok "Organization"
                 | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-              let t_to_yojson = function
-                | `Bot -> `String "Bot"
-                | `Organization -> `String "Organization"
-                | `User -> `String "User"
-
-              type t =
-                ([ `Bot
-                 | `Organization
-                 | `User
-                 ]
-                [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+              type t = (string[@of_yojson t_of_yojson])
               [@@deriving yojson { strict = false; meta = true }, show, eq]
             end
 
@@ -94,22 +81,12 @@ module Primary = struct
     module Primary = struct
       module Type = struct
         let t_of_yojson = function
-          | `String "Bot" -> Ok `Bot
-          | `String "Organization" -> Ok `Organization
-          | `String "User" -> Ok `User
+          | `String "Bot" -> Ok "Bot"
+          | `String "User" -> Ok "User"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Bot -> `String "Bot"
-          | `Organization -> `String "Organization"
-          | `User -> `String "User"
-
-        type t =
-          ([ `Bot
-           | `Organization
-           | `User
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

@@ -2,40 +2,22 @@ module Items = struct
   module Primary = struct
     module Change_type = struct
       let t_of_yojson = function
-        | `String "added" -> Ok `Added
-        | `String "removed" -> Ok `Removed
+        | `String "added" -> Ok "added"
+        | `String "removed" -> Ok "removed"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Added -> `String "added"
-        | `Removed -> `String "removed"
-
-      type t =
-        ([ `Added
-         | `Removed
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 
     module Scope = struct
       let t_of_yojson = function
-        | `String "development" -> Ok `Development
-        | `String "runtime" -> Ok `Runtime
-        | `String "unknown" -> Ok `Unknown
+        | `String "unknown" -> Ok "unknown"
+        | `String "runtime" -> Ok "runtime"
+        | `String "development" -> Ok "development"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Development -> `String "development"
-        | `Runtime -> `String "runtime"
-        | `Unknown -> `String "unknown"
-
-      type t =
-        ([ `Development
-         | `Runtime
-         | `Unknown
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 
