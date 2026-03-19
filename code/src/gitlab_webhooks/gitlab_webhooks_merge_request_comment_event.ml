@@ -1,31 +1,20 @@
 module Event_type = struct
   let t_of_yojson = function
-    | `String "note" -> Ok `Note
+    | `String "note" -> Ok "note"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Note -> `String "note"
-
-  type t = ([ `Note ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
 module Object_attributes = struct
   module Action = struct
     let t_of_yojson = function
-      | `String "create" -> Ok `Create
-      | `String "update" -> Ok `Update
+      | `String "create" -> Ok "create"
+      | `String "update" -> Ok "update"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Create -> `String "create"
-      | `Update -> `String "update"
-
-    type t =
-      ([ `Create
-       | `Update
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -40,13 +29,10 @@ end
 
 module Object_kind = struct
   let t_of_yojson = function
-    | `String "note" -> Ok `Note
+    | `String "note" -> Ok "note"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Note -> `String "note"
-
-  type t = ([ `Note ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

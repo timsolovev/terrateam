@@ -1,13 +1,10 @@
 module Primary = struct
   module Action = struct
     let t_of_yojson = function
-      | `String "rejected" -> Ok `Rejected
+      | `String "rejected" -> Ok "rejected"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Rejected -> `String "rejected"
-
-    type t = ([ `Rejected ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -39,22 +36,12 @@ module Primary = struct
         module Primary = struct
           module Type = struct
             let t_of_yojson = function
-              | `String "Bot" -> Ok `Bot
-              | `String "Organization" -> Ok `Organization
-              | `String "User" -> Ok `User
+              | `String "Bot" -> Ok "Bot"
+              | `String "User" -> Ok "User"
+              | `String "Organization" -> Ok "Organization"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Bot -> `String "Bot"
-              | `Organization -> `String "Organization"
-              | `User -> `String "User"
-
-            type t =
-              ([ `Bot
-               | `Organization
-               | `User
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -90,34 +77,16 @@ module Primary = struct
 
       module Conclusion = struct
         let t_of_yojson = function
-          | `String "action_required" -> Ok `Action_required
-          | `String "cancelled" -> Ok `Cancelled
-          | `String "failure" -> Ok `Failure
-          | `String "neutral" -> Ok `Neutral
-          | `String "stale" -> Ok `Stale
-          | `String "success" -> Ok `Success
-          | `String "timed_out" -> Ok `Timed_out
+          | `String "success" -> Ok "success"
+          | `String "failure" -> Ok "failure"
+          | `String "neutral" -> Ok "neutral"
+          | `String "cancelled" -> Ok "cancelled"
+          | `String "timed_out" -> Ok "timed_out"
+          | `String "action_required" -> Ok "action_required"
+          | `String "stale" -> Ok "stale"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Action_required -> `String "action_required"
-          | `Cancelled -> `String "cancelled"
-          | `Failure -> `String "failure"
-          | `Neutral -> `String "neutral"
-          | `Stale -> `String "stale"
-          | `Success -> `String "success"
-          | `Timed_out -> `String "timed_out"
-
-        type t =
-          ([ `Action_required
-           | `Cancelled
-           | `Failure
-           | `Neutral
-           | `Stale
-           | `Success
-           | `Timed_out
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -385,28 +354,14 @@ module Primary = struct
 
       module Status_ = struct
         let t_of_yojson = function
-          | `String "completed" -> Ok `Completed
-          | `String "in_progress" -> Ok `In_progress
-          | `String "queued" -> Ok `Queued
-          | `String "requested" -> Ok `Requested
-          | `String "waiting" -> Ok `Waiting
+          | `String "requested" -> Ok "requested"
+          | `String "in_progress" -> Ok "in_progress"
+          | `String "completed" -> Ok "completed"
+          | `String "queued" -> Ok "queued"
+          | `String "waiting" -> Ok "waiting"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Completed -> `String "completed"
-          | `In_progress -> `String "in_progress"
-          | `Queued -> `String "queued"
-          | `Requested -> `String "requested"
-          | `Waiting -> `String "waiting"
-
-        type t =
-          ([ `Completed
-           | `In_progress
-           | `Queued
-           | `Requested
-           | `Waiting
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -414,22 +369,12 @@ module Primary = struct
         module Primary = struct
           module Type = struct
             let t_of_yojson = function
-              | `String "Bot" -> Ok `Bot
-              | `String "Organization" -> Ok `Organization
-              | `String "User" -> Ok `User
+              | `String "Bot" -> Ok "Bot"
+              | `String "User" -> Ok "User"
+              | `String "Organization" -> Ok "Organization"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Bot -> `String "Bot"
-              | `Organization -> `String "Organization"
-              | `User -> `String "User"
-
-            type t =
-              ([ `Bot
-               | `Organization
-               | `User
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 

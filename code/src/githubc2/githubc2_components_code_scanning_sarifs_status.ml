@@ -5,22 +5,12 @@ module Primary = struct
 
   module Processing_status = struct
     let t_of_yojson = function
-      | `String "complete" -> Ok `Complete
-      | `String "failed" -> Ok `Failed
-      | `String "pending" -> Ok `Pending
+      | `String "pending" -> Ok "pending"
+      | `String "complete" -> Ok "complete"
+      | `String "failed" -> Ok "failed"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Complete -> `String "complete"
-      | `Failed -> `String "failed"
-      | `Pending -> `String "pending"
-
-    type t =
-      ([ `Complete
-       | `Failed
-       | `Pending
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

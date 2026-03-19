@@ -12,25 +12,13 @@ end
 
 module Export_status = struct
   let t_of_yojson = function
-    | `String "failed" -> Ok `Failed
-    | `String "finished" -> Ok `Finished
-    | `String "queued" -> Ok `Queued
-    | `String "started" -> Ok `Started
+    | `String "queued" -> Ok "queued"
+    | `String "started" -> Ok "started"
+    | `String "finished" -> Ok "finished"
+    | `String "failed" -> Ok "failed"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Failed -> `String "failed"
-    | `Finished -> `String "finished"
-    | `Queued -> `String "queued"
-    | `Started -> `String "started"
-
-  type t =
-    ([ `Failed
-     | `Finished
-     | `Queued
-     | `Started
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

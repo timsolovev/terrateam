@@ -1,22 +1,12 @@
 module Primary = struct
   module Failure_reason = struct
     let t_of_yojson = function
-      | `String "actions_workflow_run_failed" -> Ok `Actions_workflow_run_failed
-      | `String "internal_error" -> Ok `Internal_error
-      | `String "no_repos_queried" -> Ok `No_repos_queried
+      | `String "no_repos_queried" -> Ok "no_repos_queried"
+      | `String "actions_workflow_run_failed" -> Ok "actions_workflow_run_failed"
+      | `String "internal_error" -> Ok "internal_error"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Actions_workflow_run_failed -> `String "actions_workflow_run_failed"
-      | `Internal_error -> `String "internal_error"
-      | `No_repos_queried -> `String "no_repos_queried"
-
-    type t =
-      ([ `Actions_workflow_run_failed
-       | `Internal_error
-       | `No_repos_queried
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -73,25 +63,13 @@ module Primary = struct
 
   module Status_ = struct
     let t_of_yojson = function
-      | `String "cancelled" -> Ok `Cancelled
-      | `String "failed" -> Ok `Failed
-      | `String "in_progress" -> Ok `In_progress
-      | `String "succeeded" -> Ok `Succeeded
+      | `String "in_progress" -> Ok "in_progress"
+      | `String "succeeded" -> Ok "succeeded"
+      | `String "failed" -> Ok "failed"
+      | `String "cancelled" -> Ok "cancelled"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Cancelled -> `String "cancelled"
-      | `Failed -> `String "failed"
-      | `In_progress -> `String "in_progress"
-      | `Succeeded -> `String "succeeded"
-
-    type t =
-      ([ `Cancelled
-       | `Failed
-       | `In_progress
-       | `Succeeded
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

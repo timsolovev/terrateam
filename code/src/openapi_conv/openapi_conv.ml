@@ -249,29 +249,25 @@ let field_name_of_schema s =
   | "-1" -> "minus_one"
   | s -> cleanup_name s
 
-let field_default_of_value typ enum default =
-  match (default, typ, enum) with
-  | `String s, Some "boolean", _ ->
+let field_default_of_value typ default =
+  match (default, typ) with
+  | `String s, Some "boolean" ->
       Some Ast_helper.(Exp.construct (Location.mknoloc (Gen.ident [ s ])) None)
-  | `String s, _, Some enum_json -> (
-      match Gen.variant_name_of_default enum_json s with
-      | Some tag -> Some Ast_helper.(Exp.variant tag None)
-      | None -> Some Ast_helper.(Exp.constant (Const.string s)))
-  | `String s, _, None -> Some Ast_helper.(Exp.constant (Const.string s))
-  | `Bool b, _, _ ->
+  | `String s, _ -> Some Ast_helper.(Exp.constant (Const.string s))
+  | `Bool b, _ ->
       Some Ast_helper.(Exp.construct (Location.mknoloc (Gen.ident [ Bool.to_string b ])) None)
-  | `Float fl, _, _ -> Some Ast_helper.(Exp.constant (Const.float (CCFloat.to_string fl)))
-  | `Int int, _, _ -> Some Ast_helper.(Exp.constant (Const.integer (CCInt.to_string int)))
-  | `List [], _, _ -> Some Json_schema_conv.Gen.(make_list [])
-  | `List (`String _ :: _ as v), _, _ ->
+  | `Float fl, _ -> Some Ast_helper.(Exp.constant (Const.float (CCFloat.to_string fl)))
+  | `Int int, _ -> Some Ast_helper.(Exp.constant (Const.integer (CCInt.to_string int)))
+  | `List [], _ -> Some Json_schema_conv.Gen.(make_list [])
+  | `List (`String _ :: _ as v), _ ->
       Some
         Json_schema_conv.Gen.(
           make_list
             (CCList.map
                (fun s -> Ast_helper.(Exp.constant (Const.string s)))
                (Yojson.Safe.Util.filter_string v)))
-  | `List _, _, _ -> (* TODO: Add more *) None
-  | json, _, _ ->
+  | `List _, _ -> (* TODO: Add more *) None
+  | json, _ ->
       failwith (Printf.sprintf "Unknown field default value: %s" (Yojson.Safe.to_string json))
 
 let record_field_attrs schema name required =
@@ -284,19 +280,19 @@ let record_field_attrs schema name required =
             (fun default ->
               Gen.field_default
                 (Ast_helper.Exp.construct (Location.mknoloc (Gen.ident [ "Some" ])) (Some default)))
-            (field_default_of_value schema.Schema.typ schema.Schema.enum default)
+            (field_default_of_value schema.Schema.typ default)
       | Some default ->
           CCOption.map_or
             ~default:[]
             (fun default -> Gen.field_default default)
-            (field_default_of_value schema.Schema.typ schema.Schema.enum default)
+            (field_default_of_value schema.Schema.typ default)
       | None when (not (Sln_set.String.mem name required)) || schema.Schema.nullable ->
           Gen.field_default_none
       | None -> []);
       (if CCString.equal (field_name_of_schema name) name then [] else Gen.yojson_key_name name);
     ]
 
-let request_param_of_op_params base_module_name components param_in params =
+let request_param_of_op_params components param_in params =
   let params =
     params
     |> CCList.filter_map (fun p ->
@@ -313,18 +309,7 @@ let request_param_of_op_params base_module_name components param_in params =
       let array obj =
         Ast_helper.(Exp.construct (Location.mknoloc (Gen.ident [ "Array" ])) (Some obj))
       in
-      let enum_module_of_schema_value param_module schema_value =
-        match schema_value with
-        | Value.Ref ref_ -> module_name_of_ref base_module_name "paths" ref_
-        | Value.V _ -> [ param_module ]
-      in
-      let rec type_desc_of_schema ~enum_module = function
-        | { Schema.typ = Some "string"; enum = Some _; _ } ->
-            Ast_helper.Exp.construct
-              (Location.mknoloc (Gen.ident [ "Enum" ]))
-              (Some
-                 (Ast_helper.Exp.ident
-                    (Location.mknoloc (Gen.ident (enum_module @ [ "t_to_yojson" ])))))
+      let rec type_desc_of_schema = function
         | { Schema.typ = Some typ; format; _ } as schema when Json_schema_conv.is_prim_type schema
           -> (
             match Json_schema_conv.extract_prim_type schema with
@@ -335,15 +320,7 @@ let request_param_of_op_params base_module_name components param_in params =
             | Some "number" -> assert false
             | _ -> assert false)
         | { Schema.typ = Some "array"; items = Some items; _ } ->
-            let items_enum_module =
-              match items with
-              | Value.Ref ref_ -> module_name_of_ref base_module_name "paths" ref_
-              | Value.V _ -> enum_module @ [ "Items" ]
-            in
-            array
-              (type_desc_of_schema
-                 ~enum_module:items_enum_module
-                 (resolve_schema_ref components items))
+            array (type_desc_of_schema (resolve_schema_ref components items))
         | schema -> failwith (Schema.show_t_ schema)
       in
       let open Ast_helper in
@@ -390,10 +367,7 @@ let request_param_of_op_params base_module_name components param_in params =
                                         (Exp.tuple
                                            [
                                              Exp.ident (Location.mknoloc (Gen.ident [ "v" ]));
-                                             type_desc_of_schema
-                                               ~enum_module:
-                                                 [ module_name_of_string p.Parameter.name ]
-                                               schema;
+                                             type_desc_of_schema schema;
                                            ]))))
                            @@ CCList.map (resolve_schema_ref components) schemas)
                           @
@@ -412,12 +386,7 @@ let request_param_of_op_params base_module_name components param_in params =
                             ]
                           else [])
                     | schema ->
-                        let enum_module =
-                          enum_module_of_schema_value
-                            (module_name_of_string p.Parameter.name)
-                            p.Parameter.schema
-                        in
-                        let type_desc = type_desc_of_schema ~enum_module schema in
+                        let type_desc = type_desc_of_schema schema in
                         let type_desc =
                           if
                             (p.Parameter.required || CCOption.is_some schema.Schema.default)
@@ -742,17 +711,9 @@ let convert_str_operation strict_records base_module_name components uritmpl op_
              [
                (Asttypes.Labelled "headers", Gen.make_list []);
                ( Asttypes.Labelled "url_params",
-                 request_param_of_op_params
-                   base_module_name
-                   components
-                   "path"
-                   op.Operation.parameters );
+                 request_param_of_op_params components "path" op.Operation.parameters );
                ( Asttypes.Labelled "query_params",
-                 request_param_of_op_params
-                   base_module_name
-                   components
-                   "query"
-                   op.Operation.parameters );
+                 request_param_of_op_params components "query" op.Operation.parameters );
                (Asttypes.Labelled "url", Exp.ident (Location.mknoloc (Gen.ident [ "url" ])));
                ( Asttypes.Labelled "responses",
                  Exp.ident (Location.mknoloc (Gen.ident [ "Responses"; "t" ])) );

@@ -434,6 +434,26 @@ let build_modifies_lookup dirspace_configs =
     ~init:Sln_map.String.empty
     dirspace_configs
 
+let rec combine_rule accessor nested_lookup stacks vs =
+  let module V1 = Terrat_base_repo_config_v1 in
+  let module S = V1.Stacks in
+  CCListLabels.fold_left
+    ~f:(fun acc v ->
+      match Sln_map.String.find_opt v nested_lookup with
+      | Some ss ->
+          CCListLabels.fold_left
+            ~f:(fun acc s ->
+              match Sln_map.String.find_opt s stacks with
+              | Some config ->
+                  let vs = accessor config in
+                  combine_rule accessor nested_lookup stacks vs @ acc
+              | None -> assert false)
+            ~init:acc
+            ss
+      | None -> v :: acc)
+    ~init:[]
+    vs
+
 let rec collect_deps ?(acc = []) ~accessor stacks names =
   let module V1 = Terrat_base_repo_config_v1 in
   let module S = V1.Stacks in

@@ -264,53 +264,6 @@ module Gen = struct
           (Parsetree.PStr [ Str.eval (Exp.ident (Location.mknoloc (ident [ name ]))) ]));
     ]
 
-  let to_yojson_attr name =
-    [
-      Ast_helper.(
-        Attr.mk
-          (Location.mknoloc "to_yojson")
-          (Parsetree.PStr [ Str.eval (Exp.ident (Location.mknoloc (ident [ name ]))) ]));
-    ]
-
-  let variant_name_of_enum s =
-    let is_valid c =
-      (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c = '_'
-    in
-    let name =
-      s |> CCString.map (fun c -> if is_valid c then c else '_') |> CCString.capitalize_ascii
-    in
-    let name =
-      if CCString.length name = 0 then "Empty"
-      else if CCString.for_all (fun c -> c = '_') name then "V_" ^ name
-      else if name.[0] >= '0' && name.[0] <= '9' then "V_" ^ name
-      else name
-    in
-    name
-
-  (* It is possible that we will have variant names that conflict when we apply
-     [variant_name_of_enum] we might have duplicates, for example foo_bar and
-     foo-bar both become foo_bar.  So to deal with this, we sort them then add
-     an index to duplicate entries like `Foo_bar_2  *)
-  let unique_variant_names enums =
-    let sorted = CCList.sort CCString.compare enums in
-    let names = CCList.map (fun e -> (e, variant_name_of_enum e)) sorted in
-    let counts = Hashtbl.create 16 in
-    CCList.map
-      (fun (orig, name) ->
-        match Hashtbl.find_opt counts name with
-        | None ->
-            Hashtbl.replace counts name 1;
-            (orig, name)
-        | Some c ->
-            Hashtbl.replace counts name (c + 1);
-            (orig, name ^ "_" ^ string_of_int (c + 1)))
-      names
-
-  let variant_name_of_default enum_json s =
-    let enum_strings = Yojson.Safe.Util.filter_string enum_json in
-    let variant_map = unique_variant_names enum_strings in
-    CCList.assoc_opt ~eq:CCString.equal s variant_map
-
   let yojson_key_name name =
     [
       Ast_helper.Attr.mk
@@ -615,9 +568,7 @@ let rec convert_str_schema (config : Config.t) =
   let module S = Schema in
   function
   | { S.typ = Some "string"; nullable; enum = Some enum; _ } ->
-      let enum_strings = Yojson.Safe.Util.filter_string enum in
-      let variant_map = Gen.unique_variant_names enum_strings in
-      let rec of_yojson_cases = function
+      let rec f = function
         | [] ->
             [
               Ast_helper.(
@@ -641,29 +592,16 @@ let rec convert_str_schema (config : Config.t) =
                                  ] );
                            ]))));
             ]
-        | (e, tag) :: es ->
+        | e :: es ->
             Ast_helper.(
               Exp.case
                 (Pat.variant "String" (Some (Pat.constant (Const.string e))))
                 (Exp.construct
                    (Location.mknoloc (Gen.ident [ "Ok" ]))
-                   (Some (Exp.variant tag None))))
-            :: of_yojson_cases es
-      in
-      let to_yojson_cases =
-        CCList.map
-          (fun (e, tag) ->
-            Ast_helper.(
-              Exp.case
-                (Pat.variant tag None)
-                (Exp.variant "String" (Some (Exp.constant (Const.string e))))))
-          variant_map
-      in
-      let row_fields =
-        CCList.map (fun (_e, tag) -> Ast_helper.Rf.tag (Location.mknoloc tag) true []) variant_map
+                   (Some (Exp.constant (Const.string e)))))
+            :: f es
       in
       let of_yojson_name = Config.tidx_to_string config ^ "_of_yojson" in
-      let to_yojson_name = Config.tidx_to_string config ^ "_to_yojson" in
       [
         Gen.make_func
           of_yojson_name
@@ -671,22 +609,17 @@ let rec convert_str_schema (config : Config.t) =
             Exp.function_
               []
               None
-              (Parsetree.Pfunction_cases (of_yojson_cases variant_map, Location.none, [])));
-        Gen.make_func
-          to_yojson_name
-          Ast_helper.(
-            Exp.function_ [] None (Parsetree.Pfunction_cases (to_yojson_cases, Location.none, [])));
+              (Parsetree.Pfunction_cases (f (Yojson.Safe.Util.filter_string enum), Location.none, [])));
         Gen.(
           make_str_type
             ~attrs:(Config.prim_type_attrs config)
             (Config.tidx_to_string config)
             (maybe_make_nullable
                nullable
-               (Ast_helper.Typ.variant
-                  ~attrs:(of_yojson_attr of_yojson_name @ to_yojson_attr to_yojson_name)
-                  row_fields
-                  Asttypes.Closed
-                  None)));
+               (Ast_helper.Typ.constr
+                  ~attrs:(of_yojson_attr of_yojson_name)
+                  (Location.mknoloc (ident [ "string" ]))
+                  [])));
       ]
   | { S.typ = Some typ; nullable; format; _ } as schema when is_prim_type schema ->
       [

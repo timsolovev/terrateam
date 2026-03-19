@@ -113,20 +113,11 @@ module List_dirspaces = struct
   module Parameters = struct
     module D = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Page = struct
@@ -192,7 +183,7 @@ module List_dirspaces = struct
          [
            ("page", Var (params.page, Option (Array String)));
            ("q", Var (params.q, Option String));
-           ("d", Var (params.d, Option (Enum D.t_to_yojson)));
+           ("d", Var (params.d, Option String));
            ("tz", Var (params.tz, Option String));
            ("limit", Var (params.limit, Option Int));
          ])
@@ -322,20 +313,11 @@ module List_work_manifests = struct
   module Parameters = struct
     module D = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Page = struct
@@ -401,7 +383,7 @@ module List_work_manifests = struct
          [
            ("page", Var (params.page, Option (Array String)));
            ("q", Var (params.q, Option String));
-           ("d", Var (params.d, Option (Enum D.t_to_yojson)));
+           ("d", Var (params.d, Option String));
            ("tz", Var (params.tz, Option String));
            ("limit", Var (params.limit, Option Int));
          ])

@@ -1,12 +1,9 @@
 module Action = struct
   let t_of_yojson = function
-    | `String "suspend" -> Ok `Suspend
+    | `String "suspend" -> Ok "suspend"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Suspend -> `String "suspend"
-
-  type t = ([ `Suspend ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
@@ -58,19 +55,11 @@ module Installation_ = struct
 
       module Target_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "User" -> Ok `User
+          | `String "User" -> Ok "User"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `User -> `String "User"
-
-        type t =
-          ([ `Organization
-           | `User
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -175,19 +164,11 @@ module Installation_ = struct
 
       module Target_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "User" -> Ok `User
+          | `String "User" -> Ok "User"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `User -> `String "User"
-
-        type t =
-          ([ `Organization
-           | `User
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

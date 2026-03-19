@@ -1,18 +1,10 @@
 module Status = struct
   let t_of_yojson = function
-    | `String "default" -> Ok `Default
-    | `String "hidden" -> Ok `Hidden
+    | `String "default" -> Ok "default"
+    | `String "hidden" -> Ok "hidden"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Default -> `String "default"
-    | `Hidden -> `String "hidden"
-
-  type t =
-    ([ `Default
-     | `Hidden
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

@@ -89,30 +89,19 @@ module List_for_org = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "closed" -> Ok `Closed
-        | `String "open" -> Ok `Open
+        | `String "open" -> Ok "open"
+        | `String "closed" -> Ok "closed"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Closed -> `String "closed"
-        | `Open -> `String "open"
-
-      type t =
-        ([ `All
-         | `Closed
-         | `Open
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       org : string;
       page : int; [@default 1]
       per_page : int; [@default 30]
-      state : State.t; [@default `Open]
+      state : State.t; [@default "open"]
     }
     [@@deriving make, show, eq]
   end
@@ -155,7 +144,7 @@ module List_for_org = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("state", Var (params.state, Enum State.t_to_yojson));
+           ("state", Var (params.state, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -852,27 +841,16 @@ module List_cards = struct
   module Parameters = struct
     module Archived_state = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "archived" -> Ok `Archived
-        | `String "not_archived" -> Ok `Not_archived
+        | `String "all" -> Ok "all"
+        | `String "archived" -> Ok "archived"
+        | `String "not_archived" -> Ok "not_archived"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Archived -> `String "archived"
-        | `Not_archived -> `String "not_archived"
-
-      type t =
-        ([ `All
-         | `Archived
-         | `Not_archived
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
-      archived_state : Archived_state.t; [@default `Not_archived]
+      archived_state : Archived_state.t; [@default "not_archived"]
       column_id : int;
       page : int; [@default 1]
       per_page : int; [@default 30]
@@ -928,7 +906,7 @@ module List_cards = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("archived_state", Var (params.archived_state, Enum Archived_state.t_to_yojson));
+           ("archived_state", Var (params.archived_state, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -1020,25 +998,13 @@ module Update = struct
     module Primary = struct
       module Organization_permission = struct
         let t_of_yojson = function
-          | `String "admin" -> Ok `Admin
-          | `String "none" -> Ok `None
-          | `String "read" -> Ok `Read
-          | `String "write" -> Ok `Write
+          | `String "read" -> Ok "read"
+          | `String "write" -> Ok "write"
+          | `String "admin" -> Ok "admin"
+          | `String "none" -> Ok "none"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Admin -> `String "admin"
-          | `None -> `String "none"
-          | `Read -> `String "read"
-          | `Write -> `String "write"
-
-        type t =
-          ([ `Admin
-           | `None
-           | `Read
-           | `Write
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1274,27 +1240,16 @@ module List_collaborators = struct
   module Parameters = struct
     module Affiliation = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "direct" -> Ok `Direct
-        | `String "outside" -> Ok `Outside
+        | `String "outside" -> Ok "outside"
+        | `String "direct" -> Ok "direct"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Direct -> `String "direct"
-        | `Outside -> `String "outside"
-
-      type t =
-        ([ `All
-         | `Direct
-         | `Outside
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
-      affiliation : Affiliation.t; [@default `All]
+      affiliation : Affiliation.t; [@default "all"]
       page : int; [@default 1]
       per_page : int; [@default 30]
       project_id : int;
@@ -1365,7 +1320,7 @@ module List_collaborators = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("affiliation", Var (params.affiliation, Enum Affiliation.t_to_yojson));
+           ("affiliation", Var (params.affiliation, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -1459,26 +1414,16 @@ module Add_collaborator = struct
     module Primary = struct
       module Permission = struct
         let t_of_yojson = function
-          | `String "admin" -> Ok `Admin
-          | `String "read" -> Ok `Read
-          | `String "write" -> Ok `Write
+          | `String "read" -> Ok "read"
+          | `String "write" -> Ok "write"
+          | `String "admin" -> Ok "admin"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Admin -> `String "admin"
-          | `Read -> `String "read"
-          | `Write -> `String "write"
-
-        type t =
-          ([ `Admin
-           | `Read
-           | `Write
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
-      type t = { permission : Permission.t [@default `Write] }
+      type t = { permission : Permission.t [@default "write"] }
       [@@deriving make, yojson { strict = false; meta = true }, show, eq]
     end
 
@@ -1857,23 +1802,12 @@ module List_for_repo = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "closed" -> Ok `Closed
-        | `String "open" -> Ok `Open
+        | `String "open" -> Ok "open"
+        | `String "closed" -> Ok "closed"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Closed -> `String "closed"
-        | `Open -> `String "open"
-
-      type t =
-        ([ `All
-         | `Closed
-         | `Open
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1881,7 +1815,7 @@ module List_for_repo = struct
       page : int; [@default 1]
       per_page : int; [@default 30]
       repo : string;
-      state : State.t; [@default `Open]
+      state : State.t; [@default "open"]
     }
     [@@deriving make, show, eq]
   end
@@ -1952,7 +1886,7 @@ module List_for_repo = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("state", Var (params.state, Enum State.t_to_yojson));
+           ("state", Var (params.state, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -2037,29 +1971,18 @@ module List_for_user = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "closed" -> Ok `Closed
-        | `String "open" -> Ok `Open
+        | `String "open" -> Ok "open"
+        | `String "closed" -> Ok "closed"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Closed -> `String "closed"
-        | `Open -> `String "open"
-
-      type t =
-        ([ `All
-         | `Closed
-         | `Open
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       page : int; [@default 1]
       per_page : int; [@default 30]
-      state : State.t; [@default `Open]
+      state : State.t; [@default "open"]
       username : string;
     }
     [@@deriving make, show, eq]
@@ -2103,7 +2026,7 @@ module List_for_user = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("state", Var (params.state, Enum State.t_to_yojson));
+           ("state", Var (params.state, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])

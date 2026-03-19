@@ -1,22 +1,12 @@
 module Primary = struct
   module Source = struct
     let t_of_yojson = function
-      | `String "custom" -> Ok `Custom
-      | `String "github" -> Ok `Github
-      | `String "partner" -> Ok `Partner
+      | `String "github" -> Ok "github"
+      | `String "partner" -> Ok "partner"
+      | `String "custom" -> Ok "custom"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Custom -> `String "custom"
-      | `Github -> `String "github"
-      | `Partner -> `String "partner"
-
-    type t =
-      ([ `Custom
-       | `Github
-       | `Partner
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

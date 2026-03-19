@@ -24,46 +24,24 @@ end
 
 module Severity = struct
   let t_of_yojson = function
-    | `String "critical" -> Ok `Critical
-    | `String "high" -> Ok `High
-    | `String "low" -> Ok `Low
-    | `String "medium" -> Ok `Medium
+    | `String "critical" -> Ok "critical"
+    | `String "high" -> Ok "high"
+    | `String "medium" -> Ok "medium"
+    | `String "low" -> Ok "low"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Critical -> `String "critical"
-    | `High -> `String "high"
-    | `Low -> `String "low"
-    | `Medium -> `String "medium"
-
-  type t =
-    ([ `Critical
-     | `High
-     | `Low
-     | `Medium
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
 module State = struct
   let t_of_yojson = function
-    | `String "closed" -> Ok `Closed
-    | `String "draft" -> Ok `Draft
-    | `String "published" -> Ok `Published
+    | `String "published" -> Ok "published"
+    | `String "closed" -> Ok "closed"
+    | `String "draft" -> Ok "draft"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Closed -> `String "closed"
-    | `Draft -> `String "draft"
-    | `Published -> `String "published"
-
-  type t =
-    ([ `Closed
-     | `Draft
-     | `Published
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

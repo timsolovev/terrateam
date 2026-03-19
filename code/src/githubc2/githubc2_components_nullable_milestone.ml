@@ -1,19 +1,11 @@
 module Primary = struct
   module State = struct
     let t_of_yojson = function
-      | `String "closed" -> Ok `Closed
-      | `String "open" -> Ok `Open
+      | `String "open" -> Ok "open"
+      | `String "closed" -> Ok "closed"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Closed -> `String "closed"
-      | `Open -> `String "open"
-
-    type t =
-      ([ `Closed
-       | `Open
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -30,7 +22,7 @@ module Primary = struct
     node_id : string;
     number : int;
     open_issues : int;
-    state : State.t; [@default `Open]
+    state : State.t; [@default "open"]
     title : string;
     updated_at : string;
     url : string;

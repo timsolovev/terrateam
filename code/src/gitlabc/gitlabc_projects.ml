@@ -2,485 +2,232 @@ module PostApiV4ProjectsImport = struct
   module Parameters = struct
     module Override_params_analytics_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_cancel_pending_pipelines_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
+        | `String "disabled" -> Ok "disabled"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_devops_deploy_strategy_ = struct
       let t_of_yojson = function
-        | `String "continuous" -> Ok `Continuous
-        | `String "manual" -> Ok `Manual
-        | `String "timed_incremental" -> Ok `Timed_incremental
+        | `String "continuous" -> Ok "continuous"
+        | `String "manual" -> Ok "manual"
+        | `String "timed_incremental" -> Ok "timed_incremental"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Continuous -> `String "continuous"
-        | `Manual -> `String "manual"
-        | `Timed_incremental -> `String "timed_incremental"
-
-      type t =
-        ([ `Continuous
-         | `Manual
-         | `Timed_incremental
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_build_git_strategy_ = struct
       let t_of_yojson = function
-        | `String "clone" -> Ok `Clone
-        | `String "fetch" -> Ok `Fetch
+        | `String "fetch" -> Ok "fetch"
+        | `String "clone" -> Ok "clone"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Clone -> `String "clone"
-        | `Fetch -> `String "fetch"
-
-      type t =
-        ([ `Clone
-         | `Fetch
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_builds_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_container_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_environments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_feature_flags_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_forking_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_infrastructure_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_issues_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_method_ = struct
       let t_of_yojson = function
-        | `String "ff" -> Ok `Ff
-        | `String "merge" -> Ok `Merge
-        | `String "rebase_merge" -> Ok `Rebase_merge
+        | `String "ff" -> Ok "ff"
+        | `String "rebase_merge" -> Ok "rebase_merge"
+        | `String "merge" -> Ok "merge"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Ff -> `String "ff"
-        | `Merge -> `String "merge"
-        | `Rebase_merge -> `String "rebase_merge"
-
-      type t =
-        ([ `Ff
-         | `Merge
-         | `Rebase_merge
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_requests_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_experiments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_monitor_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_pages_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_releases_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_repository_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_requirements_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_security_and_compliance_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_snippets_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_squash_option_ = struct
       let t_of_yojson = function
-        | `String "always" -> Ok `Always
-        | `String "default_off" -> Ok `Default_off
-        | `String "default_on" -> Ok `Default_on
-        | `String "never" -> Ok `Never
+        | `String "never" -> Ok "never"
+        | `String "always" -> Ok "always"
+        | `String "default_on" -> Ok "default_on"
+        | `String "default_off" -> Ok "default_off"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Always -> `String "always"
-        | `Default_off -> `String "default_off"
-        | `Default_on -> `String "default_on"
-        | `Never -> `String "never"
-
-      type t =
-        ([ `Always
-         | `Default_off
-         | `Default_on
-         | `Never
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_tag_list_ = struct
@@ -493,44 +240,22 @@ module PostApiV4ProjectsImport = struct
 
     module Override_params_visibility_ = struct
       let t_of_yojson = function
-        | `String "internal" -> Ok `Internal
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "private" -> Ok "private"
+        | `String "internal" -> Ok "internal"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Internal -> `String "internal"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Internal
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_wiki_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -871,485 +596,232 @@ module PostApiV4ProjectsRemoteImport = struct
   module Parameters = struct
     module Override_params_analytics_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_cancel_pending_pipelines_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
+        | `String "disabled" -> Ok "disabled"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_devops_deploy_strategy_ = struct
       let t_of_yojson = function
-        | `String "continuous" -> Ok `Continuous
-        | `String "manual" -> Ok `Manual
-        | `String "timed_incremental" -> Ok `Timed_incremental
+        | `String "continuous" -> Ok "continuous"
+        | `String "manual" -> Ok "manual"
+        | `String "timed_incremental" -> Ok "timed_incremental"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Continuous -> `String "continuous"
-        | `Manual -> `String "manual"
-        | `Timed_incremental -> `String "timed_incremental"
-
-      type t =
-        ([ `Continuous
-         | `Manual
-         | `Timed_incremental
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_build_git_strategy_ = struct
       let t_of_yojson = function
-        | `String "clone" -> Ok `Clone
-        | `String "fetch" -> Ok `Fetch
+        | `String "fetch" -> Ok "fetch"
+        | `String "clone" -> Ok "clone"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Clone -> `String "clone"
-        | `Fetch -> `String "fetch"
-
-      type t =
-        ([ `Clone
-         | `Fetch
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_builds_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_container_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_environments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_feature_flags_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_forking_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_infrastructure_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_issues_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_method_ = struct
       let t_of_yojson = function
-        | `String "ff" -> Ok `Ff
-        | `String "merge" -> Ok `Merge
-        | `String "rebase_merge" -> Ok `Rebase_merge
+        | `String "ff" -> Ok "ff"
+        | `String "rebase_merge" -> Ok "rebase_merge"
+        | `String "merge" -> Ok "merge"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Ff -> `String "ff"
-        | `Merge -> `String "merge"
-        | `Rebase_merge -> `String "rebase_merge"
-
-      type t =
-        ([ `Ff
-         | `Merge
-         | `Rebase_merge
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_requests_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_experiments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_monitor_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_pages_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_releases_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_repository_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_requirements_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_security_and_compliance_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_snippets_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_squash_option_ = struct
       let t_of_yojson = function
-        | `String "always" -> Ok `Always
-        | `String "default_off" -> Ok `Default_off
-        | `String "default_on" -> Ok `Default_on
-        | `String "never" -> Ok `Never
+        | `String "never" -> Ok "never"
+        | `String "always" -> Ok "always"
+        | `String "default_on" -> Ok "default_on"
+        | `String "default_off" -> Ok "default_off"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Always -> `String "always"
-        | `Default_off -> `String "default_off"
-        | `Default_on -> `String "default_on"
-        | `Never -> `String "never"
-
-      type t =
-        ([ `Always
-         | `Default_off
-         | `Default_on
-         | `Never
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_tag_list_ = struct
@@ -1362,44 +834,22 @@ module PostApiV4ProjectsRemoteImport = struct
 
     module Override_params_visibility_ = struct
       let t_of_yojson = function
-        | `String "internal" -> Ok `Internal
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "private" -> Ok "private"
+        | `String "internal" -> Ok "internal"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Internal -> `String "internal"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Internal
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_wiki_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1626,485 +1076,232 @@ module PostApiV4ProjectsRemoteImportS3 = struct
   module Parameters = struct
     module Override_params_analytics_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_cancel_pending_pipelines_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
+        | `String "disabled" -> Ok "disabled"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_auto_devops_deploy_strategy_ = struct
       let t_of_yojson = function
-        | `String "continuous" -> Ok `Continuous
-        | `String "manual" -> Ok `Manual
-        | `String "timed_incremental" -> Ok `Timed_incremental
+        | `String "continuous" -> Ok "continuous"
+        | `String "manual" -> Ok "manual"
+        | `String "timed_incremental" -> Ok "timed_incremental"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Continuous -> `String "continuous"
-        | `Manual -> `String "manual"
-        | `Timed_incremental -> `String "timed_incremental"
-
-      type t =
-        ([ `Continuous
-         | `Manual
-         | `Timed_incremental
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_build_git_strategy_ = struct
       let t_of_yojson = function
-        | `String "clone" -> Ok `Clone
-        | `String "fetch" -> Ok `Fetch
+        | `String "fetch" -> Ok "fetch"
+        | `String "clone" -> Ok "clone"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Clone -> `String "clone"
-        | `Fetch -> `String "fetch"
-
-      type t =
-        ([ `Clone
-         | `Fetch
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_builds_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_container_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_environments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_feature_flags_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_forking_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_infrastructure_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_issues_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_method_ = struct
       let t_of_yojson = function
-        | `String "ff" -> Ok `Ff
-        | `String "merge" -> Ok `Merge
-        | `String "rebase_merge" -> Ok `Rebase_merge
+        | `String "ff" -> Ok "ff"
+        | `String "rebase_merge" -> Ok "rebase_merge"
+        | `String "merge" -> Ok "merge"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Ff -> `String "ff"
-        | `Merge -> `String "merge"
-        | `Rebase_merge -> `String "rebase_merge"
-
-      type t =
-        ([ `Ff
-         | `Merge
-         | `Rebase_merge
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_merge_requests_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_experiments_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_model_registry_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_monitor_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_pages_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_releases_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_repository_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_requirements_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_security_and_compliance_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_snippets_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_squash_option_ = struct
       let t_of_yojson = function
-        | `String "always" -> Ok `Always
-        | `String "default_off" -> Ok `Default_off
-        | `String "default_on" -> Ok `Default_on
-        | `String "never" -> Ok `Never
+        | `String "never" -> Ok "never"
+        | `String "always" -> Ok "always"
+        | `String "default_on" -> Ok "default_on"
+        | `String "default_off" -> Ok "default_off"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Always -> `String "always"
-        | `Default_off -> `String "default_off"
-        | `Default_on -> `String "default_on"
-        | `Never -> `String "never"
-
-      type t =
-        ([ `Always
-         | `Default_off
-         | `Default_on
-         | `Never
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_tag_list_ = struct
@@ -2117,44 +1314,22 @@ module PostApiV4ProjectsRemoteImportS3 = struct
 
     module Override_params_visibility_ = struct
       let t_of_yojson = function
-        | `String "internal" -> Ok `Internal
-        | `String "private" -> Ok `Private
-        | `String "public" -> Ok `Public
+        | `String "private" -> Ok "private"
+        | `String "internal" -> Ok "internal"
+        | `String "public" -> Ok "public"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Internal -> `String "internal"
-        | `Private -> `String "private"
-        | `Public -> `String "public"
-
-      type t =
-        ([ `Internal
-         | `Private
-         | `Public
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Override_params_wiki_access_level_ = struct
       let t_of_yojson = function
-        | `String "disabled" -> Ok `Disabled
-        | `String "enabled" -> Ok `Enabled
-        | `String "private" -> Ok `Private
+        | `String "disabled" -> Ok "disabled"
+        | `String "private" -> Ok "private"
+        | `String "enabled" -> Ok "enabled"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disabled -> `String "disabled"
-        | `Enabled -> `String "enabled"
-        | `Private -> `String "private"
-
-      type t =
-        ([ `Disabled
-         | `Enabled
-         | `Private
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {

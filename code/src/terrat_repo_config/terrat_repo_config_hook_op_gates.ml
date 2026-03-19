@@ -12,13 +12,10 @@ end
 
 module Type = struct
   let t_of_yojson = function
-    | `String "gates" -> Ok `Gates
+    | `String "gates" -> Ok "gates"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Gates -> `String "gates"
-
-  type t = ([ `Gates ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

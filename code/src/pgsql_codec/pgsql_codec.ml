@@ -376,8 +376,8 @@ module Decode = struct
         int32
         >>= fun n ->
         (match Int32.to_int n with
-        | -1 -> return None
-        | n -> bytes n >>= fun s -> return (Some s))
+         | -1 -> return None
+         | n -> bytes n >>= fun s -> return (Some s))
         >>= fun result -> return (FunctionCallResponse { result })
     | 'v' ->
         int32
@@ -581,15 +581,26 @@ module Binary_value = struct
 
     let float4 f = int4 (Int32.bits_of_float f)
     let float8 f = int8 (Int64.bits_of_float f)
-    let bool b = if b then "\001" else "\000"
+
+    let bool b =
+      if b then "\001" else "\000"
   end
 
   module Decode = struct
-    let int2 s = if String.length s = 2 then Some (EndianString.BigEndian.get_int16 s 0) else None
-    let int4 s = if String.length s = 4 then Some (EndianString.BigEndian.get_int32 s 0) else None
-    let int8 s = if String.length s = 8 then Some (EndianString.BigEndian.get_int64 s 0) else None
+    let int2 s =
+      if String.length s = 2 then Some (EndianString.BigEndian.get_int16 s 0) else None
+
+    let int4 s =
+      if String.length s = 4 then Some (EndianString.BigEndian.get_int32 s 0) else None
+
+    let int8 s =
+      if String.length s = 8 then Some (EndianString.BigEndian.get_int64 s 0) else None
+
     let float4 s = Option.map Int32.float_of_bits (int4 s)
     let float8 s = Option.map Int64.float_of_bits (int8 s)
-    let bool s = if String.length s = 1 then Some (Char.code s.[0] <> 0) else None
+
+    let bool s =
+      if String.length s = 1 then Some (Char.code s.[0] <> 0) else None
+
   end
 end

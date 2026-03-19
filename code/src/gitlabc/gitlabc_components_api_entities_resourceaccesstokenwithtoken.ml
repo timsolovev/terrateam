@@ -1,18 +1,10 @@
 module Resource_type = struct
   let t_of_yojson = function
-    | `String "group" -> Ok `Group
-    | `String "project" -> Ok `Project
+    | `String "project" -> Ok "project"
+    | `String "group" -> Ok "group"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Group -> `String "group"
-    | `Project -> `String "project"
-
-  type t =
-    ([ `Group
-     | `Project
-     ]
-    [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

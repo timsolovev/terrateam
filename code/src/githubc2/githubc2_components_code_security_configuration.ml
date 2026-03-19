@@ -1,40 +1,22 @@
 module Primary = struct
   module Advanced_security = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Code_scanning_default_setup_ = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -42,22 +24,12 @@ module Primary = struct
     module Primary = struct
       module Runner_type = struct
         let t_of_yojson = function
-          | `String "labeled" -> Ok `Labeled
-          | `String "not_set" -> Ok `Not_set
-          | `String "standard" -> Ok `Standard
+          | `String "standard" -> Ok "standard"
+          | `String "labeled" -> Ok "labeled"
+          | `String "not_set" -> Ok "not_set"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Labeled -> `String "labeled"
-          | `Not_set -> `String "not_set"
-          | `Standard -> `String "standard"
-
-        type t =
-          ([ `Labeled
-           | `Not_set
-           | `Standard
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -73,106 +45,56 @@ module Primary = struct
 
   module Code_scanning_delegated_alert_dismissal = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Dependabot_alerts = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Dependabot_security_updates = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Dependency_graph = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Dependency_graph_autosubmit_action = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -187,103 +109,55 @@ module Primary = struct
 
   module Enforcement = struct
     let t_of_yojson = function
-      | `String "enforced" -> Ok `Enforced
-      | `String "unenforced" -> Ok `Unenforced
+      | `String "enforced" -> Ok "enforced"
+      | `String "unenforced" -> Ok "unenforced"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Enforced -> `String "enforced"
-      | `Unenforced -> `String "unenforced"
-
-    type t =
-      ([ `Enforced
-       | `Unenforced
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Private_vulnerability_reporting = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning_delegated_alert_dismissal = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning_delegated_bypass = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
@@ -294,19 +168,11 @@ module Primary = struct
           module Primary = struct
             module Reviewer_type = struct
               let t_of_yojson = function
-                | `String "ROLE" -> Ok `ROLE
-                | `String "TEAM" -> Ok `TEAM
+                | `String "TEAM" -> Ok "TEAM"
+                | `String "ROLE" -> Ok "ROLE"
                 | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-              let t_to_yojson = function
-                | `ROLE -> `String "ROLE"
-                | `TEAM -> `String "TEAM"
-
-              type t =
-                ([ `ROLE
-                 | `TEAM
-                 ]
-                [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+              type t = (string[@of_yojson t_of_yojson])
               [@@deriving yojson { strict = false; meta = true }, show, eq]
             end
 
@@ -332,106 +198,56 @@ module Primary = struct
 
   module Secret_scanning_generic_secrets = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning_non_provider_patterns = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning_push_protection = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Secret_scanning_validity_checks = struct
     let t_of_yojson = function
-      | `String "disabled" -> Ok `Disabled
-      | `String "enabled" -> Ok `Enabled
-      | `String "not_set" -> Ok `Not_set
+      | `String "enabled" -> Ok "enabled"
+      | `String "disabled" -> Ok "disabled"
+      | `String "not_set" -> Ok "not_set"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Disabled -> `String "disabled"
-      | `Enabled -> `String "enabled"
-      | `Not_set -> `String "not_set"
-
-    type t =
-      ([ `Disabled
-       | `Enabled
-       | `Not_set
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 
   module Target_type = struct
     let t_of_yojson = function
-      | `String "enterprise" -> Ok `Enterprise
-      | `String "global" -> Ok `Global
-      | `String "organization" -> Ok `Organization
+      | `String "global" -> Ok "global"
+      | `String "organization" -> Ok "organization"
+      | `String "enterprise" -> Ok "enterprise"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Enterprise -> `String "enterprise"
-      | `Global -> `String "global"
-      | `Organization -> `String "organization"
-
-    type t =
-      ([ `Enterprise
-       | `Global
-       | `Organization
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

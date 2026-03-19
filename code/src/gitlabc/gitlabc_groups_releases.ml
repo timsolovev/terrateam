@@ -2,20 +2,11 @@ module GetApiV4GroupsIdReleases = struct
   module Parameters = struct
     module Sort = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -23,7 +14,7 @@ module GetApiV4GroupsIdReleases = struct
       page : int; [@default 1]
       per_page : int; [@default 20]
       simple : bool; [@default false]
-      sort : Sort.t; [@default `Desc]
+      sort : Sort.t; [@default "desc"]
     }
     [@@deriving make, show, eq]
   end
@@ -64,7 +55,7 @@ module GetApiV4GroupsIdReleases = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("sort", Var (params.sort, String));
            ("simple", Var (params.simple, Bool));
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));

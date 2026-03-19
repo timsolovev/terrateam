@@ -1,12 +1,9 @@
 module Action = struct
   let t_of_yojson = function
-    | `String "opened" -> Ok `Opened
+    | `String "opened" -> Ok "opened"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Opened -> `String "opened"
-
-  type t = ([ `Opened ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 
@@ -93,19 +90,11 @@ module Pull_request_ = struct
 
       module State = struct
         let t_of_yojson = function
-          | `String "closed" -> Ok `Closed
-          | `String "open" -> Ok `Open
+          | `String "open" -> Ok "open"
+          | `String "closed" -> Ok "closed"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Closed -> `String "closed"
-          | `Open -> `String "open"
-
-        type t =
-          ([ `Closed
-           | `Open
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -247,19 +236,11 @@ module Pull_request_ = struct
 
       module State = struct
         let t_of_yojson = function
-          | `String "closed" -> Ok `Closed
-          | `String "open" -> Ok `Open
+          | `String "open" -> Ok "open"
+          | `String "closed" -> Ok "closed"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Closed -> `String "closed"
-          | `Open -> `String "open"
-
-        type t =
-          ([ `Closed
-           | `Open
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

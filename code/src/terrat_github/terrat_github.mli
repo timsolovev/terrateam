@@ -124,12 +124,7 @@ module Commit_status : sig
       type t [@@deriving show]
 
       val make :
-        ?target_url:string ->
-        ?description:string ->
-        ?context:string ->
-        state:Githubc2_repos.Create_commit_status.Request_body.Primary.State.t ->
-        unit ->
-        t
+        ?target_url:string -> ?description:string -> ?context:string -> state:string -> unit -> t
     end
 
     type t = T.t list
@@ -298,7 +293,7 @@ val minimize_comment :
   (unit, [> minimize_comment_err ]) result Abb.Future.t
 
 val react_to_comment :
-  ?content:Githubc2_reactions.Create_for_issue_comment.Request_body.Primary.Content.t ->
+  ?content:string ->
   owner:string ->
   repo:string ->
   comment_id:int ->

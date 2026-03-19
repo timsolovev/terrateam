@@ -65,22 +65,12 @@ module Primary = struct
 
   module State_reason = struct
     let t_of_yojson = function
-      | `String "completed" -> Ok `Completed
-      | `String "not_planned" -> Ok `Not_planned
-      | `String "reopened" -> Ok `Reopened
+      | `String "completed" -> Ok "completed"
+      | `String "reopened" -> Ok "reopened"
+      | `String "not_planned" -> Ok "not_planned"
       | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-    let t_to_yojson = function
-      | `Completed -> `String "completed"
-      | `Not_planned -> `String "not_planned"
-      | `Reopened -> `String "reopened"
-
-    type t =
-      ([ `Completed
-       | `Not_planned
-       | `Reopened
-       ]
-      [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+    type t = (string[@of_yojson t_of_yojson])
     [@@deriving yojson { strict = false; meta = true }, show, eq]
   end
 

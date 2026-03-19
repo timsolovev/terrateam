@@ -2,59 +2,27 @@ module GetApiV4ProjectsIdEvents = struct
   module Parameters = struct
     module Sort = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Target_type = struct
       let t_of_yojson = function
-        | `String "design" -> Ok `Design
-        | `String "issue" -> Ok `Issue
-        | `String "merge_request" -> Ok `Merge_request
-        | `String "milestone" -> Ok `Milestone
-        | `String "note" -> Ok `Note
-        | `String "project" -> Ok `Project
-        | `String "snippet" -> Ok `Snippet
-        | `String "user" -> Ok `User
-        | `String "wiki" -> Ok `Wiki
+        | `String "issue" -> Ok "issue"
+        | `String "milestone" -> Ok "milestone"
+        | `String "merge_request" -> Ok "merge_request"
+        | `String "note" -> Ok "note"
+        | `String "project" -> Ok "project"
+        | `String "snippet" -> Ok "snippet"
+        | `String "user" -> Ok "user"
+        | `String "wiki" -> Ok "wiki"
+        | `String "design" -> Ok "design"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Design -> `String "design"
-        | `Issue -> `String "issue"
-        | `Merge_request -> `String "merge_request"
-        | `Milestone -> `String "milestone"
-        | `Note -> `String "note"
-        | `Project -> `String "project"
-        | `Snippet -> `String "snippet"
-        | `User -> `String "user"
-        | `Wiki -> `String "wiki"
-
-      type t =
-        ([ `Design
-         | `Issue
-         | `Merge_request
-         | `Milestone
-         | `Note
-         | `Project
-         | `Snippet
-         | `User
-         | `Wiki
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -64,7 +32,7 @@ module GetApiV4ProjectsIdEvents = struct
       id : string;
       page : int; [@default 1]
       per_page : int; [@default 20]
-      sort : Sort.t; [@default `Desc]
+      sort : Sort.t; [@default "desc"]
       target_type : Target_type.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -92,10 +60,10 @@ module GetApiV4ProjectsIdEvents = struct
          let open Parameters in
          [
            ("action", Var (params.action, Option String));
-           ("target_type", Var (params.target_type, Option (Enum Target_type.t_to_yojson)));
+           ("target_type", Var (params.target_type, Option String));
            ("before", Var (params.before, Option String));
            ("after", Var (params.after, Option String));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
+           ("sort", Var (params.sort, String));
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));
          ])

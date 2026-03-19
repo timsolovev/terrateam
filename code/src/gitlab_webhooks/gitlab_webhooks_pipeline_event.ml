@@ -18,13 +18,10 @@ end
 
 module Object_kind = struct
   let t_of_yojson = function
-    | `String "pipeline" -> Ok `Pipeline
+    | `String "pipeline" -> Ok "pipeline"
     | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-  let t_to_yojson = function
-    | `Pipeline -> `String "pipeline"
-
-  type t = ([ `Pipeline ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+  type t = (string[@of_yojson t_of_yojson])
   [@@deriving yojson { strict = false; meta = true }, show, eq]
 end
 

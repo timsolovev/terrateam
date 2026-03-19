@@ -52,46 +52,24 @@ module Update = struct
     module Primary = struct
       module Default_repository_permission = struct
         let t_of_yojson = function
-          | `String "admin" -> Ok `Admin
-          | `String "none" -> Ok `None
-          | `String "read" -> Ok `Read
-          | `String "write" -> Ok `Write
+          | `String "read" -> Ok "read"
+          | `String "write" -> Ok "write"
+          | `String "admin" -> Ok "admin"
+          | `String "none" -> Ok "none"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Admin -> `String "admin"
-          | `None -> `String "none"
-          | `Read -> `String "read"
-          | `Write -> `String "write"
-
-        type t =
-          ([ `Admin
-           | `None
-           | `Read
-           | `Write
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Members_allowed_repository_creation_type = struct
         let t_of_yojson = function
-          | `String "all" -> Ok `All
-          | `String "none" -> Ok `None
-          | `String "private" -> Ok `Private
+          | `String "all" -> Ok "all"
+          | `String "private" -> Ok "private"
+          | `String "none" -> Ok "none"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `All -> `String "all"
-          | `None -> `String "none"
-          | `Private -> `String "private"
-
-        type t =
-          ([ `All
-           | `None
-           | `Private
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -100,7 +78,7 @@ module Update = struct
         billing_email : string option; [@default None]
         blog : string option; [@default None]
         company : string option; [@default None]
-        default_repository_permission : Default_repository_permission.t; [@default `Read]
+        default_repository_permission : Default_repository_permission.t; [@default "read"]
         dependabot_alerts_enabled_for_new_repositories : bool option; [@default None]
         dependabot_security_updates_enabled_for_new_repositories : bool option; [@default None]
         dependency_graph_enabled_for_new_repositories : bool option; [@default None]
@@ -1306,25 +1284,13 @@ module Create_invitation = struct
     module Primary = struct
       module Role = struct
         let t_of_yojson = function
-          | `String "admin" -> Ok `Admin
-          | `String "billing_manager" -> Ok `Billing_manager
-          | `String "direct_member" -> Ok `Direct_member
-          | `String "reinstate" -> Ok `Reinstate
+          | `String "admin" -> Ok "admin"
+          | `String "direct_member" -> Ok "direct_member"
+          | `String "billing_manager" -> Ok "billing_manager"
+          | `String "reinstate" -> Ok "reinstate"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Admin -> `String "admin"
-          | `Billing_manager -> `String "billing_manager"
-          | `Direct_member -> `String "direct_member"
-          | `Reinstate -> `String "reinstate"
-
-        type t =
-          ([ `Admin
-           | `Billing_manager
-           | `Direct_member
-           | `Reinstate
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1335,7 +1301,7 @@ module Create_invitation = struct
       type t = {
         email : string option; [@default None]
         invitee_id : int option; [@default None]
-        role : Role.t; [@default `Direct_member]
+        role : Role.t; [@default "direct_member"]
         team_ids : Team_ids.t option; [@default None]
       }
       [@@deriving make, yojson { strict = false; meta = true }, show, eq]
@@ -1397,58 +1363,32 @@ module List_pending_invitations = struct
   module Parameters = struct
     module Invitation_source = struct
       let t_of_yojson = function
-        | `String "all" -> Ok `All
-        | `String "member" -> Ok `Member
-        | `String "scim" -> Ok `Scim
+        | `String "all" -> Ok "all"
+        | `String "member" -> Ok "member"
+        | `String "scim" -> Ok "scim"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `All -> `String "all"
-        | `Member -> `String "member"
-        | `Scim -> `String "scim"
-
-      type t =
-        ([ `All
-         | `Member
-         | `Scim
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Role = struct
       let t_of_yojson = function
-        | `String "admin" -> Ok `Admin
-        | `String "all" -> Ok `All
-        | `String "billing_manager" -> Ok `Billing_manager
-        | `String "direct_member" -> Ok `Direct_member
-        | `String "hiring_manager" -> Ok `Hiring_manager
+        | `String "all" -> Ok "all"
+        | `String "admin" -> Ok "admin"
+        | `String "direct_member" -> Ok "direct_member"
+        | `String "billing_manager" -> Ok "billing_manager"
+        | `String "hiring_manager" -> Ok "hiring_manager"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Admin -> `String "admin"
-        | `All -> `String "all"
-        | `Billing_manager -> `String "billing_manager"
-        | `Direct_member -> `String "direct_member"
-        | `Hiring_manager -> `String "hiring_manager"
-
-      type t =
-        ([ `Admin
-         | `All
-         | `Billing_manager
-         | `Direct_member
-         | `Hiring_manager
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
-      invitation_source : Invitation_source.t; [@default `All]
+      invitation_source : Invitation_source.t; [@default "all"]
       org : string;
       page : int; [@default 1]
       per_page : int; [@default 30]
-      role : Role.t; [@default `All]
+      role : Role.t; [@default "all"]
     }
     [@@deriving make, show, eq]
   end
@@ -1492,8 +1432,8 @@ module List_pending_invitations = struct
          [
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
-           ("role", Var (params.role, Enum Role.t_to_yojson));
-           ("invitation_source", Var (params.invitation_source, Enum Invitation_source.t_to_yojson));
+           ("role", Var (params.role, String));
+           ("invitation_source", Var (params.invitation_source, String));
          ])
       ~url
       ~responses:Responses.t
@@ -1829,49 +1769,29 @@ module List_members = struct
   module Parameters = struct
     module Filter = struct
       let t_of_yojson = function
-        | `String "2fa_disabled" -> Ok `V_2fa_disabled
-        | `String "all" -> Ok `All
+        | `String "2fa_disabled" -> Ok "2fa_disabled"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `V_2fa_disabled -> `String "2fa_disabled"
-        | `All -> `String "all"
-
-      type t =
-        ([ `V_2fa_disabled
-         | `All
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Role = struct
       let t_of_yojson = function
-        | `String "admin" -> Ok `Admin
-        | `String "all" -> Ok `All
-        | `String "member" -> Ok `Member
+        | `String "all" -> Ok "all"
+        | `String "admin" -> Ok "admin"
+        | `String "member" -> Ok "member"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Admin -> `String "admin"
-        | `All -> `String "all"
-        | `Member -> `String "member"
-
-      type t =
-        ([ `Admin
-         | `All
-         | `Member
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
-      filter : Filter.t; [@default `All]
+      filter : Filter.t; [@default "all"]
       org : string;
       page : int; [@default 1]
       per_page : int; [@default 30]
-      role : Role.t; [@default `All]
+      role : Role.t; [@default "all"]
     }
     [@@deriving make, show, eq]
   end
@@ -1914,8 +1834,8 @@ module List_members = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("filter", Var (params.filter, Enum Filter.t_to_yojson));
-           ("role", Var (params.role, Enum Role.t_to_yojson));
+           ("filter", Var (params.filter, String));
+           ("role", Var (params.role, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -2078,23 +1998,15 @@ module Set_membership_for_user = struct
     module Primary = struct
       module Role = struct
         let t_of_yojson = function
-          | `String "admin" -> Ok `Admin
-          | `String "member" -> Ok `Member
+          | `String "admin" -> Ok "admin"
+          | `String "member" -> Ok "member"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Admin -> `String "admin"
-          | `Member -> `String "member"
-
-        type t =
-          ([ `Admin
-           | `Member
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
-      type t = { role : Role.t [@default `Member] }
+      type t = { role : Role.t [@default "member"] }
       [@@deriving make, yojson { strict = false; meta = true }, show, eq]
     end
 
@@ -2734,24 +2646,15 @@ module List_outside_collaborators = struct
   module Parameters = struct
     module Filter = struct
       let t_of_yojson = function
-        | `String "2fa_disabled" -> Ok `V_2fa_disabled
-        | `String "all" -> Ok `All
+        | `String "2fa_disabled" -> Ok "2fa_disabled"
+        | `String "all" -> Ok "all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `V_2fa_disabled -> `String "2fa_disabled"
-        | `All -> `String "all"
-
-      type t =
-        ([ `V_2fa_disabled
-         | `All
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
-      filter : Filter.t; [@default `All]
+      filter : Filter.t; [@default "all"]
       org : string;
       page : int; [@default 1]
       per_page : int; [@default 30]
@@ -2783,7 +2686,7 @@ module List_outside_collaborators = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("filter", Var (params.filter, Enum Filter.t_to_yojson));
+           ("filter", Var (params.filter, String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -2920,19 +2823,11 @@ module Review_pat_grant_requests_in_bulk = struct
     module Primary = struct
       module Action = struct
         let t_of_yojson = function
-          | `String "approve" -> Ok `Approve
-          | `String "deny" -> Ok `Deny
+          | `String "approve" -> Ok "approve"
+          | `String "deny" -> Ok "deny"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Approve -> `String "approve"
-          | `Deny -> `String "deny"
-
-        type t =
-          ([ `Approve
-           | `Deny
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -3019,20 +2914,11 @@ module List_pat_grant_requests = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Owner = struct
@@ -3041,14 +2927,10 @@ module List_pat_grant_requests = struct
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created_at" -> Ok `Created_at
+        | `String "created_at" -> Ok "created_at"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created_at -> `String "created_at"
-
-      type t = ([ `Created_at ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Token_id = struct
@@ -3056,7 +2938,7 @@ module List_pat_grant_requests = struct
     end
 
     type t = {
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       last_used_after : string option; [@default None]
       last_used_before : string option; [@default None]
       org : string;
@@ -3065,7 +2947,7 @@ module List_pat_grant_requests = struct
       per_page : int; [@default 30]
       permission : string option; [@default None]
       repository : string option; [@default None]
-      sort : Sort.t; [@default `Created_at]
+      sort : Sort.t; [@default "created_at"]
       token_id : Token_id.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -3134,8 +3016,8 @@ module List_pat_grant_requests = struct
          [
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("sort", Var (params.sort, String));
+           ("direction", Var (params.direction, String));
            ("owner", Var (params.owner, Option (Array String)));
            ("repository", Var (params.repository, Option String));
            ("permission", Var (params.permission, Option String));
@@ -3161,19 +3043,11 @@ module Review_pat_grant_request = struct
     module Primary = struct
       module Action = struct
         let t_of_yojson = function
-          | `String "approve" -> Ok `Approve
-          | `String "deny" -> Ok `Deny
+          | `String "approve" -> Ok "approve"
+          | `String "deny" -> Ok "deny"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Approve -> `String "approve"
-          | `Deny -> `String "deny"
-
-        type t =
-          ([ `Approve
-           | `Deny
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -3327,13 +3201,10 @@ module Update_pat_accesses = struct
     module Primary = struct
       module Action = struct
         let t_of_yojson = function
-          | `String "revoke" -> Ok `Revoke
+          | `String "revoke" -> Ok "revoke"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Revoke -> `String "revoke"
-
-        type t = ([ `Revoke ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -3419,20 +3290,11 @@ module List_pat_grants = struct
   module Parameters = struct
     module Direction = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Owner = struct
@@ -3441,14 +3303,10 @@ module List_pat_grants = struct
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "created_at" -> Ok `Created_at
+        | `String "created_at" -> Ok "created_at"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created_at -> `String "created_at"
-
-      type t = ([ `Created_at ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Token_id = struct
@@ -3456,7 +3314,7 @@ module List_pat_grants = struct
     end
 
     type t = {
-      direction : Direction.t; [@default `Desc]
+      direction : Direction.t; [@default "desc"]
       last_used_after : string option; [@default None]
       last_used_before : string option; [@default None]
       org : string;
@@ -3465,7 +3323,7 @@ module List_pat_grants = struct
       per_page : int; [@default 30]
       permission : string option; [@default None]
       repository : string option; [@default None]
-      sort : Sort.t; [@default `Created_at]
+      sort : Sort.t; [@default "created_at"]
       token_id : Token_id.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -3534,8 +3392,8 @@ module List_pat_grants = struct
          [
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("direction", Var (params.direction, Enum Direction.t_to_yojson));
+           ("sort", Var (params.sort, String));
+           ("direction", Var (params.direction, String));
            ("owner", Var (params.owner, Option (Array String)));
            ("repository", Var (params.repository, Option String));
            ("permission", Var (params.permission, Option String));
@@ -3561,13 +3419,10 @@ module Update_pat_access = struct
     module Primary = struct
       module Action = struct
         let t_of_yojson = function
-          | `String "revoke" -> Ok `Revoke
+          | `String "revoke" -> Ok "revoke"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Revoke -> `String "revoke"
-
-        type t = ([ `Revoke ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -4524,53 +4379,25 @@ module Enable_or_disable_security_product_on_all_org_repos = struct
   module Parameters = struct
     module Enablement = struct
       let t_of_yojson = function
-        | `String "disable_all" -> Ok `Disable_all
-        | `String "enable_all" -> Ok `Enable_all
+        | `String "enable_all" -> Ok "enable_all"
+        | `String "disable_all" -> Ok "disable_all"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Disable_all -> `String "disable_all"
-        | `Enable_all -> `String "enable_all"
-
-      type t =
-        ([ `Disable_all
-         | `Enable_all
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Security_product = struct
       let t_of_yojson = function
-        | `String "advanced_security" -> Ok `Advanced_security
-        | `String "code_scanning_default_setup" -> Ok `Code_scanning_default_setup
-        | `String "dependabot_alerts" -> Ok `Dependabot_alerts
-        | `String "dependabot_security_updates" -> Ok `Dependabot_security_updates
-        | `String "dependency_graph" -> Ok `Dependency_graph
-        | `String "secret_scanning" -> Ok `Secret_scanning
-        | `String "secret_scanning_push_protection" -> Ok `Secret_scanning_push_protection
+        | `String "dependency_graph" -> Ok "dependency_graph"
+        | `String "dependabot_alerts" -> Ok "dependabot_alerts"
+        | `String "dependabot_security_updates" -> Ok "dependabot_security_updates"
+        | `String "advanced_security" -> Ok "advanced_security"
+        | `String "code_scanning_default_setup" -> Ok "code_scanning_default_setup"
+        | `String "secret_scanning" -> Ok "secret_scanning"
+        | `String "secret_scanning_push_protection" -> Ok "secret_scanning_push_protection"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Advanced_security -> `String "advanced_security"
-        | `Code_scanning_default_setup -> `String "code_scanning_default_setup"
-        | `Dependabot_alerts -> `String "dependabot_alerts"
-        | `Dependabot_security_updates -> `String "dependabot_security_updates"
-        | `Dependency_graph -> `String "dependency_graph"
-        | `Secret_scanning -> `String "secret_scanning"
-        | `Secret_scanning_push_protection -> `String "secret_scanning_push_protection"
-
-      type t =
-        ([ `Advanced_security
-         | `Code_scanning_default_setup
-         | `Dependabot_alerts
-         | `Dependabot_security_updates
-         | `Dependency_graph
-         | `Secret_scanning
-         | `Secret_scanning_push_protection
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -4585,19 +4412,11 @@ module Enable_or_disable_security_product_on_all_org_repos = struct
     module Primary = struct
       module Query_suite = struct
         let t_of_yojson = function
-          | `String "default" -> Ok `Default
-          | `String "extended" -> Ok `Extended
+          | `String "default" -> Ok "default"
+          | `String "extended" -> Ok "extended"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Default -> `String "default"
-          | `Extended -> `String "extended"
-
-        type t =
-          ([ `Default
-           | `Extended
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -4633,8 +4452,8 @@ module Enable_or_disable_security_product_on_all_org_repos = struct
          let open Parameters in
          [
            ("org", Var (params.org, String));
-           ("security_product", Var (params.security_product, Enum Security_product.t_to_yojson));
-           ("enablement", Var (params.enablement, Enum Enablement.t_to_yojson));
+           ("security_product", Var (params.security_product, String));
+           ("enablement", Var (params.enablement, String));
          ])
       ~query_params:[]
       ~url
@@ -4646,20 +4465,11 @@ module List_memberships_for_authenticated_user = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "active" -> Ok `Active
-        | `String "pending" -> Ok `Pending
+        | `String "active" -> Ok "active"
+        | `String "pending" -> Ok "pending"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Active -> `String "active"
-        | `Pending -> `String "pending"
-
-      type t =
-        ([ `Active
-         | `Pending
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -4723,7 +4533,7 @@ module List_memberships_for_authenticated_user = struct
         (let open Openapi.Request.Var in
          let open Parameters in
          [
-           ("state", Var (params.state, Option (Enum State.t_to_yojson)));
+           ("state", Var (params.state, Option String));
            ("per_page", Var (params.per_page, Int));
            ("page", Var (params.page, Int));
          ])
@@ -4741,13 +4551,10 @@ module Update_membership_for_authenticated_user = struct
     module Primary = struct
       module State = struct
         let t_of_yojson = function
-          | `String "active" -> Ok `Active
+          | `String "active" -> Ok "active"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Active -> `String "active"
-
-        type t = ([ `Active ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

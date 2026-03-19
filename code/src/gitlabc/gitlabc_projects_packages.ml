@@ -2,140 +2,68 @@ module GetApiV4ProjectsIdPackages = struct
   module Parameters = struct
     module Order_by = struct
       let t_of_yojson = function
-        | `String "created_at" -> Ok `Created_at
-        | `String "name" -> Ok `Name
-        | `String "type" -> Ok `Type
-        | `String "version" -> Ok `Version
+        | `String "created_at" -> Ok "created_at"
+        | `String "name" -> Ok "name"
+        | `String "version" -> Ok "version"
+        | `String "type" -> Ok "type"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Created_at -> `String "created_at"
-        | `Name -> `String "name"
-        | `Type -> `String "type"
-        | `Version -> `String "version"
-
-      type t =
-        ([ `Created_at
-         | `Name
-         | `Type
-         | `Version
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Package_type = struct
       let t_of_yojson = function
-        | `String "composer" -> Ok `Composer
-        | `String "conan" -> Ok `Conan
-        | `String "debian" -> Ok `Debian
-        | `String "generic" -> Ok `Generic
-        | `String "golang" -> Ok `Golang
-        | `String "helm" -> Ok `Helm
-        | `String "maven" -> Ok `Maven
-        | `String "ml_model" -> Ok `Ml_model
-        | `String "npm" -> Ok `Npm
-        | `String "nuget" -> Ok `Nuget
-        | `String "pypi" -> Ok `Pypi
-        | `String "rpm" -> Ok `Rpm
-        | `String "rubygems" -> Ok `Rubygems
-        | `String "terraform_module" -> Ok `Terraform_module
+        | `String "maven" -> Ok "maven"
+        | `String "npm" -> Ok "npm"
+        | `String "conan" -> Ok "conan"
+        | `String "nuget" -> Ok "nuget"
+        | `String "pypi" -> Ok "pypi"
+        | `String "composer" -> Ok "composer"
+        | `String "generic" -> Ok "generic"
+        | `String "golang" -> Ok "golang"
+        | `String "debian" -> Ok "debian"
+        | `String "rubygems" -> Ok "rubygems"
+        | `String "helm" -> Ok "helm"
+        | `String "terraform_module" -> Ok "terraform_module"
+        | `String "rpm" -> Ok "rpm"
+        | `String "ml_model" -> Ok "ml_model"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Composer -> `String "composer"
-        | `Conan -> `String "conan"
-        | `Debian -> `String "debian"
-        | `Generic -> `String "generic"
-        | `Golang -> `String "golang"
-        | `Helm -> `String "helm"
-        | `Maven -> `String "maven"
-        | `Ml_model -> `String "ml_model"
-        | `Npm -> `String "npm"
-        | `Nuget -> `String "nuget"
-        | `Pypi -> `String "pypi"
-        | `Rpm -> `String "rpm"
-        | `Rubygems -> `String "rubygems"
-        | `Terraform_module -> `String "terraform_module"
-
-      type t =
-        ([ `Composer
-         | `Conan
-         | `Debian
-         | `Generic
-         | `Golang
-         | `Helm
-         | `Maven
-         | `Ml_model
-         | `Npm
-         | `Nuget
-         | `Pypi
-         | `Rpm
-         | `Rubygems
-         | `Terraform_module
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Sort = struct
       let t_of_yojson = function
-        | `String "asc" -> Ok `Asc
-        | `String "desc" -> Ok `Desc
+        | `String "asc" -> Ok "asc"
+        | `String "desc" -> Ok "desc"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Asc -> `String "asc"
-        | `Desc -> `String "desc"
-
-      type t =
-        ([ `Asc
-         | `Desc
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     module Status = struct
       let t_of_yojson = function
-        | `String "default" -> Ok `Default
-        | `String "deprecated" -> Ok `Deprecated
-        | `String "error" -> Ok `Error
-        | `String "hidden" -> Ok `Hidden
-        | `String "pending_destruction" -> Ok `Pending_destruction
-        | `String "processing" -> Ok `Processing
+        | `String "default" -> Ok "default"
+        | `String "hidden" -> Ok "hidden"
+        | `String "processing" -> Ok "processing"
+        | `String "error" -> Ok "error"
+        | `String "pending_destruction" -> Ok "pending_destruction"
+        | `String "deprecated" -> Ok "deprecated"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Default -> `String "default"
-        | `Deprecated -> `String "deprecated"
-        | `Error -> `String "error"
-        | `Hidden -> `String "hidden"
-        | `Pending_destruction -> `String "pending_destruction"
-        | `Processing -> `String "processing"
-
-      type t =
-        ([ `Default
-         | `Deprecated
-         | `Error
-         | `Hidden
-         | `Pending_destruction
-         | `Processing
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       id : string;
       include_versionless : bool option; [@default None]
-      order_by : Order_by.t; [@default `Created_at]
+      order_by : Order_by.t; [@default "created_at"]
       package_name : string option; [@default None]
       package_type : Package_type.t option; [@default None]
       package_version : string option; [@default None]
       page : int; [@default 1]
       per_page : int; [@default 20]
-      sort : Sort.t; [@default `Asc]
+      sort : Sort.t; [@default "asc"]
       status : Status.t option; [@default None]
     }
     [@@deriving make, show, eq]
@@ -172,13 +100,13 @@ module GetApiV4ProjectsIdPackages = struct
          [
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));
-           ("order_by", Var (params.order_by, Enum Order_by.t_to_yojson));
-           ("sort", Var (params.sort, Enum Sort.t_to_yojson));
-           ("package_type", Var (params.package_type, Option (Enum Package_type.t_to_yojson)));
+           ("order_by", Var (params.order_by, String));
+           ("sort", Var (params.sort, String));
+           ("package_type", Var (params.package_type, Option String));
            ("package_name", Var (params.package_name, Option String));
            ("package_version", Var (params.package_version, Option String));
            ("include_versionless", Var (params.include_versionless, Option Bool));
-           ("status", Var (params.status, Option (Enum Status.t_to_yojson)));
+           ("status", Var (params.status, Option String));
          ])
       ~url
       ~responses:Responses.t
@@ -878,32 +806,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -970,7 +881,7 @@ struct
            ("package_username", Var (params.package_username, String));
            ("package_channel", Var (params.package_channel, String));
            ("recipe_revision", Var (params.recipe_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -984,32 +895,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1063,7 +957,7 @@ struct
            ("package_username", Var (params.package_username, String));
            ("package_channel", Var (params.package_channel, String));
            ("recipe_revision", Var (params.recipe_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -1077,32 +971,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1159,7 +1036,7 @@ struct
            ("package_username", Var (params.package_username, String));
            ("package_channel", Var (params.package_channel, String));
            ("recipe_revision", Var (params.recipe_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -1173,32 +1050,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1269,7 +1129,7 @@ struct
            ("recipe_revision", Var (params.recipe_revision, String));
            ("conan_package_reference", Var (params.conan_package_reference, String));
            ("package_revision", Var (params.package_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -1283,32 +1143,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1359,7 +1202,7 @@ struct
            ("recipe_revision", Var (params.recipe_revision, String));
            ("conan_package_reference", Var (params.conan_package_reference, String));
            ("package_revision", Var (params.package_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -1373,32 +1216,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1459,7 +1285,7 @@ struct
            ("recipe_revision", Var (params.recipe_revision, String));
            ("conan_package_reference", Var (params.conan_package_reference, String));
            ("package_revision", Var (params.package_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -1627,32 +1453,15 @@ struct
   module Parameters = struct
     module File_name = struct
       let t_of_yojson = function
-        | `String "conan_export.tgz" -> Ok `Conan_export_tgz
-        | `String "conan_package.tgz" -> Ok `Conan_package_tgz
-        | `String "conan_sources.tgz" -> Ok `Conan_sources_tgz
-        | `String "conanfile.py" -> Ok `Conanfile_py
-        | `String "conaninfo.txt" -> Ok `Conaninfo_txt
-        | `String "conanmanifest.txt" -> Ok `Conanmanifest_txt
+        | `String "conanfile.py" -> Ok "conanfile.py"
+        | `String "conanmanifest.txt" -> Ok "conanmanifest.txt"
+        | `String "conan_sources.tgz" -> Ok "conan_sources.tgz"
+        | `String "conan_export.tgz" -> Ok "conan_export.tgz"
+        | `String "conaninfo.txt" -> Ok "conaninfo.txt"
+        | `String "conan_package.tgz" -> Ok "conan_package.tgz"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Conan_export_tgz -> `String "conan_export.tgz"
-        | `Conan_package_tgz -> `String "conan_package.tgz"
-        | `Conan_sources_tgz -> `String "conan_sources.tgz"
-        | `Conanfile_py -> `String "conanfile.py"
-        | `Conaninfo_txt -> `String "conaninfo.txt"
-        | `Conanmanifest_txt -> `String "conanmanifest.txt"
-
-      type t =
-        ([ `Conan_export_tgz
-         | `Conan_package_tgz
-         | `Conan_sources_tgz
-         | `Conanfile_py
-         | `Conaninfo_txt
-         | `Conanmanifest_txt
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -1709,7 +1518,7 @@ struct
            ("package_username", Var (params.package_username, String));
            ("package_channel", Var (params.package_channel, String));
            ("recipe_revision", Var (params.recipe_revision, String));
-           ("file_name", Var (params.file_name, Enum File_name.t_to_yojson));
+           ("file_name", Var (params.file_name, String));
          ])
       ~query_params:[]
       ~url
@@ -5093,13 +4902,10 @@ module GetApiV4ProjectsIdPackagesTerraformModulesModuleNameModuleSystem = struct
   module Parameters = struct
     module Terraform_get = struct
       let t_of_yojson = function
-        | `String "1" -> Ok `V_1
+        | `String "1" -> Ok "1"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `V_1 -> `String "1"
-
-      type t = ([ `V_1 ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson]) [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -5150,7 +4956,7 @@ module GetApiV4ProjectsIdPackagesTerraformModulesModuleNameModuleSystem = struct
       ~query_params:
         (let open Openapi.Request.Var in
          let open Parameters in
-         [ ("terraform-get", Var (params.terraform_get, Option (Enum Terraform_get.t_to_yojson))) ])
+         [ ("terraform-get", Var (params.terraform_get, Option String)) ])
       ~url
       ~responses:Responses.t
       `Get
@@ -5160,13 +4966,10 @@ module GetApiV4ProjectsIdPackagesTerraformModulesModuleNameModuleSystem_moduleVe
   module Parameters = struct
     module Terraform_get = struct
       let t_of_yojson = function
-        | `String "1" -> Ok `V_1
+        | `String "1" -> Ok "1"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `V_1 -> `String "1"
-
-      type t = ([ `V_1 ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson]) [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -5221,7 +5024,7 @@ module GetApiV4ProjectsIdPackagesTerraformModulesModuleNameModuleSystem_moduleVe
          let open Parameters in
          [
            ("module_version", Var (params.module_version, String));
-           ("terraform-get", Var (params.terraform_get, Option (Enum Terraform_get.t_to_yojson)));
+           ("terraform-get", Var (params.terraform_get, Option String));
          ])
       ~url
       ~responses:Responses.t

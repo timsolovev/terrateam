@@ -37,29 +37,18 @@ module GetApiV4UsersUserIdImpersonationTokens = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "active" -> Ok `Active
-        | `String "all" -> Ok `All
-        | `String "inactive" -> Ok `Inactive
+        | `String "all" -> Ok "all"
+        | `String "active" -> Ok "active"
+        | `String "inactive" -> Ok "inactive"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Active -> `String "active"
-        | `All -> `String "all"
-        | `Inactive -> `String "inactive"
-
-      type t =
-        ([ `Active
-         | `All
-         | `Inactive
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
       page : int; [@default 1]
       per_page : int; [@default 20]
-      state : State.t; [@default `All]
+      state : State.t; [@default "all"]
       user_id : int;
     }
     [@@deriving make, show, eq]
@@ -88,7 +77,7 @@ module GetApiV4UsersUserIdImpersonationTokens = struct
          [
            ("page", Var (params.page, Int));
            ("per_page", Var (params.per_page, Int));
-           ("state", Var (params.state, Enum State.t_to_yojson));
+           ("state", Var (params.state, String));
          ])
       ~url
       ~responses:Responses.t

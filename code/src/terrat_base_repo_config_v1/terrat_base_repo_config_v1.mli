@@ -324,7 +324,7 @@ module Automerge : sig
       | Squash
     [@@deriving show, yojson, eq]
 
-    val make : [< `Auto | `Merge | `Rebase | `Squash ] -> t
+    val make : string -> (t, [> `Merge_strategy_parse_err of string ]) result
     val to_string : t -> string
   end
 
@@ -844,12 +844,22 @@ type of_version_1_err =
   | `Apply_requirements_approved_any_of_match_parse_err of string
   | `Apply_requirements_check_tag_query_err of string * string
   | `Depends_on_err of string * string
+  | `Drift_schedule_err of string
   | `Drift_tag_query_err of string * string
   | `Glob_parse_err of string * string
+  | `Hooks_unknown_run_on_err of Terrat_repo_config_run_on.t
+  | `Hooks_unknown_visible_on_err of string
+  | `Merge_strategy_parse_err of string
   | `Notification_policy_tag_query_err of string * string
   | `Pattern_parse_err of string
   | `Stack_config_tag_query_err of string * string
+  | `Unknown_lock_policy_err of string
+  | `Unknown_plan_mode_err of string
   | `Window_parse_timezone_err of string
+  | `Workflows_apply_unknown_run_on_err of Terrat_repo_config_run_on.t
+  | `Workflows_apply_unknown_visible_on_err of string
+  | `Workflows_plan_unknown_run_on_err of Terrat_repo_config_run_on.t
+  | `Workflows_plan_unknown_visible_on_err of string
   | `Workflows_tag_query_parse_err of string * string
   ]
 [@@deriving show]

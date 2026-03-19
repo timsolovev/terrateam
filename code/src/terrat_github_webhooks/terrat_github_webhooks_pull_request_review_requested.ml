@@ -2,13 +2,10 @@ module V0 = struct
   module Primary = struct
     module Action = struct
       let t_of_yojson = function
-        | `String "review_requested" -> Ok `Review_requested
+        | `String "review_requested" -> Ok "review_requested"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Review_requested -> `String "review_requested"
-
-      type t = ([ `Review_requested ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 
@@ -32,13 +29,10 @@ module V1 = struct
   module Primary = struct
     module Action = struct
       let t_of_yojson = function
-        | `String "review_requested" -> Ok `Review_requested
+        | `String "review_requested" -> Ok "review_requested"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Review_requested -> `String "review_requested"
-
-      type t = ([ `Review_requested ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+      type t = (string[@of_yojson t_of_yojson])
       [@@deriving yojson { strict = false; meta = true }, show, eq]
     end
 

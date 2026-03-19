@@ -37,20 +37,11 @@ module GetApiV4GroupsIdAccessTokens = struct
   module Parameters = struct
     module State = struct
       let t_of_yojson = function
-        | `String "active" -> Ok `Active
-        | `String "inactive" -> Ok `Inactive
+        | `String "active" -> Ok "active"
+        | `String "inactive" -> Ok "inactive"
         | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-      let t_to_yojson = function
-        | `Active -> `String "active"
-        | `Inactive -> `String "inactive"
-
-      type t =
-        ([ `Active
-         | `Inactive
-         ]
-        [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
-      [@@deriving show, eq]
+      type t = (string[@of_yojson t_of_yojson]) [@@deriving show, eq]
     end
 
     type t = {
@@ -80,7 +71,7 @@ module GetApiV4GroupsIdAccessTokens = struct
       ~query_params:
         (let open Openapi.Request.Var in
          let open Parameters in
-         [ ("state", Var (params.state, Option (Enum State.t_to_yojson))) ])
+         [ ("state", Var (params.state, Option String)) ])
       ~url
       ~responses:Responses.t
       `Get

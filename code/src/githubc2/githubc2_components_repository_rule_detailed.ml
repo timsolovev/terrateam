@@ -3,31 +3,20 @@ module V0 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "creation" -> Ok `Creation
+          | `String "creation" -> Ok "creation"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Creation -> `String "creation"
-
-        type t = ([ `Creation ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -47,31 +36,20 @@ module V0 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "creation" -> Ok `Creation
+          | `String "creation" -> Ok "creation"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Creation -> `String "creation"
-
-        type t = ([ `Creation ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -108,31 +86,20 @@ module V1 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "update" -> Ok `Update
+          | `String "update" -> Ok "update"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Update -> `String "update"
-
-        type t = ([ `Update ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -162,31 +129,20 @@ module V1 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "update" -> Ok `Update
+          | `String "update" -> Ok "update"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Update -> `String "update"
-
-        type t = ([ `Update ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -215,31 +171,20 @@ module V2 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "deletion" -> Ok `Deletion
+          | `String "deletion" -> Ok "deletion"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Deletion -> `String "deletion"
-
-        type t = ([ `Deletion ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -259,31 +204,20 @@ module V2 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "deletion" -> Ok `Deletion
+          | `String "deletion" -> Ok "deletion"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Deletion -> `String "deletion"
-
-        type t = ([ `Deletion ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -311,31 +245,20 @@ module V3 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_linear_history" -> Ok `Required_linear_history
+          | `String "required_linear_history" -> Ok "required_linear_history"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_linear_history -> `String "required_linear_history"
-
-        type t = ([ `Required_linear_history ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -355,31 +278,20 @@ module V3 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_linear_history" -> Ok `Required_linear_history
+          | `String "required_linear_history" -> Ok "required_linear_history"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_linear_history -> `String "required_linear_history"
-
-        type t = ([ `Required_linear_history ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -409,40 +321,22 @@ module V4 = struct
         module Primary = struct
           module Grouping_strategy = struct
             let t_of_yojson = function
-              | `String "ALLGREEN" -> Ok `ALLGREEN
-              | `String "HEADGREEN" -> Ok `HEADGREEN
+              | `String "ALLGREEN" -> Ok "ALLGREEN"
+              | `String "HEADGREEN" -> Ok "HEADGREEN"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `ALLGREEN -> `String "ALLGREEN"
-              | `HEADGREEN -> `String "HEADGREEN"
-
-            type t =
-              ([ `ALLGREEN
-               | `HEADGREEN
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
           module Merge_method = struct
             let t_of_yojson = function
-              | `String "MERGE" -> Ok `MERGE
-              | `String "REBASE" -> Ok `REBASE
-              | `String "SQUASH" -> Ok `SQUASH
+              | `String "MERGE" -> Ok "MERGE"
+              | `String "SQUASH" -> Ok "SQUASH"
+              | `String "REBASE" -> Ok "REBASE"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `MERGE -> `String "MERGE"
-              | `REBASE -> `String "REBASE"
-              | `SQUASH -> `String "SQUASH"
-
-            type t =
-              ([ `MERGE
-               | `REBASE
-               | `SQUASH
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -463,31 +357,20 @@ module V4 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "merge_queue" -> Ok `Merge_queue
+          | `String "merge_queue" -> Ok "merge_queue"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Merge_queue -> `String "merge_queue"
-
-        type t = ([ `Merge_queue ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -510,40 +393,22 @@ module V4 = struct
         module Primary = struct
           module Grouping_strategy = struct
             let t_of_yojson = function
-              | `String "ALLGREEN" -> Ok `ALLGREEN
-              | `String "HEADGREEN" -> Ok `HEADGREEN
+              | `String "ALLGREEN" -> Ok "ALLGREEN"
+              | `String "HEADGREEN" -> Ok "HEADGREEN"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `ALLGREEN -> `String "ALLGREEN"
-              | `HEADGREEN -> `String "HEADGREEN"
-
-            type t =
-              ([ `ALLGREEN
-               | `HEADGREEN
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
           module Merge_method = struct
             let t_of_yojson = function
-              | `String "MERGE" -> Ok `MERGE
-              | `String "REBASE" -> Ok `REBASE
-              | `String "SQUASH" -> Ok `SQUASH
+              | `String "MERGE" -> Ok "MERGE"
+              | `String "SQUASH" -> Ok "SQUASH"
+              | `String "REBASE" -> Ok "REBASE"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `MERGE -> `String "MERGE"
-              | `REBASE -> `String "REBASE"
-              | `SQUASH -> `String "SQUASH"
-
-            type t =
-              ([ `MERGE
-               | `REBASE
-               | `SQUASH
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -564,31 +429,20 @@ module V4 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "merge_queue" -> Ok `Merge_queue
+          | `String "merge_queue" -> Ok "merge_queue"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Merge_queue -> `String "merge_queue"
-
-        type t = ([ `Merge_queue ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -630,31 +484,20 @@ module V5 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_deployments" -> Ok `Required_deployments
+          | `String "required_deployments" -> Ok "required_deployments"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_deployments -> `String "required_deployments"
-
-        type t = ([ `Required_deployments ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -688,31 +531,20 @@ module V5 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_deployments" -> Ok `Required_deployments
+          | `String "required_deployments" -> Ok "required_deployments"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_deployments -> `String "required_deployments"
-
-        type t = ([ `Required_deployments ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -741,31 +573,20 @@ module V6 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_signatures" -> Ok `Required_signatures
+          | `String "required_signatures" -> Ok "required_signatures"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_signatures -> `String "required_signatures"
-
-        type t = ([ `Required_signatures ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -785,31 +606,20 @@ module V6 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_signatures" -> Ok `Required_signatures
+          | `String "required_signatures" -> Ok "required_signatures"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_signatures -> `String "required_signatures"
-
-        type t = ([ `Required_signatures ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -840,22 +650,12 @@ module V7 = struct
           module Allowed_merge_methods = struct
             module Items = struct
               let t_of_yojson = function
-                | `String "merge" -> Ok `Merge
-                | `String "rebase" -> Ok `Rebase
-                | `String "squash" -> Ok `Squash
+                | `String "merge" -> Ok "merge"
+                | `String "squash" -> Ok "squash"
+                | `String "rebase" -> Ok "rebase"
                 | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-              let t_to_yojson = function
-                | `Merge -> `String "merge"
-                | `Rebase -> `String "rebase"
-                | `Squash -> `String "squash"
-
-              type t =
-                ([ `Merge
-                 | `Rebase
-                 | `Squash
-                 ]
-                [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+              type t = (string[@of_yojson t_of_yojson])
               [@@deriving yojson { strict = false; meta = true }, show, eq]
             end
 
@@ -879,31 +679,20 @@ module V7 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "pull_request" -> Ok `Pull_request
+          | `String "pull_request" -> Ok "pull_request"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Pull_request -> `String "pull_request"
-
-        type t = ([ `Pull_request ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -927,22 +716,12 @@ module V7 = struct
           module Allowed_merge_methods = struct
             module Items = struct
               let t_of_yojson = function
-                | `String "merge" -> Ok `Merge
-                | `String "rebase" -> Ok `Rebase
-                | `String "squash" -> Ok `Squash
+                | `String "merge" -> Ok "merge"
+                | `String "squash" -> Ok "squash"
+                | `String "rebase" -> Ok "rebase"
                 | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-              let t_to_yojson = function
-                | `Merge -> `String "merge"
-                | `Rebase -> `String "rebase"
-                | `Squash -> `String "squash"
-
-              type t =
-                ([ `Merge
-                 | `Rebase
-                 | `Squash
-                 ]
-                [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+              type t = (string[@of_yojson t_of_yojson])
               [@@deriving yojson { strict = false; meta = true }, show, eq]
             end
 
@@ -966,31 +745,20 @@ module V7 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "pull_request" -> Ok `Pull_request
+          | `String "pull_request" -> Ok "pull_request"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Pull_request -> `String "pull_request"
-
-        type t = ([ `Pull_request ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1037,31 +805,20 @@ module V8 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_status_checks" -> Ok `Required_status_checks
+          | `String "required_status_checks" -> Ok "required_status_checks"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_status_checks -> `String "required_status_checks"
-
-        type t = ([ `Required_status_checks ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1100,31 +857,20 @@ module V8 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "required_status_checks" -> Ok `Required_status_checks
+          | `String "required_status_checks" -> Ok "required_status_checks"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Required_status_checks -> `String "required_status_checks"
-
-        type t = ([ `Required_status_checks ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1153,31 +899,20 @@ module V9 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "non_fast_forward" -> Ok `Non_fast_forward
+          | `String "non_fast_forward" -> Ok "non_fast_forward"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Non_fast_forward -> `String "non_fast_forward"
-
-        type t = ([ `Non_fast_forward ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1197,31 +932,20 @@ module V9 = struct
     module Primary = struct
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "non_fast_forward" -> Ok `Non_fast_forward
+          | `String "non_fast_forward" -> Ok "non_fast_forward"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Non_fast_forward -> `String "non_fast_forward"
-
-        type t = ([ `Non_fast_forward ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1251,25 +975,13 @@ module V10 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1287,31 +999,20 @@ module V10 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "commit_message_pattern" -> Ok `Commit_message_pattern
+          | `String "commit_message_pattern" -> Ok "commit_message_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Commit_message_pattern -> `String "commit_message_pattern"
-
-        type t = ([ `Commit_message_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1334,25 +1035,13 @@ module V10 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1370,31 +1059,20 @@ module V10 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "commit_message_pattern" -> Ok `Commit_message_pattern
+          | `String "commit_message_pattern" -> Ok "commit_message_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Commit_message_pattern -> `String "commit_message_pattern"
-
-        type t = ([ `Commit_message_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1425,25 +1103,13 @@ module V11 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1461,31 +1127,20 @@ module V11 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "commit_author_email_pattern" -> Ok `Commit_author_email_pattern
+          | `String "commit_author_email_pattern" -> Ok "commit_author_email_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Commit_author_email_pattern -> `String "commit_author_email_pattern"
-
-        type t = ([ `Commit_author_email_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1508,25 +1163,13 @@ module V11 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1544,31 +1187,20 @@ module V11 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "commit_author_email_pattern" -> Ok `Commit_author_email_pattern
+          | `String "commit_author_email_pattern" -> Ok "commit_author_email_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Commit_author_email_pattern -> `String "commit_author_email_pattern"
-
-        type t = ([ `Commit_author_email_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1599,25 +1231,13 @@ module V12 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1635,31 +1255,20 @@ module V12 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "committer_email_pattern" -> Ok `Committer_email_pattern
+          | `String "committer_email_pattern" -> Ok "committer_email_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Committer_email_pattern -> `String "committer_email_pattern"
-
-        type t = ([ `Committer_email_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1682,25 +1291,13 @@ module V12 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1718,31 +1315,20 @@ module V12 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "committer_email_pattern" -> Ok `Committer_email_pattern
+          | `String "committer_email_pattern" -> Ok "committer_email_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Committer_email_pattern -> `String "committer_email_pattern"
-
-        type t = ([ `Committer_email_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1773,25 +1359,13 @@ module V13 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1809,31 +1383,20 @@ module V13 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "branch_name_pattern" -> Ok `Branch_name_pattern
+          | `String "branch_name_pattern" -> Ok "branch_name_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Branch_name_pattern -> `String "branch_name_pattern"
-
-        type t = ([ `Branch_name_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1856,25 +1419,13 @@ module V13 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1892,31 +1443,20 @@ module V13 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "branch_name_pattern" -> Ok `Branch_name_pattern
+          | `String "branch_name_pattern" -> Ok "branch_name_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Branch_name_pattern -> `String "branch_name_pattern"
-
-        type t = ([ `Branch_name_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -1947,25 +1487,13 @@ module V14 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -1983,31 +1511,20 @@ module V14 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "tag_name_pattern" -> Ok `Tag_name_pattern
+          | `String "tag_name_pattern" -> Ok "tag_name_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Tag_name_pattern -> `String "tag_name_pattern"
-
-        type t = ([ `Tag_name_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2030,25 +1547,13 @@ module V14 = struct
         module Primary = struct
           module Operator = struct
             let t_of_yojson = function
-              | `String "contains" -> Ok `Contains
-              | `String "ends_with" -> Ok `Ends_with
-              | `String "regex" -> Ok `Regex
-              | `String "starts_with" -> Ok `Starts_with
+              | `String "starts_with" -> Ok "starts_with"
+              | `String "ends_with" -> Ok "ends_with"
+              | `String "contains" -> Ok "contains"
+              | `String "regex" -> Ok "regex"
               | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-            let t_to_yojson = function
-              | `Contains -> `String "contains"
-              | `Ends_with -> `String "ends_with"
-              | `Regex -> `String "regex"
-              | `Starts_with -> `String "starts_with"
-
-            type t =
-              ([ `Contains
-               | `Ends_with
-               | `Regex
-               | `Starts_with
-               ]
-              [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+            type t = (string[@of_yojson t_of_yojson])
             [@@deriving yojson { strict = false; meta = true }, show, eq]
           end
 
@@ -2066,31 +1571,20 @@ module V14 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "tag_name_pattern" -> Ok `Tag_name_pattern
+          | `String "tag_name_pattern" -> Ok "tag_name_pattern"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Tag_name_pattern -> `String "tag_name_pattern"
-
-        type t = ([ `Tag_name_pattern ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2132,31 +1626,20 @@ module V15 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "file_path_restriction" -> Ok `File_path_restriction
+          | `String "file_path_restriction" -> Ok "file_path_restriction"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `File_path_restriction -> `String "file_path_restriction"
-
-        type t = ([ `File_path_restriction ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2190,31 +1673,20 @@ module V15 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "file_path_restriction" -> Ok `File_path_restriction
+          | `String "file_path_restriction" -> Ok "file_path_restriction"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `File_path_restriction -> `String "file_path_restriction"
-
-        type t = ([ `File_path_restriction ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2252,31 +1724,20 @@ module V16 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "max_file_path_length" -> Ok `Max_file_path_length
+          | `String "max_file_path_length" -> Ok "max_file_path_length"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Max_file_path_length -> `String "max_file_path_length"
-
-        type t = ([ `Max_file_path_length ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2306,31 +1767,20 @@ module V16 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "max_file_path_length" -> Ok `Max_file_path_length
+          | `String "max_file_path_length" -> Ok "max_file_path_length"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Max_file_path_length -> `String "max_file_path_length"
-
-        type t = ([ `Max_file_path_length ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2372,31 +1822,20 @@ module V17 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "file_extension_restriction" -> Ok `File_extension_restriction
+          | `String "file_extension_restriction" -> Ok "file_extension_restriction"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `File_extension_restriction -> `String "file_extension_restriction"
-
-        type t = ([ `File_extension_restriction ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2430,31 +1869,20 @@ module V17 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "file_extension_restriction" -> Ok `File_extension_restriction
+          | `String "file_extension_restriction" -> Ok "file_extension_restriction"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `File_extension_restriction -> `String "file_extension_restriction"
-
-        type t = ([ `File_extension_restriction ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2492,31 +1920,20 @@ module V18 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "max_file_size" -> Ok `Max_file_size
+          | `String "max_file_size" -> Ok "max_file_size"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Max_file_size -> `String "max_file_size"
-
-        type t = ([ `Max_file_size ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2546,31 +1963,20 @@ module V18 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "max_file_size" -> Ok `Max_file_size
+          | `String "max_file_size" -> Ok "max_file_size"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Max_file_size -> `String "max_file_size"
-
-        type t = ([ `Max_file_size ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2616,31 +2022,20 @@ module V19 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "workflows" -> Ok `Workflows
+          | `String "workflows" -> Ok "workflows"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Workflows -> `String "workflows"
-
-        type t = ([ `Workflows ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2678,31 +2073,20 @@ module V19 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "workflows" -> Ok `Workflows
+          | `String "workflows" -> Ok "workflows"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Workflows -> `String "workflows"
-
-        type t = ([ `Workflows ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2745,31 +2129,20 @@ module V20 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "code_scanning" -> Ok `Code_scanning
+          | `String "code_scanning" -> Ok "code_scanning"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Code_scanning -> `String "code_scanning"
-
-        type t = ([ `Code_scanning ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
@@ -2804,31 +2177,20 @@ module V20 = struct
 
       module Ruleset_source_type = struct
         let t_of_yojson = function
-          | `String "Organization" -> Ok `Organization
-          | `String "Repository" -> Ok `Repository
+          | `String "Repository" -> Ok "Repository"
+          | `String "Organization" -> Ok "Organization"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Organization -> `String "Organization"
-          | `Repository -> `String "Repository"
-
-        type t =
-          ([ `Organization
-           | `Repository
-           ]
-          [@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 
       module Type = struct
         let t_of_yojson = function
-          | `String "code_scanning" -> Ok `Code_scanning
+          | `String "code_scanning" -> Ok "code_scanning"
           | json -> Error ("Unknown value: " ^ Yojson.Safe.pretty_to_string json)
 
-        let t_to_yojson = function
-          | `Code_scanning -> `String "code_scanning"
-
-        type t = ([ `Code_scanning ][@of_yojson t_of_yojson] [@to_yojson t_to_yojson])
+        type t = (string[@of_yojson t_of_yojson])
         [@@deriving yojson { strict = false; meta = true }, show, eq]
       end
 

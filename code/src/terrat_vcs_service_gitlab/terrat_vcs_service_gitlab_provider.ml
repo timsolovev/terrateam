@@ -2585,6 +2585,108 @@ end
 
 module Comment = struct
   module Result = struct
+    let steps_has_changes steps =
+      let module P = struct
+        type t = { has_changes : bool [@default false] } [@@deriving of_yojson { strict = false }]
+      end in
+      let module O = Terrat_api_components.Workflow_step_output in
+      match
+        CCList.find_map
+          (function
+            | {
+                O.step = "tf/plan" | "pulumi/plan" | "custom/plan" | "fly/plan";
+                payload;
+                success;
+                _;
+              } -> (
+                match P.of_yojson (O.Payload.to_yojson payload) with
+                | Ok { P.has_changes } -> Some has_changes
+                | _ -> None)
+            | _ -> None)
+          steps
+      with
+      | Some has_changes -> has_changes
+      | None -> false
+
+    let steps_success steps =
+      let module O = Terrat_api_components.Workflow_step_output in
+      CCList.for_all (fun { O.success; ignore_errors; _ } -> success || ignore_errors) steps
+
+    module Publisher2 = struct
+      let rec iterate_comment_posts
+          ?(view = `Full)
+          request_id
+          account_status
+          config
+          client
+          is_layered_run
+          remaining_layers
+          results
+          pull_request
+          work_manifest =
+        let module Wm = Terrat_work_manifest3 in
+        let module R2 = Terrat_api_components.Work_manifest_tf_operation_result2 in
+        let module Comment_api = Terrat_vcs_gitlab_comment_publishers.Comment_api in
+        let module Publisher_tools = Terrat_vcs_gitlab_comment_publishers.Publisher_tools in
+        let by_scope = By_scope.group results.R2.steps in
+        let gates = results.R2.gates in
+        let output =
+          Publisher_tools.create_run_output
+            ~view
+            request_id
+            account_status
+            config
+            is_layered_run
+            remaining_layers
+            by_scope
+            gates
+            work_manifest
+        in
+        let open Abb.Future.Infix_monad in
+        Api.comment_on_pull_request ~request_id client pull_request output
+        >>= function
+        | Ok _ -> Abb.Future.return (Ok ())
+        | Error `Error -> (
+            let dirspaces =
+              CCList.filter
+                (function
+                  | Scope.Dirspace _, _ -> true
+                  | _ -> false)
+                by_scope
+            in
+            match (view, dirspaces) with
+            | _, [] -> assert false
+            | `Full, _ ->
+                iterate_comment_posts
+                  ~view:`Compact
+                  request_id
+                  account_status
+                  config
+                  client
+                  is_layered_run
+                  remaining_layers
+                  results
+                  pull_request
+                  work_manifest
+            | `Compact, _ ->
+                let kv =
+                  Snabela.Kv.(
+                    Map.of_list []
+                    (* CCOption.map_or *)
+                    (*   ~default:[] *)
+                    (*   (fun work_manifest_url -> *)
+                    (*     [ ("work_manifest_url", string (Uri.to_string work_manifest_url)) ]) *)
+                    (*   (S.work_manifest_url config work_manifest.Wm.account work_manifest) *))
+                in
+                Comment_api.apply_template_and_publish
+                  ~request_id
+                  client
+                  pull_request
+                  "ITERATE_COMMENT_POST2"
+                  Tmpl.comment_too_large
+                  kv)
+    end
+
     module Publisher3 = struct
       module Gcm = Terrat_vcs_comment.Make (Terrat_vcs_gitlab_comment.S)
 
@@ -2641,6 +2743,251 @@ module Comment = struct
         in
         Gcm.run t els
     end
+  end
+
+  module Result_publisher = struct
+    module Workflow_step_output = struct
+      type t = {
+        success : bool;
+        key : string option;
+        text : string;
+        step_type : string;
+        details : string option;
+      }
+    end
+
+    let maybe_credential_error_strings =
+      [
+        "no valid credential";
+        "Required token could not be found";
+        "could not find default credentials";
+      ]
+
+    let pre_hook_output_texts outputs =
+      let module Output = Terrat_api_components_hook_outputs.Pre.Items in
+      let module Text = Terrat_api_components_output_text in
+      let module Run = Terrat_api_components_workflow_output_run in
+      let module Checkout = Terrat_api_components_workflow_output_checkout in
+      let module Ce = Terrat_api_components_workflow_output_cost_estimation in
+      let module Oidc = Terrat_api_components_workflow_output_oidc in
+      outputs
+      |> CCList.filter_map (function
+           | Output.Workflow_output_run
+               Run.
+                 {
+                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               Some
+                 Workflow_step_output.
+                   {
+                     key = output_key;
+                     text;
+                     success;
+                     step_type = type_;
+                     details = Some (CCString.concat " " cmd);
+                   }
+           | Output.Workflow_output_oidc
+               Oidc.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 }
+           | Output.Workflow_output_checkout
+               Checkout.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Text.{ text; output_key };
+                   success;
+                 }
+           | Output.Workflow_output_cost_estimation
+               Ce.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Outputs.Output_text Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               Some
+                 Workflow_step_output.
+                   { key = output_key; text; success; step_type = type_; details = None }
+           | Output.Workflow_output_run
+               Run.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
+           | Output.Workflow_output_oidc
+               Oidc.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ } ->
+               Some
+                 Workflow_step_output.
+                   { key = None; text = ""; success; step_type = type_; details = None }
+           | Output.Workflow_output_env _
+           | Output.Workflow_output_cost_estimation
+               Ce.{ outputs = Outputs.Output_cost_estimation _; _ } -> None)
+
+    let post_hook_output_texts (outputs : Terrat_api_components_hook_outputs.Post.t) =
+      let module Output = Terrat_api_components_hook_outputs.Post.Items in
+      let module Text = Terrat_api_components_output_text in
+      let module Run = Terrat_api_components_workflow_output_run in
+      let module Oidc = Terrat_api_components_workflow_output_oidc in
+      let module Drift_create_issue = Terrat_api_components_workflow_output_drift_create_issue in
+      outputs
+      |> CCList.filter_map (function
+           | Output.Workflow_output_run
+               Run.
+                 {
+                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               Some
+                 Workflow_step_output.
+                   {
+                     key = output_key;
+                     text;
+                     success;
+                     step_type = type_;
+                     details = Some (CCString.concat " " cmd);
+                   }
+           | Output.Workflow_output_oidc
+               Oidc.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 }
+           | Output.Workflow_output_drift_create_issue
+               Drift_create_issue.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               Some
+                 Workflow_step_output.
+                   { key = output_key; text; success; step_type = type_; details = None }
+           | Output.Workflow_output_run
+               Run.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
+           | Output.Workflow_output_oidc
+               Oidc.{ workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ }
+           | Output.Workflow_output_drift_create_issue
+               Drift_create_issue.
+                 { workflow_step = Workflow_step.{ type_; _ }; outputs = None; success; _ } ->
+               Some
+                 Workflow_step_output.
+                   { key = None; text = ""; success; step_type = type_; details = None }
+           | Output.Workflow_output_env _ -> None)
+
+    let workflow_output_texts outputs =
+      let module Output = Terrat_api_components_workflow_outputs.Items in
+      let module Run = Terrat_api_components_workflow_output_run in
+      let module Init = Terrat_api_components_workflow_output_init in
+      let module Plan = Terrat_api_components_workflow_output_plan in
+      let module Apply = Terrat_api_components_workflow_output_apply in
+      let module Text = Terrat_api_components_output_text in
+      let module Output_plan = Terrat_api_components_output_plan in
+      let module Oidc = Terrat_api_components_workflow_output_oidc in
+      outputs
+      |> CCList.flat_map (function
+           | Output.Workflow_output_run
+               Run.
+                 {
+                   workflow_step = Workflow_step.{ type_; cmd; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   {
+                     key = output_key;
+                     text;
+                     success;
+                     step_type = type_;
+                     details = Some (CCString.concat " " cmd);
+                   };
+               ]
+           | Output.Workflow_output_oidc
+               Oidc.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 }
+           | Output.Workflow_output_init
+               Init.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 }
+           | Output.Workflow_output_plan
+               Plan.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some (Plan.Outputs.Output_text Text.{ text; output_key });
+                   success;
+                   _;
+                 }
+           | Output.Workflow_output_apply
+               Apply.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some Text.{ text; output_key };
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   { step_type = type_; text; key = output_key; success; details = None };
+               ]
+           | Output.Workflow_output_plan
+               Plan.
+                 {
+                   workflow_step = Workflow_step.{ type_; _ };
+                   outputs = Some (Plan.Outputs.Output_plan Output_plan.{ plan; plan_text; _ });
+                   success;
+                   _;
+                 } ->
+               [
+                 Workflow_step_output.
+                   {
+                     step_type = type_;
+                     text = plan_text;
+                     key = Some "plan_text";
+                     success;
+                     details = None;
+                   };
+                 Workflow_step_output.
+                   { step_type = type_; text = plan; key = Some "plan"; success; details = None };
+               ]
+           | Output.Workflow_output_run _
+           | Output.Workflow_output_oidc _
+           | Output.Workflow_output_plan _
+           | Output.Workflow_output_env _
+           | Output.Workflow_output_init Init.{ outputs = None; _ }
+           | Output.Workflow_output_apply Apply.{ outputs = None; _ } -> [])
+
+    let has_changes_of_workflow_outputs outputs =
+      let module Output = Terrat_api_components_workflow_outputs.Items in
+      let module Plan = Terrat_api_components_workflow_output_plan in
+      let module Output_plan = Terrat_api_components_output_plan in
+      (* Find the plan output, and then extract the has changes if it's there *)
+      outputs
+      |> CCList.find_opt (function
+           | Output.Workflow_output_plan _ -> true
+           | _ -> false)
+      |> CCOption.flat_map (function
+           | Output.Workflow_output_plan
+               Plan.{ outputs = Some (Plan.Outputs.Output_plan Output_plan.{ has_changes; _ }); _ }
+             -> Some has_changes
+           | _ -> None)
   end
 
   let repo_config_failure ~request_id ~client ~pull_request ~title err =
@@ -2795,6 +3142,15 @@ module Comment = struct
           "DRIFT_TAG_QUERY_ERR"
           Tmpl.repo_config_err_depends_on_err
           kv
+    | `Drift_schedule_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("schedule", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "DRIFT_SCHEDULE_ERR"
+          Tmpl.repo_config_err_drift_schedule_err
+          kv
     | `Drift_tag_query_err (q, err) ->
         let kv = Snabela.Kv.(Map.of_list [ ("query", string q); ("error", string err) ]) in
         Gcm_api.apply_template_and_publish
@@ -2813,6 +3169,34 @@ module Comment = struct
           "GLOB_PARSE_ERR"
           Tmpl.repo_config_err_glob_parse_err
           kv
+    | `Hooks_unknown_run_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "HOOKS_UNKNOWN_RUN_ON_ERR"
+          Tmpl.repo_config_err_hooks_unknown_run_on_err
+          kv
+    | `Hooks_unknown_visible_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "HOOKS_UNKNOWN_VISIBLE_ON_ERR"
+          Tmpl.repo_config_err_hooks_unknown_visible_on_err
+          kv
+    | `Merge_strategy_parse_err s ->
+        let kv = `Assoc [ ("strategy", `String s) ] in
+        Abbs_future_combinators.Result.ignore
+        @@ Gcm_api.apply_template_and_publish_jinja
+             ~request_id
+             client
+             pull_request
+             "MERGE_STRATEGY_PARSE_ERR"
+             Tmpl.merge_strategy_parse_err
+             kv
     | `Pattern_parse_err s ->
         let kv = Snabela.Kv.(Map.of_list [ ("pattern", string s) ]) in
         Gcm_api.apply_template_and_publish
@@ -2822,6 +3206,16 @@ module Comment = struct
           "PATTERN_PARSE_ERR"
           Tmpl.repo_config_err_pattern_parse_err
           kv
+    | `Unknown_lock_policy_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("lock_policy", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "UNKNOWN_LOCK_POLICY_ERR"
+          Tmpl.repo_config_err_unknown_lock_policy_err
+          kv
+    | `Unknown_plan_mode_err s -> assert false
     | `Window_parse_timezone_err tz ->
         let kv = Snabela.Kv.(Map.of_list [ ("tz", string tz) ]) in
         Gcm_api.apply_template_and_publish
@@ -2830,6 +3224,42 @@ module Comment = struct
           pull_request
           "WINDOW_PARSE_TIMEZONE_ERR"
           Tmpl.repo_config_err_window_parse_timezone_err
+          kv
+    | `Workflows_apply_unknown_run_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "WORKFLOWS_APPLY_UNKNOWN_RUN_ON_ERR"
+          Tmpl.repo_config_err_workflows_apply_unknown_run_on_err
+          kv
+    | `Workflows_apply_unknown_visible_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "WORKFLOWS_APPLY_UNKNOWN_VISIBLE_ON_ERR"
+          Tmpl.repo_config_err_workflows_apply_unknown_visible_on_err
+          kv
+    | `Workflows_plan_unknown_run_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("run_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "WORKFLOWS_PLAN_UNKNOWN_RUN_ON_ERR"
+          Tmpl.repo_config_err_workflows_plan_unknown_run_on_err
+          kv
+    | `Workflows_plan_unknown_visible_on_err s ->
+        let kv = Snabela.Kv.(Map.of_list [ ("visible_on", string s) ]) in
+        Gcm_api.apply_template_and_publish
+          ~request_id
+          client
+          pull_request
+          "WORKFLOWS_PLAN_UNKNOWN_VISIBLE_ON_ERR"
+          Tmpl.repo_config_err_workflows_plan_unknown_visible_on_err
           kv
     | `Workflows_tag_query_parse_err (q, err) ->
         let kv = Snabela.Kv.(Map.of_list [ ("query", string q); ("error", string err) ]) in
@@ -4108,6 +4538,15 @@ module Work_manifest = struct
              |> CCString.concat "\n")
            (Terrat_files_gitlab_sql.read fname))
 
+    let policy =
+      let module P = struct
+        type t = Terrat_base_repo_config_v1.Access_control.Match_list.t [@@deriving yojson]
+      end in
+      CCFun.(
+        CCOption.wrap Yojson.Safe.from_string
+        %> CCOption.map P.of_yojson
+        %> CCOption.flat_map CCResult.to_opt)
+
     let insert_work_manifest_query = read "insert_work_manifest.sql"
 
     let insert_work_manifest () =
@@ -4194,6 +4633,17 @@ module Work_manifest = struct
         /^ "select id from work_manifests where run_id = $run_id"
         /% Var.text "run_id")
   end
+
+  let make_run_telemetry config step repo =
+    let module Wm = Terrat_work_manifest3 in
+    Terrat_telemetry.Event.Run
+      {
+        app_type = "gitlab";
+        app_id = Terrat_config.Gitlab.app_id @@ Api.Config.vcs_config config;
+        step;
+        owner = Api.Repo.owner repo;
+        repo = Api.Repo.name repo;
+      }
 
   let run ~request_id config client work_manifest =
     let module Pipeline_api = Gitlabc_projects_pipeline.PostApiV4ProjectsIdPipeline in
@@ -4700,9 +5150,6 @@ module Stacks = struct
         db
         (Sql.select_dirspace_states ())
         ~f:(fun dir workspace state ->
-          let state =
-            CCResult.get_or_failwith @@ Terrat_api_components_stack_state.of_yojson (`String state)
-          in
           { Terrat_vcs_stacks.Dirspace_state.dirspace = { Terrat_dirspace.dir; workspace }; state })
         (CCInt64.of_int repo_id)
         (CCInt64.of_int pull_request_id)
@@ -4718,6 +5165,18 @@ end
 
 module Job_context = struct
   module Tjc = Terrat_job_context
+
+  module Tag_query = struct
+    type t = Terrat_tag_query.t
+
+    let to_yojson = CCFun.(Terrat_tag_query.to_string %> [%to_yojson: string])
+
+    let of_yojson json =
+      let open CCResult.Infix in
+      [%of_yojson: string] json
+      >>= fun tag_query ->
+      CCResult.map_err Terrat_tag_query_ast.show_err (Terrat_tag_query.of_string tag_query)
+  end
 
   module Sql = struct
     let read fname =
@@ -4804,7 +5263,7 @@ module Job_context = struct
         let module O = Terrat_job_type_kind in
         let module Kd = Terrat_job_type_kind_drift in
         CCOption.map (function K.Drift { reconcile } ->
-            O.Kind_drift { Kd.reconcile; type_ = `Drift })
+            O.Kind_drift { Kd.reconcile; type_ = "drift" })
 
       let json_to_kind =
         let module K = Terrat_job_context.Job.Type_.Kind in
@@ -4820,28 +5279,28 @@ module Job_context = struct
           | T.Apply { tag_query; kind; force } ->
               Jt.Type.Apply
                 {
-                  Jt.Apply.type_ = `Apply;
+                  Jt.Apply.type_ = "apply";
                   tag_query = Some (Terrat_tag_query.to_string tag_query);
                   kind = kind_to_json kind;
                   force;
                 }
           | T.Autoapply ->
               Jt.Type.Apply
-                { Jt.Apply.type_ = `Apply; tag_query = None; kind = None; force = false }
-          | T.Autoplan -> Jt.Type.Plan { Jt.Plan.type_ = `Plan; tag_query = None; kind = None }
+                { Jt.Apply.type_ = "apply"; tag_query = None; kind = None; force = false }
+          | T.Autoplan -> Jt.Type.Plan { Jt.Plan.type_ = "plan"; tag_query = None; kind = None }
           | T.Plan { tag_query; kind } ->
               Jt.Type.Plan
                 {
-                  Jt.Plan.type_ = `Plan;
+                  Jt.Plan.type_ = "plan";
                   tag_query = Some (Terrat_tag_query.to_string tag_query);
                   kind = kind_to_json kind;
                 }
           | T.Gate_approval { tokens } ->
-              Jt.Type.Gate_approval { Jt.Gate_approval.type_ = `Gate_approval; tokens }
-          | T.Index -> Jt.Type.Index { Jt.Index.type_ = `Index }
-          | T.Repo_config -> Jt.Type.Repo_config { Jt.Repo_config.type_ = `Repo_config }
-          | T.Unlock unlocks -> Jt.Type.Unlock { Jt.Unlock.type_ = `Unlock; ids = unlocks }
-          | T.Push -> Jt.Type.Push { Jt.Push.type_ = `Push })
+              Jt.Type.Gate_approval { Jt.Gate_approval.type_ = "gate-approval"; tokens }
+          | T.Index -> Jt.Type.Index { Jt.Index.type_ = "index" }
+          | T.Repo_config -> Jt.Type.Repo_config { Jt.Repo_config.type_ = "repo-config" }
+          | T.Unlock unlocks -> Jt.Type.Unlock { Jt.Unlock.type_ = "unlock"; ids = unlocks }
+          | T.Push -> Jt.Type.Push { Jt.Push.type_ = "push" })
           %> Jt.Type.to_yojson)
 
       let of_json =
