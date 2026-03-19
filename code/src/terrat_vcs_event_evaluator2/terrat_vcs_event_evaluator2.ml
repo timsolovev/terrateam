@@ -397,7 +397,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
       ~user
       event =
     match Sys.getenv_opt "TERRAT_EVENT_EVALUATOR_MODE" with
-    | None | Some ("" | "new-age" | "legacy-drift") ->
+    | None | Some ("" | "new-age" | "legacy-drift") -> (
         let store =
           Hmap.empty
           |> Keys.Key.add Keys.account account
@@ -406,20 +406,22 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           |> Keys.Key.add Keys.user (Some user)
           |> Keys.Key.add Keys.work_manifest_event None
         in
-        Fc.ignore
-        @@ Abb.Future.fork
-        @@ run_pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             ~event
-             ~store
-             ()
+        let open Abb.Future.Infix_monad in
+        run_pull_request_event
+          ~request_id
+          ~config
+          ~storage
+          ~exec
+          ~account
+          ~repo
+          ~pull_request_id
+          ~user
+          ~event
+          ~store
+          ()
+        >>= function
+        | Ok _ -> Abb.Future.return (Ok ())
+        | Error _ -> Abb.Future.return (Error `Error))
     | Some _ ->
         let run =
           let ctx = Legacy.Ctx.make ~config ~storage ~request_id () in
@@ -443,7 +445,16 @@ module Make (S : Terrat_vcs_provider2.S) = struct
                 ~comment
                 ()
         in
-        Fc.ignore @@ Abb.Future.fork run
+        Abb.Future.await_bind
+          (function
+            | `Det _ -> Abb.Future.return (Ok ())
+            | `Exn (exn, _) ->
+                Logs.err (fun m -> m "%s : %s" request_id (Printexc.to_string exn));
+                Abb.Future.return (Error `Error)
+            | `Aborted ->
+                Logs.err (fun m -> m "%s : ABORTED" request_id);
+                Abb.Future.return (Error `Error))
+          run
 
   let work_manifest_job_failed ~request_id ~config ~storage ~exec ~account ~repo ~run_id () =
     let run =
@@ -478,7 +489,11 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           Legacy.run_work_manifest_failure ~ctx work_manifest.Terrat_work_manifest3.id
           >>= fun _ -> Abb.Future.return (Ok (`Ok ()))
     in
-    Fc.ignore @@ log_err ~request_id run
+    let open Abb.Future.Infix_monad in
+    log_err ~request_id run
+    >>= function
+    | Ok _ -> Abb.Future.return (Ok ())
+    | Error _ -> Abb.Future.return (Error `Error)
 
   let compute_node_poll ~request_id ~config ~storage ~exec ~compute_node_id offering =
     let open Abb.Future.Infix_monad in
@@ -885,7 +900,10 @@ module Make (S : Terrat_vcs_provider2.S) = struct
               Logs.info (fun m -> m "%s : target=%s" (Builder.log_id s) (Hmap.Key.info target));
               Pgsql_io.tx db ~f:(fun () -> tx_safe ~request_id @@ Builder.eval s target))
           >>= fun _ ->
-          Fc.to_result @@ Fc.ignore @@ run_missing_drift_schedules ~config ~storage ~exec ()
+          Fc.to_result
+          @@ Fc.ignore
+          @@ Abb.Future.fork
+          @@ run_missing_drift_schedules ~config ~storage ~exec ()
       | Some _ ->
           with_conn storage ~f:(fun db -> S.Api.create_client ~request_id config account db)
           >>= fun client ->
@@ -898,7 +916,12 @@ module Make (S : Terrat_vcs_provider2.S) = struct
           else Abb.Future.return (Ok ())
     in
     Fc.with_finally
-      (fun () -> Fc.ignore @@ Abb.Future.fork @@ log_err ~request_id run)
+      (fun () ->
+        let open Abb.Future.Infix_monad in
+        log_err ~request_id run
+        >>= function
+        | Ok _ -> Abb.Future.return (Ok ())
+        | Error _ -> Abb.Future.return (Error `Error))
       ~finally:(fun () ->
         Fc.ignore
         @@ Abb.Future.fork

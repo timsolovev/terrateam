@@ -113,8 +113,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         let repo = P.Api.Repo.make ~id:repo_id ~name ~owner () in
         let user = P.Api.User.make user_username in
         let branch = P.Api.Ref.of_string default_branch in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.push ~request_id ~config ~storage ~exec ~account ~repo ~branch ~user ()
+        Evaluator2.push ~request_id ~config ~storage ~exec ~account ~repo ~branch ~user ()
     | E.Push_event _ -> Abb.Future.return (Ok ())
     | E.Merge_request_comment_event
         {
@@ -141,17 +140,16 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                   pull_request_id
                   username
                   comment_body);
-            Abbs_future_combinators.to_result
-            @@ Evaluator2.pull_request_event
-                 ~request_id
-                 ~config
-                 ~storage
-                 ~exec
-                 ~account
-                 ~repo
-                 ~pull_request_id
-                 ~user
-                 (Evaluator2.Pull_request_event.Comment { comment_id; comment })
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              (Evaluator2.Pull_request_event.Comment { comment_id; comment })
         | Error _ -> Abb.Future.return (Ok ()))
     | E.Merge_request_comment_event _ -> Abb.Future.return (Ok ())
     | E.Merge_request_event
@@ -175,17 +173,16 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                   name
                   pull_request_id
                   username);
-            Abbs_future_combinators.to_result
-            @@ Evaluator2.pull_request_event
-                 ~request_id
-                 ~config
-                 ~storage
-                 ~exec
-                 ~account
-                 ~repo
-                 ~pull_request_id
-                 ~user
-                 Evaluator2.Pull_request_event.Open
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Open
         | `Update ->
             Logs.info (fun m ->
                 m
@@ -195,17 +192,16 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                   name
                   pull_request_id
                   username);
-            Abbs_future_combinators.to_result
-            @@ Evaluator2.pull_request_event
-                 ~request_id
-                 ~config
-                 ~storage
-                 ~exec
-                 ~account
-                 ~repo
-                 ~pull_request_id
-                 ~user
-                 Evaluator2.Pull_request_event.Sync
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Sync
         | `Merge | `Close ->
             Logs.info (fun m ->
                 m
@@ -216,17 +212,16 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                   name
                   pull_request_id
                   username);
-            Abbs_future_combinators.to_result
-            @@ Evaluator2.pull_request_event
-                 ~request_id
-                 ~config
-                 ~storage
-                 ~exec
-                 ~account
-                 ~repo
-                 ~pull_request_id
-                 ~user
-                 Evaluator2.Pull_request_event.Close
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Close
         | _ -> raise (Failure "nyi"))
     | E.Pipeline_event _ -> Abb.Future.return (Ok ())
     | E.Job_event
@@ -239,16 +234,15 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         let owner, name = parse_path_with_namespace path_with_namespace in
         let account = P.Api.Account.make installation_id in
         let repo = P.Api.Repo.make ~id:repo_id ~name ~owner () in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.work_manifest_job_failed
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~run_id:(CCInt.to_string run_id)
-             ()
+        Evaluator2.work_manifest_job_failed
+          ~request_id
+          ~config
+          ~storage
+          ~exec
+          ~account
+          ~repo
+          ~run_id:(CCInt.to_string run_id)
+          ()
     | E.Job_event _ -> Abb.Future.return (Ok ())
 
   let post' config storage exec webhook_secret ctx =
