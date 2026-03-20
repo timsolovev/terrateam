@@ -743,7 +743,9 @@ module Cursor = struct
   and consume_exec_frames conn row_func st = function
     | [] -> consume_exec conn row_func st
     | Pgsql_codec.Frame.Backend.CommandComplete _ :: fs -> consume_exec_end conn row_func st fs
-    | Pgsql_codec.Frame.Backend.DataRow _ :: _ -> assert false
+    | Pgsql_codec.Frame.Backend.DataRow _ :: _ as fs ->
+        let open Abb.Future.Infix_monad in
+        Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
     | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
         let open Abb.Future.Infix_monad in
         Io.error_response conn fs
@@ -765,7 +767,9 @@ module Cursor = struct
         let open Abb.Future.Infix_monad in
         Io.error_response conn fs
         >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
-    | _ -> assert false
+    | fs ->
+        let open Abb.Future.Infix_monad in
+        Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
 
   let execute t =
     let open Abbs_future_combinators.Infix_result_monad in
@@ -817,7 +821,9 @@ module Cursor = struct
         let open Abb.Future.Infix_monad in
         Io.error_response conn fs
         >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
-    | _ -> assert false
+    | fs ->
+        let open Abb.Future.Infix_monad in
+        Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
 
   let fetch ?(n = 0) t =
     let open Abbs_future_combinators.Infix_result_monad in
