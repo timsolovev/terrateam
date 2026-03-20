@@ -906,7 +906,7 @@ struct
                   (fun () ->
                     store_cache_repo_tree
                       ~log_name:"CACHE_REPO_TREE"
-                      ~chunk_size:10000
+                      ~chunk_size:2000
                       cache_key
                       s
                       repo_tree)
@@ -1069,7 +1069,7 @@ struct
                   (fun () ->
                     store_cache_repo_tree
                       ~log_name:"CACHE_REPO_TREE_DEST_BRANCH"
-                      ~chunk_size:10000
+                      ~chunk_size:2000
                       cache_key
                       s
                       repo_tree)
