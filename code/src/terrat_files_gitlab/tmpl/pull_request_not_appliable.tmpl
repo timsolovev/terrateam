@@ -21,7 +21,7 @@ The following required reviews are missing:
     {% endif %}
     {% if c.missing_any_of_count > 0 %}
 
-Missing {{ c.missing_any_of_count }} reviews from any of the following:
+You have {{ c.any_of_count - c.missing_any_of_count }} of {{ c.any_of_count }} required approvals. You need {{ c.missing_any_of_count }} more from any of the following:
 
       {% for r in c.any_of %}
 - `{{ r }}`
