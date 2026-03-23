@@ -127,6 +127,44 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
     | `User -> "User"
     | `Bot -> "Bot"
 
+  let insert_installation_if_missing config storage ~installation_id ~login ~target_type ~sender =
+    let open Abbs_future_combinators.Infix_result_monad in
+    Pgsql_pool.with_conn storage ~f:(fun db ->
+        Pgsql_io.Prepared_stmt.fetch
+          db
+          Sql.select_github_installation
+          ~f:CCFun.id
+          (CCInt64.of_int installation_id)
+        >>= function
+        | [] -> (
+            Pgsql_io.Prepared_stmt.fetch db Sql.insert_org ~f:CCFun.id login
+            >>= function
+            | org_id :: _ ->
+                Pgsql_io.Prepared_stmt.execute
+                  db
+                  Sql.insert_github_installation
+                  (Int64.of_int installation_id)
+                  login
+                  org_id
+                  target_type
+                  (Terrat_config.default_tier @@ P.Api.Config.config config)
+                  sender
+            | [] -> assert false)
+        | _ :: _ -> Abb.Future.return (Ok ()))
+
+  let with_installation_recovery config storage ~installation_id ~login ~target_type ~sender f =
+    let open Abb.Future.Infix_monad in
+    f ()
+    >>= function
+    | Ok _ as ok -> Abb.Future.return ok
+    | Error _ -> (
+        Logs.info (fun m ->
+            m "MISSING_INSTALLATION : CHECKING : installation_id=%d" installation_id);
+        insert_installation_if_missing config storage ~installation_id ~login ~target_type ~sender
+        >>= function
+        | Ok () -> f ()
+        | Error _ as err -> Abb.Future.return err)
+
   let process_installation request_id config storage = function
     | Gw.Installation_event.Installation_created created ->
         let open Abbs_future_combinators.Infix_result_monad in
@@ -254,17 +292,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ~owner:repository.Gw.Repository.owner.Gw.User.login
             ()
         in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             Evaluator2.Pull_request_event.Open
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Open)
     | Gw.Pull_request_event.Pull_request_synchronize
         {
           Gw.Pull_request_synchronize.installation =
@@ -292,17 +337,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ~owner:repository.Gw.Repository.owner.Gw.User.login
             ()
         in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             Evaluator2.Pull_request_event.Sync
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Sync)
     | Gw.Pull_request_event.Pull_request_reopened
         {
           Gw.Pull_request_reopened.installation =
@@ -332,17 +384,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ~owner:repository.Gw.Repository.owner.Gw.User.login
             ()
         in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             Evaluator2.Pull_request_event.Open
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Open)
     | Gw.Pull_request_event.Pull_request_ready_for_review
         {
           Gw.Pull_request_ready_for_review.installation =
@@ -373,17 +432,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ~owner:repository.Gw.Repository.owner.Gw.User.login
             ()
         in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             Evaluator2.Pull_request_event.Ready_for_review
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Ready_for_review)
     | Gw.Pull_request_event.Pull_request_opened _ -> failwith "Invalid pull_request_open event"
     | Gw.Pull_request_event.Pull_request_synchronize _ ->
         failwith "Invalid pull_request_synchronize event"
@@ -420,17 +486,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
         in
         (* Should we have a "closed" job type or reuse autoplan which does
            nothing on close? *)
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.pull_request_event
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~pull_request_id
-             ~user
-             Evaluator2.Pull_request_event.Close
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.pull_request_event
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~pull_request_id
+              ~user
+              Evaluator2.Pull_request_event.Close)
     | Gw.Pull_request_event.Pull_request_closed _ -> failwith "Invalid pull_request_closed event"
     | Gw.Pull_request_event.Pull_request_assigned _ ->
         Logs.debug (fun m -> m "%s : NOOP : PULL_REQUEST_ASSIGNED" request_id);
@@ -512,17 +585,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
                 ~owner:repository.Gw.Repository.owner.Gw.User.login
                 ()
             in
-            Abbs_future_combinators.to_result
-            @@ Evaluator2.pull_request_event
-                 ~request_id
-                 ~config
-                 ~storage
-                 ~exec
-                 ~account
-                 ~repo
-                 ~pull_request_id
-                 ~user
-                 (Evaluator2.Pull_request_event.Comment { comment_id; comment })
+            with_installation_recovery
+              config
+              storage
+              ~installation_id
+              ~login:repository.Gw.Repository.owner.Gw.User.login
+              ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+              ~sender:sender.Gw.User.login
+              (fun () ->
+                Evaluator2.pull_request_event
+                  ~request_id
+                  ~config
+                  ~storage
+                  ~exec
+                  ~account
+                  ~repo
+                  ~pull_request_id
+                  ~user
+                  (Evaluator2.Pull_request_event.Comment { comment_id; comment }))
         | Error `Not_terrateam ->
             Prmths.Counter.inc_one (Metrics.comment_events_total "not_terrateam");
             Abb.Future.return (Ok ())
@@ -586,13 +666,13 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
 
   let process_workflow_job request_id config storage exec event =
     match event with
-    | Gw.Workflow_job_event.
-        {
-          installation = Some Gw.Installation_lite.{ id = installation_id; _ };
-          repository;
-          workflow_job = Gw.Workflow_job.{ run_id; conclusion = Some "failure"; _ };
-          _;
-        } ->
+    | {
+     Gw.Workflow_job_event.installation = Some { Gw.Installation_lite.id = installation_id; _ };
+     repository;
+     workflow_job = { Gw.Workflow_job.run_id; conclusion = Some "failure"; _ };
+     sender;
+     _;
+    } ->
         Logs.info (fun m ->
             m
               "%s : WORKFLOW_JOB_EVENT : FAILURE : owner = %s : repo = %s : run_id = %d"
@@ -608,16 +688,23 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ~owner:repository.Gw.Repository.owner.Gw.User.login
             ()
         in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.work_manifest_job_failed
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~run_id:(CCInt.to_string run_id)
-             ()
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:sender.Gw.User.login
+          (fun () ->
+            Evaluator2.work_manifest_job_failed
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~run_id:(CCInt.to_string run_id)
+              ())
     | _ -> Abb.Future.return (Ok ())
 
   let process_push_event request_id config storage exec event =
@@ -644,17 +731,24 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
             ()
         in
         let user = P.Api.User.make event.Gw.Push_event.sender.Gw.User.login in
-        Abbs_future_combinators.to_result
-        @@ Evaluator2.push
-             ~request_id
-             ~config
-             ~storage
-             ~exec
-             ~account
-             ~repo
-             ~branch:(P.Api.Ref.of_string default_branch)
-             ~user
-             ()
+        with_installation_recovery
+          config
+          storage
+          ~installation_id
+          ~login:repository.Gw.Repository.owner.Gw.User.login
+          ~target_type:(target_of_user_type repository.Gw.Repository.owner.Gw.User.type_)
+          ~sender:event.Gw.Push_event.sender.Gw.User.login
+          (fun () ->
+            Evaluator2.push
+              ~request_id
+              ~config
+              ~storage
+              ~exec
+              ~account
+              ~repo
+              ~branch:(P.Api.Ref.of_string default_branch)
+              ~user
+              ())
     | Some _ | None ->
         Logs.debug (fun m -> m "%s : PUSH_EVENT : NOOP" request_id);
         Abb.Future.return (Ok ())

@@ -27,7 +27,7 @@ module Make (S : Terrat_vcs_provider2.S) : sig
     pull_request_id:S.Api.Pull_request.Id.t ->
     user:S.Api.User.t ->
     Pull_request_event.t ->
-    unit Abb.Future.t
+    (unit, [> `Error ]) result Abb.Future.t
 
   val work_manifest_job_failed :
     request_id:string ->
@@ -38,7 +38,7 @@ module Make (S : Terrat_vcs_provider2.S) : sig
     repo:S.Api.Repo.t ->
     run_id:string ->
     unit ->
-    unit Abb.Future.t
+    (unit, [> `Error ]) result Abb.Future.t
 
   val compute_node_poll :
     request_id:string ->
@@ -68,7 +68,7 @@ module Make (S : Terrat_vcs_provider2.S) : sig
     branch:S.Api.Ref.t ->
     user:S.Api.User.t ->
     unit ->
-    unit Abb.Future.t
+    (unit, [> `Error ]) result Abb.Future.t
 
   val run_missing_drift_schedules :
     config:S.Api.Config.t -> storage:Terrat_storage.t -> exec:Exec.t -> unit -> unit Abb.Future.t
