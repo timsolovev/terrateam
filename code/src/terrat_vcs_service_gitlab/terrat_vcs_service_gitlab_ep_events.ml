@@ -14,31 +14,9 @@ module Metrics = struct
     let help = "Number of seconds that handling an incoming event takes" in
     DefaultHistogram.v ~help ~namespace ~subsystem "events_duration_seconds"
 
-  let events_total_family =
-    let help = "Number of events that the system has received" in
-    Prmths.Counter.v_labels
-      ~label_names:[ "type"; "action" ]
-      ~help
-      ~namespace
-      ~subsystem
-      "events_total"
-
-  let comment_events_total action = Prmths.Counter.labels events_total_family [ "comment"; action ]
-  let pr_events_total action = Prmths.Counter.labels events_total_family [ "pr"; action ]
-
-  let installation_events_total typ =
-    Prmths.Counter.labels events_total_family [ "installation"; typ ]
-
   let events_concurrent =
     let help = "Number of events being handled right now" in
     Prmths.Gauge.v ~help ~namespace ~subsystem "events_concurrent"
-
-  let pgsql_pool_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"pgsql_pool"
-  let pgsql_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"pgsql"
-  let gitlab_errors_total = Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"gitlab"
-
-  let gitlab_webhook_decode_errors_total =
-    Terrat_metrics.errors_total ~m:"ep_gitlab_events" ~t:"gitlab_webhook_decode"
 end
 
 module Sql = struct
@@ -71,15 +49,6 @@ module Sql = struct
       /% Var.bigint "installation_id"
       /% Var.text "owner"
       /% Var.text "name")
-
-  let select_work_manifest_by_run_id =
-    Pgsql_io.Typed_sql.(
-      sql
-      //
-      (* id *)
-      Ret.uuid
-      /^ "select id from work_manifests where run_id = $run_id"
-      /% Var.text "run_id")
 end
 
 module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
@@ -151,7 +120,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         {
           Mrce.project = { Pr.id = repo_id; path_with_namespace; _ };
           object_attributes =
-            { Mrceoa.action = Some "create"; id = Some comment_id; note = Some comment_body; _ };
+            { Mrceoa.action = Some `Create; id = Some comment_id; note = Some comment_body; _ };
           user = { User.username; _ };
           merge_request = { Mr.iid = Some pull_request_id; _ };
           _;
@@ -197,7 +166,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
         let repo = P.Api.Repo.make ~id:repo_id ~name ~owner () in
         let user = P.Api.User.make username in
         match action with
-        | "open" | "reopen" ->
+        | `Open | `Reopen ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : OPEN : owner=%s : repo=%s : pull_number=%d : sender=%s"
@@ -217,7 +186,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Open
-        | "update" ->
+        | `Update ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : SYNC : owner=%s : repo=%s : pull_number=%d : sender=%s"
@@ -237,7 +206,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Sync
-        | "merge" | "close" ->
+        | `Merge | `Close ->
             Logs.info (fun m ->
                 m
                   "%s : PULL_REQUEST_EVENT : CLOSE : owner=%s : repo=%s : pull_number=%d : \
@@ -258,7 +227,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
                  ~pull_request_id
                  ~user
                  Evaluator2.Pull_request_event.Close
-        | any -> raise (Failure "nyi"))
+        | _ -> raise (Failure "nyi"))
     | E.Pipeline_event _ -> Abb.Future.return (Ok ())
     | E.Job_event
         {

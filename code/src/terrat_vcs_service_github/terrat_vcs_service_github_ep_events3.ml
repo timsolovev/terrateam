@@ -122,6 +122,11 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
       CCOption.get_exn_or fname (Terrat_files_github_tmpl.read fname)
   end
 
+  let target_of_user_type = function
+    | `Organization -> "Organization"
+    | `User -> "User"
+    | `Bot -> "Bot"
+
   let process_installation request_id config storage = function
     | Gw.Installation_event.Installation_created created ->
         let open Abbs_future_combinators.Infix_result_monad in
@@ -154,7 +159,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
                       (Int64.of_int installation.Gw.Installation.id)
                       installation.Gw.Installation.account.Gw.User.login
                       org_id
-                      installation.Gw.Installation.account.Gw.User.type_
+                      (target_of_user_type installation.Gw.Installation.account.Gw.User.type_)
                       (Terrat_config.default_tier @@ P.Api.Config.config config)
                       created.Gw.Installation_created.sender.Gw.User.login
                 | [] -> assert false)

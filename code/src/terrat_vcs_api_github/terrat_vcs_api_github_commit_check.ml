@@ -25,10 +25,10 @@ let create ~owner ~repo ~ref_ ~checks client =
              ~state:
                Terrat_commit_check.Status.(
                  match status with
-                 | Queued | Running -> "pending"
-                 | Completed -> "success"
-                 | Failed -> "failure"
-                 | Canceled -> "failure")
+                 | Queued | Running -> `Pending
+                 | Completed -> `Success
+                 | Failed -> `Failure
+                 | Canceled -> `Failure)
              ())
          checks)
     client
@@ -122,14 +122,12 @@ let list ~log_id ~owner ~repo ~ref_ client =
                    ~title:name
                    ~status:
                      (match (status, conclusion) with
-                     | "queued", _ -> Status.Queued
-                     | "in_progress", _ -> Status.Running
-                     | "completed", Some ("success" | "skipped" | "neutral") -> Status.Completed
-                     | "completed", Some ("failure" | "cancelled" | "timed_out" | "action_required")
-                       -> Status.Failed
-                     | "completed", Some v ->
-                         raise (Failure ("Unknown status check conclusion value: " ^ v))
-                     | "completed", None -> raise (Failure "None conclusion")
+                     | `Queued, _ -> Status.Queued
+                     | `In_progress, _ -> Status.Running
+                     | `Completed, Some (`Success | `Skipped | `Neutral) -> Status.Completed
+                     | `Completed, Some (`Failure | `Cancelled | `Timed_out | `Action_required) ->
+                         Status.Failed
+                     | `Completed, None -> raise (Failure "None conclusion")
                      | _, _ -> assert false)))
       in
       let all_unique_checks =

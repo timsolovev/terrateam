@@ -182,7 +182,7 @@ module Io = struct
     assert (res = []);
     Abb.Future.return (Ok ())
 
-  let handle_err_frame msgs fs =
+  let handle_err_frame msgs =
     let c = CCList.Assoc.get_exn ~eq:Char.equal 'C' msgs in
     let m = CCList.Assoc.get_exn ~eq:Char.equal 'M' msgs in
     let d = CCList.Assoc.get ~eq:Char.equal 'D' msgs in
@@ -236,7 +236,7 @@ module Io = struct
         match_frames ~skip_leading_unmatched conn fs rfs
     | _, (Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as r_fs) ->
         let open Abb.Future.Infix_monad in
-        error_response conn r_fs >>= fun _ -> Abb.Future.return (Error (handle_err_frame msgs r_fs))
+        error_response conn r_fs >>= fun _ -> Abb.Future.return (Error (handle_err_frame msgs))
     | _, _ :: r_fs when skip_leading_unmatched -> match_frames ~skip_leading_unmatched conn fs r_fs
     | _, _ ->
         let open Abb.Future.Infix_monad in
@@ -650,7 +650,12 @@ module Typed_sql = struct
     | None -> Error (`Unknown_variable name)
 
   let to_query t =
-    let query = to_query' t in
+    let query =
+      to_query' t
+      |> CCString.split_on_char '\n'
+      |> CCList.filter (fun line -> not (CCString.prefix ~pre:"--" (CCString.trim line)))
+      |> CCString.concat "\n"
+    in
     let variables = CCArray.of_list (CCList.rev (extract_variables t)) in
     replace_variables
       variables
@@ -748,8 +753,7 @@ module Cursor = struct
         Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
     | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
         let open Abb.Future.Infix_monad in
-        Io.error_response conn fs
-        >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
+        Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs))
     | Pgsql_codec.Frame.Backend.NoticeResponse { msgs } :: fs ->
         conn.notice_response msgs;
         consume_exec_frames conn row_func st fs
@@ -765,8 +769,7 @@ module Cursor = struct
         Abb.Future.return (Ok (row_func.Row_func.fin st))
     | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
         let open Abb.Future.Infix_monad in
-        Io.error_response conn fs
-        >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
+        Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs))
     | fs ->
         let open Abb.Future.Infix_monad in
         Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
@@ -797,8 +800,7 @@ module Cursor = struct
         consume_fetch_process_frame conn row_func st fs data
     | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
         let open Abb.Future.Infix_monad in
-        Io.error_response conn fs
-        >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
+        Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs))
     | Pgsql_codec.Frame.Backend.NoticeResponse { msgs } :: fs ->
         conn.notice_response msgs;
         consume_fetch_frames conn row_func st fs
@@ -819,8 +821,7 @@ module Cursor = struct
         Abb.Future.return (Ok (row_func.Row_func.fin st))
     | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
         let open Abb.Future.Infix_monad in
-        Io.error_response conn fs
-        >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
+        Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs))
     | fs ->
         let open Abb.Future.Infix_monad in
         Io.reset conn >>= fun _ -> Abb.Future.return (Error (`Unmatching_frame fs))
@@ -1603,7 +1604,7 @@ and consume_copy_frames conn = function
   | Pgsql_codec.Frame.Backend.CommandComplete { tag } :: fs -> consume_copy_end conn tag fs
   | Pgsql_codec.Frame.Backend.ErrorResponse { msgs } :: _ as fs ->
       let open Abb.Future.Infix_monad in
-      Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs fs))
+      Io.error_response conn fs >>= fun _ -> Abb.Future.return (Error (Io.handle_err_frame msgs))
   | Pgsql_codec.Frame.Backend.NoticeResponse { msgs } :: fs ->
       conn.notice_response msgs;
       consume_copy_frames conn fs
@@ -1651,5 +1652,5 @@ let copy_to ~table ~cols t iter =
 let clean_string s =
   s
   |> CCString.split_on_char '\n'
-  |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+  |> CCList.filter (fun line -> not (CCString.prefix ~pre:"--" (CCString.trim line)))
   |> CCString.concat "\n"

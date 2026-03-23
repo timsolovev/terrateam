@@ -152,9 +152,9 @@ module Typed_sql : sig
     val u : 'a t -> ('a -> 'b option) -> 'b t
 
     val ud : (string option list -> ('a * string option list) option) -> 'a t
-    [@@ocaml.deprecated "Use u with B.t instead"]
+    [@@ocaml.deprecated "Use u instead"]
 
-    val ud' : (string -> 'a option) -> 'a t [@@ocaml.deprecated "Use u with B.t instead"]
+    val ud' : (string -> 'a option) -> 'a t [@@ocaml.deprecated "Use u instead"]
     val option : 'a t -> 'a option t
     val debug : (string option list -> unit) -> 'a t -> 'a t
   end
