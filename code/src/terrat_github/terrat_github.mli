@@ -190,7 +190,7 @@ val call :
   ?tries:int ->
   Githubc2_abb.t ->
   'a Openapi.Request.t ->
-  ('a Openapi.Response.t, [> Githubc2_abb.call_err ]) result Abb_scheduler_kqueue.Future.t
+  ('a Openapi.Response.t, [> Githubc2_abb.call_err ]) result Abb.Future.t
 
 val user :
   config:Terrat_config.Github.t ->

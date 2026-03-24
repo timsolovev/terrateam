@@ -23,7 +23,7 @@ module Comment_api : sig
     string ->
     Snabela.t ->
     Snabela.Kv.t Snabela.Kv.Map.t ->
-    (unit, [> `Error ]) result Abb_scheduler_kqueue.Future.t
+    (unit, [> `Error ]) result Abb.Future.t
 
   val apply_template_and_publish_jinja :
     request_id:string ->
