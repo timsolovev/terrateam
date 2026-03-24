@@ -497,6 +497,7 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
               | Curl.CURLINFO_Socket _ -> assert false
               | Curl.CURLINFO_Version _ -> assert false
             in
+            Curl.cleanup handle;
             match Id_map.get id t.responses with
             | Some resp ->
                 t.responses <- Id_map.remove id t.responses;
