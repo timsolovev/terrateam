@@ -1511,40 +1511,26 @@ module Process = struct
   }
 
   let int_of_signal = function
-    | Abb_intf.Process.Signal.SIGHUP -> 1
-    | Abb_intf.Process.Signal.SIGINT -> 2
-    | Abb_intf.Process.Signal.SIGQUIT -> 3
-    | Abb_intf.Process.Signal.SIGABRT -> 6
-    | Abb_intf.Process.Signal.SIGKILL -> 9
-    | Abb_intf.Process.Signal.SIGBUS -> 10
-    | Abb_intf.Process.Signal.SIGSEGV -> 11
-    | Abb_intf.Process.Signal.SIGPIPE -> 13
-    | Abb_intf.Process.Signal.SIGALRM -> 14
-    | Abb_intf.Process.Signal.SIGTERM -> 15
-    | Abb_intf.Process.Signal.SIGSTOP -> 17
-    | Abb_intf.Process.Signal.SIGCONT -> 19
-    | Abb_intf.Process.Signal.SIGCHLD -> 20
-    | Abb_intf.Process.Signal.SIGUSR1 -> 30
-    | Abb_intf.Process.Signal.SIGUSR2 -> 31
+    | Abb_intf.Process.Signal.SIGABRT -> Sys_stdlib.sigabrt
+    | Abb_intf.Process.Signal.SIGFPE -> Sys_stdlib.sigfpe
+    | Abb_intf.Process.Signal.SIGHUP -> Sys_stdlib.sighup
+    | Abb_intf.Process.Signal.SIGILL -> Sys_stdlib.sigill
+    | Abb_intf.Process.Signal.SIGINT -> Sys_stdlib.sigint
+    | Abb_intf.Process.Signal.SIGKILL -> Sys_stdlib.sigkill
+    | Abb_intf.Process.Signal.SIGSEGV -> Sys_stdlib.sigsegv
+    | Abb_intf.Process.Signal.SIGTERM -> Sys_stdlib.sigterm
     | Abb_intf.Process.Signal.Num s -> s
 
-  let signal_of_int = function
-    | 1 -> Abb_intf.Process.Signal.SIGHUP
-    | 2 -> Abb_intf.Process.Signal.SIGINT
-    | 3 -> Abb_intf.Process.Signal.SIGQUIT
-    | 6 -> Abb_intf.Process.Signal.SIGABRT
-    | 9 -> Abb_intf.Process.Signal.SIGKILL
-    | 10 -> Abb_intf.Process.Signal.SIGBUS
-    | 11 -> Abb_intf.Process.Signal.SIGSEGV
-    | 13 -> Abb_intf.Process.Signal.SIGPIPE
-    | 14 -> Abb_intf.Process.Signal.SIGALRM
-    | 15 -> Abb_intf.Process.Signal.SIGTERM
-    | 17 -> Abb_intf.Process.Signal.SIGSTOP
-    | 19 -> Abb_intf.Process.Signal.SIGCONT
-    | 20 -> Abb_intf.Process.Signal.SIGCHLD
-    | 30 -> Abb_intf.Process.Signal.SIGUSR1
-    | 31 -> Abb_intf.Process.Signal.SIGUSR2
-    | n -> Abb_intf.Process.Signal.Num n
+  let signal_of_int n =
+    if n = Sys_stdlib.sigabrt then Abb_intf.Process.Signal.SIGABRT
+    else if n = Sys_stdlib.sigfpe then Abb_intf.Process.Signal.SIGFPE
+    else if n = Sys_stdlib.sighup then Abb_intf.Process.Signal.SIGHUP
+    else if n = Sys_stdlib.sigill then Abb_intf.Process.Signal.SIGILL
+    else if n = Sys_stdlib.sigint then Abb_intf.Process.Signal.SIGINT
+    else if n = Sys_stdlib.sigkill then Abb_intf.Process.Signal.SIGKILL
+    else if n = Sys_stdlib.sigsegv then Abb_intf.Process.Signal.SIGSEGV
+    else if n = Sys_stdlib.sigterm then Abb_intf.Process.Signal.SIGTERM
+    else Abb_intf.Process.Signal.Num n
 
   let wait_on_pid pid =
     Thread.run (fun () ->
