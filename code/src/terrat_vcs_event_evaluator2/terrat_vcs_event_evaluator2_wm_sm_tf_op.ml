@@ -414,19 +414,6 @@ struct
     let { Terrat_access_control2.R.pass = passed_dirspaces; deny = denied_dirspaces } =
       access_control_results
     in
-    Logs.info (fun m ->
-        m
-          "%s : MATCHES : all_matches=%d : working_set=%d : working_layer=%d : passed_dirspaces=%d \
-           : denied_dirspaces=%d"
-          (Builder.log_id s)
-          (CCListLabels.fold_left
-             ~init:0
-             ~f:(fun acc v -> acc + CCList.length v)
-             matches.Keys.Matches.all_matches)
-          (CCList.length matches.Keys.Matches.working_set_matches)
-          (CCList.length matches.Keys.Matches.working_layer)
-          (CCList.length passed_dirspaces)
-          (CCList.length denied_dirspaces));
     Abb.Future.return
       (dirspaceflows_of_changes_with_branch_target
          repo_config
