@@ -2,44 +2,28 @@ module List = ListLabels
 module Sys_stdlib = Sys
 module Unix = UnixLabels
 
-module Native = struct
-  type t = Unix.file_descr
-end
-
 module Fd_map = CCMap.Make (struct
   type t = Unix.file_descr
 
   let compare = compare
 end)
 
-module Timers = struct
-  module Timer_map = Map.Make (struct
-    type t = (Mtime.span[@compare Mtime.Span.compare]) * int [@@deriving ord]
-  end)
-
-  type 'a t = 'a Timer_map.t
-
-  let empty = Timer_map.empty
-  let add id timestamp f t = Timer_map.add (timestamp, id) f t
-  let remove id timestamp t = Timer_map.remove (timestamp, id) t
-  let next t = Timer_map.min_binding t
+module Native = struct
+  type t = Unix.file_descr
 end
+
+external unsafe_int_of_file_descr : Unix.file_descr -> int = "%identity"
 
 let sec_ns = Mtime.Span.(to_float_ns s)
 
 (* El is short for Event Loop *)
 module El = struct
   type t = {
-    reads : (t Abb_fut.State.t -> t Abb_fut.State.t) Fd_map.t;
-    writes : (t Abb_fut.State.t -> t Abb_fut.State.t) Fd_map.t;
-    timers : (t Abb_fut.State.t -> t Abb_fut.State.t) Timers.t;
-    next_timer_id : int;
-    curr_time : float;
-    mono_time : Mtime.span;
-    exec_duration : float -> unit;
-    thread_pool : (Unix.file_descr * Unix.file_descr) Abb_thread_pool.t;
-    ignore_reads : Unix.file_descr list;
-    ignore_writes : Unix.file_descr list;
+    loop : Luv.Loop.t;
+    mutable curr_time : float;
+    mutable mono_time : Mtime.span;
+    check : Luv.Check.t;
+    thread_pool : (Unix.file_descr * Unix.file_descr) Abb_domain_pool.t;
   }
 
   type t_ = t
@@ -48,112 +32,33 @@ module El = struct
     type t = t_
   end)
 
-  let create ?(thread_pool_size = 100) ?(exec_duration = fun _ -> ()) () =
+  let create ?thread_pool_size () =
+    let pool_size =
+      CCInt.max 2 (CCOption.get_or ~default:(Domain.recommended_domain_count ()) thread_pool_size)
+    in
+    let loop = Luv.Loop.init () |> Result.get_ok in
+    let check = Luv.Check.init ~loop () |> Result.get_ok in
     let t =
       {
-        reads = Fd_map.empty;
-        writes = Fd_map.empty;
-        timers = Timers.empty;
-        next_timer_id = 0;
+        loop;
         curr_time = Unix.gettimeofday ();
         mono_time = Mtime_clock.elapsed ();
-        exec_duration;
-        thread_pool = Abb_thread_pool.create ~capacity:thread_pool_size ~wait:Unix.pipe;
-        ignore_reads = [];
-        ignore_writes = [];
+        check;
+        thread_pool = Abb_domain_pool.create ~capacity:pool_size ~wait:Unix.pipe;
       }
     in
+    ignore
+      (Luv.Check.start t.check (fun () ->
+           t.curr_time <- Unix.gettimeofday ();
+           t.mono_time <- Mtime_clock.elapsed ())
+      |> Result.get_ok);
     t
 
-  let destroy t = Abb_thread_pool.destroy t.thread_pool
-  let read_fds t = Iter.to_list (Fd_map.keys t.reads)
-  let write_fds t = Iter.to_list (Fd_map.keys t.writes)
-
-  let dispatch fds get set ignores s =
-    ListLabels.fold_left
-      ~init:s
-      ~f:(fun s fd ->
-        let ignore_list = ignores s in
-        if not (CCList.mem ~eq:( = ) fd ignore_list) then
-          let m = get s in
-          let f = Fd_map.find fd m in
-          let s = set (Fd_map.remove fd m) s in
-          f s
-        else s)
-      fds
-
-  let dispatch_reads reads s =
-    dispatch
-      reads
-      (fun s -> (Abb_fut.State.state s).reads)
-      (fun reads s ->
-        let t = Abb_fut.State.state s in
-        Abb_fut.State.set_state { t with reads } s)
-      (fun s -> (Abb_fut.State.state s).ignore_reads)
-      s
-
-  let dispatch_writes writes s =
-    dispatch
-      writes
-      (fun s -> (Abb_fut.State.state s).writes)
-      (fun writes s ->
-        let t = Abb_fut.State.state s in
-        Abb_fut.State.set_state { t with writes } s)
-      (fun s -> (Abb_fut.State.state s).ignore_writes)
-      s
-
-  let rec dispatch_timers s =
-    let t = Abb_fut.State.state s in
-    try
-      match Timers.next t.timers with
-      | (ts, id), f when Mtime.Span.compare ts t.mono_time <= 0 ->
-          let t = { t with timers = Timers.remove id ts t.timers } in
-          let s = Abb_fut.State.set_state t s in
-          dispatch_timers (f s)
-      | _ -> s
-    with Not_found -> s
-
-  let wait_on_event s =
-    let t = Abb_fut.State.state s in
-
-    let timeout =
-      try
-        match Timers.next t.timers with
-        | (ts, _), _ when Mtime.Span.compare ts t.mono_time > 0 ->
-            Mtime.Span.(to_float_ns (abs_diff ts t.mono_time) /. sec_ns)
-        | _ -> 0.0
-      with Not_found -> -1.0
-    in
-    assert (timeout >= -1.0);
-    let read = read_fds t in
-    let write = write_fds t in
-    assert ((not (CCList.is_empty read && CCList.is_empty write)) || timeout >= 0.0);
-    let reads, writes, _ =
-      try Unix.select ~read ~write ~except:[] ~timeout
-      with Unix.Unix_error (Unix.EINTR, _, _) -> ([], [], [])
-    in
-    let t =
-      {
-        t with
-        curr_time = Unix.gettimeofday ();
-        mono_time = Mtime_clock.elapsed ();
-        ignore_reads = [];
-        ignore_writes = [];
-      }
-    in
-    let s = Abb_fut.State.set_state t s in
-    let s = s |> dispatch_reads reads |> dispatch_writes writes |> dispatch_timers in
-    let end_time = Mtime_clock.elapsed () in
-    let duration = Mtime.Span.(to_float_ns (abs_diff end_time t.mono_time) /. sec_ns) in
-    (Abb_fut.State.state s).exec_duration duration;
-    s
-
-  let rec loop s done_fut =
-    match Future.state done_fut with
-    | `Det _ | `Aborted | `Exn _ -> s
-    | `Undet ->
-        let s = wait_on_event s in
-        loop s done_fut
+  let destroy t =
+    Abb_domain_pool.destroy t.thread_pool;
+    ignore (Luv.Check.stop t.check);
+    Luv.Handle.close t.check CCFun.id;
+    ignore (Luv.Loop.close t.loop)
 end
 
 module Future = El.Future
@@ -161,8 +66,8 @@ module Future = El.Future
 module Scheduler = struct
   type t = El.t Abb_fut.State.t
 
-  let create ?thread_pool_size ?exec_duration () =
-    Abb_fut.State.create (El.create ?thread_pool_size ?exec_duration ())
+  let create ?thread_pool_size ?exec_duration:_ () =
+    Abb_fut.State.create (El.create ?thread_pool_size ())
 
   let destroy t = El.destroy (Abb_fut.State.state t)
 
@@ -170,13 +75,27 @@ module Scheduler = struct
     ignore Sys.(signal sigpipe Signal_ignore);
     let ret = f () in
     let t = Future.run_with_state ret t in
-    let t = El.loop t ret in
     match Future.state ret with
     | (`Det _ | `Aborted | `Exn _) as r -> (t, r)
-    | `Undet -> assert false
+    | `Undet -> (
+        let stopper =
+          let open Future.Infix_monad in
+          ret
+          >>= fun _ ->
+          Future.with_state (fun s ->
+              let el = Abb_fut.State.state s in
+              Luv.Loop.stop el.El.loop;
+              (s, Future.return ()))
+        in
+        let t = Future.run_with_state stopper t in
+        let el = Abb_fut.State.state t in
+        ignore (Luv.Loop.run ~loop:el.El.loop ());
+        match Future.state ret with
+        | (`Det _ | `Aborted | `Exn _) as r -> (t, r)
+        | `Undet -> assert false)
 
-  let run_with_state ?thread_pool_size ?exec_duration f =
-    let t = create ?thread_pool_size ?exec_duration () in
+  let run_with_state ?thread_pool_size ?exec_duration:_ f =
+    let t = create ?thread_pool_size () in
     let t, r = run t f in
     destroy t;
     r
@@ -184,104 +103,85 @@ end
 
 module Sys = struct
   let sleep duration =
+    assert (duration >= 0.0);
     Future.with_state (fun s ->
-        let t = Abb_fut.State.state s in
-        let timer_id = t.El.next_timer_id in
-        (* Add one [ns] to the duration just to ensure we do not get caught in a
-           tight loop by sleeping 0 seconds. *)
-        let duration_span =
-          CCOption.get_exn_or
-            "negative sleep duration"
-            (Mtime.Span.of_float_ns (duration *. sec_ns))
-        in
-        let ts = Mtime.Span.(add t.El.mono_time (add duration_span ns)) in
+        let el = Abb_fut.State.state s in
+        let timer = Luv.Timer.init ~loop:el.El.loop () |> Result.get_ok in
+        let ms = max 1 (int_of_float (duration *. 1000.0)) in
         let p =
           Future.Promise.create
             ~abort:(fun () ->
-              Future.with_state (fun s ->
-                  let t = Abb_fut.State.state s in
-                  let t = { t with El.timers = Timers.remove timer_id ts t.El.timers } in
-                  let s = Abb_fut.State.set_state t s in
-                  (s, Future.return ())))
+              ignore (Luv.Timer.stop timer);
+              Luv.Handle.close timer CCFun.id;
+              Future.return ())
             ()
         in
-        let f s = Future.run_with_state (Future.Promise.set p ()) s in
-        let t =
-          {
-            t with
-            El.next_timer_id = t.El.next_timer_id + 1;
-            timers = Timers.add timer_id ts f t.El.timers;
-          }
-        in
-
-        let s = Abb_fut.State.set_state t s in
+        ignore
+          (Luv.Timer.start timer ms (fun () ->
+               ignore (Future.run_with_state (Future.Promise.set p ()) s);
+               Luv.Handle.close timer CCFun.id)
+          |> Result.get_ok);
         (s, Future.Promise.future p))
 
   let time () =
     Future.with_state (fun s ->
-        let t = Abb_fut.State.state s in
-        (s, Future.return t.El.curr_time))
+        let el = Abb_fut.State.state s in
+        (s, Future.return el.El.curr_time))
 
   let monotonic () =
     Future.with_state (fun s ->
-        let t = Abb_fut.State.state s in
-        (s, Future.return Mtime.Span.(to_float_ns t.El.mono_time /. sec_ns)))
+        let el = Abb_fut.State.state s in
+        (s, Future.return Mtime.Span.(to_float_ns el.El.mono_time /. sec_ns)))
 end
 
 module Thread = struct
   let run f =
     Future.with_state (fun s ->
-        let t = Abb_fut.State.state s in
+        let el = Abb_fut.State.state s in
         let ret = ref None in
-        let trigger (_, trigger) res =
+        let aborted = ref false in
+        let trigger (_, trigger_fd) res =
           ret := Some res;
-          (* Send something on the pipe to trigger the read side *)
-          (try ignore (Unix.write trigger ~buf:(Bytes.of_string "0") ~pos:0 ~len:1)
-           with Unix.Unix_error _ ->
-             (* If the other side has closed the trigger, this write will fail,
-                so ignore any write error. *)
-             ());
-          Unix.close trigger
+          (try ignore (Unix.write trigger_fd ~buf:(Bytes.of_string "0") ~pos:0 ~len:1)
+           with Unix.Unix_error _ -> ());
+          Unix.close trigger_fd
         in
-        let wait, _ = Abb_thread_pool.enqueue t.El.thread_pool ~f ~trigger in
+        let wait, _write_end = Abb_domain_pool.enqueue el.El.thread_pool ~f ~trigger in
+        let poll =
+          Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr wait) |> Result.get_ok
+        in
         let abort () =
-          (* It would be nice to kill the thread here but several issues arise,
-             including: the thread may have allocated resources it needs to clean
-             up, and Thread.kill is not actually implemented. *)
           Future.with_state (fun s ->
-              let t = Abb_fut.State.state s in
-              let t =
-                {
-                  t with
-                  El.reads = Fd_map.remove wait t.El.reads;
-                  ignore_reads = wait :: t.El.ignore_reads;
-                  ignore_writes = wait :: t.El.ignore_writes;
-                }
-              in
-              Unix.close wait;
-              let s = Abb_fut.State.set_state t s in
+              let el = Abb_fut.State.state s in
+              let timer = Luv.Timer.init ~loop:el.El.loop () |> Result.get_ok in
+              ignore
+                (Luv.Timer.start timer 0 (fun () ->
+                     aborted := true;
+                     ignore (Luv.Poll.stop poll);
+                     Luv.Handle.close poll (fun () -> try Unix.close wait with _ -> ());
+                     Luv.Handle.close timer CCFun.id)
+                |> Result.get_ok);
               (s, Future.return ()))
         in
         let p = Future.Promise.create ~abort () in
-        let handler s =
-          let open Future.Infix_monad in
-          let fut =
-            match !ret with
-            | Some (Ok v) -> Future.Promise.set p v >>| fun () -> Unix.close wait
-            | Some (Error exn) -> Future.Promise.set_exn p exn >>| fun () -> Unix.close wait
-            | None -> assert false
-          in
-          Future.run_with_state fut s
-        in
-        let t = { t with El.reads = Fd_map.add wait handler t.El.reads } in
-        let s = Abb_fut.State.set_state t s in
+        Luv.Poll.start poll [ `READABLE ] (fun _result ->
+            ignore (Luv.Poll.stop poll);
+            let fut =
+              match !ret with
+              | Some (Ok v) -> Future.Promise.set p v
+              | Some (Error exn) -> Future.Promise.set_exn p exn
+              | None when !aborted -> Future.return ()
+              | None -> assert false
+            in
+            ignore (Future.run_with_state fut s);
+            Luv.Handle.close poll (fun () -> try Unix.close wait with _ -> ()));
         (s, Future.Promise.future p))
 end
 
 let safe_call f = try Ok (f ()) with e -> Error (`Unexpected e)
 
-(** The filesystem calls are implemented through a thread call because there is no guarantee that
-    they will not block, for example on an NFS system. *)
+(* The filesystem calls are implemented through a thread call because there is
+   no guarantee that they will not block, for example on an NFS system. *)
 module File = struct
   type t = Unix.file_descr
 
@@ -320,102 +220,186 @@ module File = struct
     | _ -> 0
 
   let open_file ~flags path =
-    Thread.run (fun () ->
-        try
-          let t = Unix.openfile path ~mode:(mode_of_flags flags) ~perm:(perm_of_flags flags) in
-          (* FIXME Possible descriptor leak here? *)
-          Unix.set_close_on_exec t;
-          Ok t
-        with
-        | Unix.Unix_error (err, _, _) as exn ->
-            let open Unix in
-            Error
-              (match err with
-              | ENOTDIR -> `E_not_dir
-              | ENAMETOOLONG -> `E_name_too_long
-              | ENOENT -> `E_no_entity
-              | EACCES -> `E_access
-              | EROFS | EPERM -> `E_permission
-              | ELOOP -> `E_loop
-              | ENFILE | EMFILE -> `E_file_table_full
-              | ENOSPC -> `E_no_space
-              | EIO -> `E_io
-              | EEXIST -> `E_exists
-              | EINVAL -> `E_invalid
-              | _ -> `Unexpected exn)
-        | exn -> Error (`Unexpected exn))
-
-  let safe_read t ~buf ~pos ~len =
-    try Ok (Unix.read t ~buf ~pos ~len) with
+    try
+      let t =
+        Unix.openfile
+          path
+          ~mode:(Unix.O_CLOEXEC :: Unix.O_NONBLOCK :: mode_of_flags flags)
+          ~perm:(perm_of_flags flags)
+      in
+      Future.return (Ok t)
+    with
     | Unix.Unix_error (err, _, _) as exn ->
         let open Unix in
-        Error
-          (match err with
-          | EBADF -> `E_bad_file
-          | EIO -> `E_io
-          | EINVAL -> `E_invalid
-          | EISDIR -> `E_is_dir
-          | _ -> `Unexpected exn)
-    | exn -> Error (`Unexpected exn)
+        Future.return
+          (Error
+             (match err with
+             | ENOTDIR -> `E_not_dir
+             | ENAMETOOLONG -> `E_name_too_long
+             | ENOENT -> `E_no_entity
+             | EACCES -> `E_access
+             | EROFS | EPERM -> `E_permission
+             | ELOOP -> `E_loop
+             | ENFILE | EMFILE -> `E_file_table_full
+             | ENOSPC -> `E_no_space
+             | EIO -> `E_io
+             | EEXIST -> `E_exists
+             | EINVAL -> `E_invalid
+             | _ -> `Unexpected exn))
+    | exn -> Future.return (Error (`Unexpected exn))
 
-  let read t ~buf ~pos ~len = Thread.run (fun () -> safe_read t ~buf ~pos ~len)
+  let read t ~buf ~pos ~len =
+    try Future.return (Ok (Unix.read t ~buf ~pos ~len)) with
+    | Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
+        Future.with_state (fun s ->
+            let el = Abb_fut.State.state s in
+            let poll =
+              Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+            in
+            let p =
+              Future.Promise.create
+                ~abort:(fun () ->
+                  ignore (Luv.Poll.stop poll);
+                  Luv.Handle.close poll CCFun.id;
+                  Future.return ())
+                ()
+            in
+            Luv.Poll.start poll [ `READABLE ] (fun _result ->
+                ignore (Luv.Poll.stop poll);
+                Luv.Handle.close poll CCFun.id;
+                ignore
+                  (Future.run_with_state
+                     (Future.Promise.set
+                        p
+                        (try Ok (Unix.read t ~buf ~pos ~len) with
+                        | Unix.Unix_error (err, _, _) as exn ->
+                            let open Unix in
+                            Error
+                              (match err with
+                              | EBADF -> `E_bad_file
+                              | EIO -> `E_io
+                              | EINVAL -> `E_invalid
+                              | EISDIR -> `E_is_dir
+                              | _ -> `Unexpected exn)
+                        | exn -> Error (`Unexpected exn)))
+                     s));
+            (s, Future.Promise.future p))
+    | Unix.Unix_error (err, _, _) as exn ->
+        let open Unix in
+        Future.return
+          (Error
+             (match err with
+             | EBADF -> `E_bad_file
+             | EIO -> `E_io
+             | EINVAL -> `E_invalid
+             | EISDIR -> `E_is_dir
+             | _ -> `Unexpected exn))
+    | exn -> Future.return (Error (`Unexpected exn))
 
   let pread t ~offset ~buf ~pos ~len =
-    Thread.run (fun () ->
-        try
-          let n = Unix.lseek t offset ~mode:Unix.SEEK_SET in
-          assert (n = offset);
-          safe_read t ~buf ~pos ~len
-        with
-        | Unix.Unix_error (Unix.ENXIO, _, _) -> Error `E_nxio
-        | exn -> Error (`Unexpected exn))
+    try
+      let n = Unix.lseek t offset ~mode:Unix.SEEK_SET in
+      assert (n = offset);
+      read t ~buf ~pos ~len
+    with
+    | Unix.Unix_error (Unix.ENXIO, _, _) -> Future.return (Error `E_nxio)
+    | exn -> Future.return (Error (`Unexpected exn))
+
+  let write' ~buf ~pos ~len t =
+    try Future.return (Ok (Unix.write t ~buf ~pos ~len)) with
+    | Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
+        Future.with_state (fun s ->
+            let el = Abb_fut.State.state s in
+            let poll =
+              Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+            in
+            let p =
+              Future.Promise.create
+                ~abort:(fun () ->
+                  ignore (Luv.Poll.stop poll);
+                  Luv.Handle.close poll CCFun.id;
+                  Future.return ())
+                ()
+            in
+            Luv.Poll.start poll [ `WRITABLE ] (fun _result ->
+                ignore (Luv.Poll.stop poll);
+                Luv.Handle.close poll CCFun.id;
+                ignore
+                  (Future.run_with_state
+                     (Future.Promise.set
+                        p
+                        (try Ok (Unix.write t ~buf ~pos ~len) with
+                        | Unix.Unix_error (err, _, _) as exn ->
+                            let open Unix in
+                            Error
+                              (match err with
+                              | EBADF -> `E_bad_file
+                              | EPIPE -> `E_pipe
+                              | EINVAL -> `E_invalid
+                              | ENOSPC -> `E_no_space
+                              | EIO -> `E_io
+                              | EROFS -> `E_permission
+                              | _ -> `Unexpected exn)
+                        | exn -> Error (`Unexpected exn)))
+                     s));
+            (s, Future.Promise.future p))
+    | Unix.Unix_error (err, _, _) as exn ->
+        let open Unix in
+        Future.return
+          (Error
+             (match err with
+             | EBADF -> `E_bad_file
+             | EPIPE -> `E_pipe
+             | EINVAL -> `E_invalid
+             | ENOSPC -> `E_no_space
+             | EIO -> `E_io
+             | EROFS -> `E_permission
+             | _ -> `Unexpected exn))
+    | exn -> Future.return (Error (`Unexpected exn))
 
   let rec write_buf t buf =
-    let n =
-      Unix.write
-        t
-        ~buf:buf.Abb_intf.Write_buf.buf
-        ~pos:buf.Abb_intf.Write_buf.pos
-        ~len:buf.Abb_intf.Write_buf.len
-    in
-    match n with
-    | n when n < buf.Abb_intf.Write_buf.len ->
+    let open Future.Infix_monad in
+    write'
+      t
+      ~buf:buf.Abb_intf.Write_buf.buf
+      ~pos:buf.Abb_intf.Write_buf.pos
+      ~len:buf.Abb_intf.Write_buf.len
+    >>= function
+    | Ok n when n < buf.Abb_intf.Write_buf.len -> (
         let buf = Abb_intf.Write_buf.{ buf with pos = buf.pos + n; len = buf.len - n } in
-        n + write_buf t buf
-    | n -> n
+        write_buf t buf
+        >>= function
+        | Ok n' -> Future.return (Ok (n + n'))
+        | Error _ as err -> Future.return err)
+    | Ok n -> Future.return (Ok n)
+    | Error _ as err -> Future.return err
 
   let write_bufs t bufs =
     let rec write_bufs' t = function
-      | [] -> 0
-      | b :: bs ->
-          let n = write_buf t b in
-          n + write_bufs' t bs
+      | [] -> Future.return (Ok 0)
+      | b :: bs -> (
+          let open Future.Infix_monad in
+          write_buf t b
+          >>= function
+          | Ok n -> (
+              write_bufs' t bs
+              >>= function
+              | Ok n' -> Future.return (Ok (n + n'))
+              | Error _ as err -> Future.return err)
+          | Error _ as err -> Future.return err)
     in
-    try Ok (write_bufs' t bufs) with
-    | Unix.Unix_error (err, _, _) as exn ->
-        let open Unix in
-        Error
-          (match err with
-          | EBADF -> `E_bad_file
-          | EPIPE -> `E_pipe
-          | EINVAL -> `E_invalid
-          | ENOSPC -> `E_no_space
-          | EIO -> `E_io
-          | EROFS -> `E_permission
-          | _ -> `Unexpected exn)
-    | exn -> Error (`Unexpected exn)
+    write_bufs' t bufs
 
-  let write t bufs = Thread.run (fun () -> write_bufs t bufs)
+  let write t bufs = write_bufs t bufs
 
   let pwrite t ~offset bufs =
-    Thread.run (fun () ->
-        try
-          let n = Unix.lseek t offset ~mode:Unix.SEEK_SET in
-          assert (n = offset);
-          write_bufs t bufs
-        with
-        | Unix.Unix_error (Unix.ENXIO, _, _) -> Error `E_nxio
-        | exn -> Error (`Unexpected exn))
+    try
+      let n = Unix.lseek t offset ~mode:Unix.SEEK_SET in
+      assert (n = offset);
+      write_bufs t bufs
+    with
+    | Unix.Unix_error (Unix.ENXIO, _, _) -> Future.return (Error `E_nxio)
+    | exn -> Future.return (Error (`Unexpected exn))
 
   let lseek' t ~offset = function
     | Abb_intf.File.Seek.Cur ->
@@ -441,35 +425,33 @@ module File = struct
     | exn -> Error (`Unexpected exn)
 
   let close t =
-    Thread.run (fun () ->
-        try Ok (Unix.close t) with
-        | Unix.Unix_error (err, _, _) as exn ->
-            let open Unix in
-            Error
-              (match err with
-              | EBADF -> `E_bad_file
-              | ENOSPC -> `E_no_space
-              | _ -> `Unexpected exn)
-        | exn -> Error (`Unexpected exn))
+    Future.with_state (fun s ->
+        let el = Abb_fut.State.state s in
+        let timer = Luv.Timer.init ~loop:el.El.loop () |> Result.get_ok in
+        ignore
+          (Luv.Timer.start timer 0 (fun () ->
+               Luv.Handle.close timer (fun () -> try Unix.close t with _ -> ()))
+          |> Result.get_ok);
+        (s, Future.return (Ok ())))
 
   let unlink path =
-    Thread.run (fun () ->
-        try Ok (Unix.unlink path) with
-        | Unix.Unix_error (err, _, _) as exn ->
-            let open Unix in
-            Error
-              (match err with
-              | ENOTDIR -> `E_not_dir
-              | EISDIR -> `E_is_dir
-              | ENAMETOOLONG -> `E_name_too_long
-              | ENOENT -> `E_no_entity
-              | EACCES -> `E_access
-              | ELOOP -> `E_loop
-              | EPERM -> `E_permission
-              | EIO -> `E_io
-              | ENOSPC -> `E_no_space
-              | _ -> `Unexpected exn)
-        | exn -> Error (`Unexpected exn))
+    try Future.return (Ok (Unix.unlink path)) with
+    | Unix.Unix_error (err, _, _) as exn ->
+        let open Unix in
+        Future.return
+          (Error
+             (match err with
+             | ENOTDIR -> `E_not_dir
+             | EISDIR -> `E_is_dir
+             | ENAMETOOLONG -> `E_name_too_long
+             | ENOENT -> `E_no_entity
+             | EACCES -> `E_access
+             | ELOOP -> `E_loop
+             | EPERM -> `E_permission
+             | EIO -> `E_io
+             | ENOSPC -> `E_no_space
+             | _ -> `Unexpected exn))
+    | exn -> Future.return (Error (`Unexpected exn))
 
   let mkdir path perm =
     Thread.run (fun () ->
@@ -852,44 +834,37 @@ module Socket = struct
     | Unix.ADDR_INET (addr, port) -> Abb_intf.Socket.Sockaddr.(Inet { addr; port })
 
   let recvfrom t ~buf ~pos ~len =
-    let p =
-      Future.Promise.create
-        ~abort:(fun () ->
-          Future.with_state (fun s ->
-              let el = Abb_fut.State.state s in
-              let el =
-                {
-                  el with
-                  El.reads = Fd_map.remove t el.El.reads;
-                  ignore_reads = t :: el.El.ignore_reads;
-                }
-              in
-              let s = Abb_fut.State.set_state el s in
-              (s, Future.return ())))
-        ()
-    in
-    let handler s =
-      Future.run_with_state
-        (Future.Promise.set
-           p
-           (try
-              let n, addr = Unix.recvfrom t ~buf ~pos ~len ~mode:[] in
-              Ok (n, sockaddr_of_unix_sockaddr addr)
-            with
-           | Unix.Unix_error (err, _, _) as exn ->
-               let open Unix in
-               Error
-                 (match err with
-                 | EBADF -> `E_bad_file
-                 | ECONNRESET -> `E_connection_reset
-                 | _ -> `Unexpected exn)
-           | exn -> Error (`Unexpected exn)))
-        s
-    in
     Future.with_state (fun s ->
         let el = Abb_fut.State.state s in
-        let el = { el with El.reads = Fd_map.add t handler el.El.reads } in
-        let s = Abb_fut.State.set_state el s in
+        let poll = Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok in
+        let p =
+          Future.Promise.create
+            ~abort:(fun () ->
+              ignore (Luv.Poll.stop poll);
+              Luv.Handle.close poll CCFun.id;
+              Future.return ())
+            ()
+        in
+        Luv.Poll.start poll [ `READABLE ] (fun _result ->
+            ignore (Luv.Poll.stop poll);
+            Luv.Handle.close poll CCFun.id;
+            ignore
+              (Future.run_with_state
+                 (Future.Promise.set
+                    p
+                    (try
+                       let n, addr = Unix.recvfrom t ~buf ~pos ~len ~mode:[] in
+                       Ok (n, sockaddr_of_unix_sockaddr addr)
+                     with
+                    | Unix.Unix_error (err, _, _) as exn ->
+                        let open Unix in
+                        Error
+                          (match err with
+                          | EBADF -> `E_bad_file
+                          | ECONNRESET -> `E_connection_reset
+                          | _ -> `Unexpected exn)
+                    | exn -> Error (`Unexpected exn)))
+                 s));
         (s, Future.Promise.future p))
 
   let sendto t ~bufs sockaddr =
@@ -897,75 +872,65 @@ module Socket = struct
       Future.Promise.create
         ~abort:(fun () ->
           Future.with_state (fun s ->
-              let el = Abb_fut.State.state s in
-              let el =
-                {
-                  el with
-                  El.writes = Fd_map.remove t el.El.writes;
-                  ignore_writes = t :: el.El.ignore_writes;
-                }
-              in
-              let s = Abb_fut.State.set_state el s in
+              (* We don't track the poll handle here so we can't stop it on abort.
+                 The poll callback will detect the aborted promise and no-op. *)
               (s, Future.return ())))
         ()
     in
     let addr = unix_sockaddr_of_sockaddr sockaddr in
-    let rec send' total = function
+    let rec send' ~total ~pos = function
       | [] -> Future.Promise.set p (Ok total)
-      | wb :: bufs -> (
-          try
-            let n =
-              Unix.sendto
-                t
-                ~buf:wb.Abb_intf.Write_buf.buf
-                ~pos:wb.Abb_intf.Write_buf.pos
-                ~len:wb.Abb_intf.Write_buf.len
-                ~mode:[]
-                ~addr
-            in
-            (* FIXME Make this handle incomplete sends *)
-            assert (n = wb.Abb_intf.Write_buf.len);
-            send' (n + total) bufs
-          with
-          | Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
-              let handler s = Future.run_with_state (send' total (wb :: bufs)) s in
-              Future.with_state (fun s ->
-                  let el = Abb_fut.State.state s in
-                  let el = { el with El.writes = Fd_map.add t handler el.El.writes } in
-                  let s = Abb_fut.State.set_state el s in
-                  (s, Future.return ()))
-          | Unix.Unix_error (err, _, _) as exn ->
-              let open Unix in
-              Future.Promise.set
-                p
-                (Error
-                   (match err with
-                   | EBADF -> `E_bad_file
-                   | EACCES -> `E_access
-                   | ENOBUFS -> `E_no_buffers
-                   | EHOSTUNREACH -> `E_host_unreachable
-                   | EHOSTDOWN -> `E_host_down
-                   | ECONNREFUSED -> `E_connection_refused
-                   | _ -> `Unexpected exn))
-          | exn -> Future.Promise.set p (Error (`Unexpected exn)))
+      | wb :: bufs as all_bufs ->
+          Future.with_state (fun s ->
+              let el = Abb_fut.State.state s in
+              let poll =
+                Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+              in
+              Luv.Poll.start poll [ `WRITABLE ] (fun _result ->
+                  ignore (Luv.Poll.stop poll);
+                  Luv.Handle.close poll CCFun.id;
+                  ignore
+                    (try
+                       let len = wb.Abb_intf.Write_buf.len - pos in
+                       let n =
+                         Unix.sendto t ~buf:wb.Abb_intf.Write_buf.buf ~pos ~len ~mode:[] ~addr
+                       in
+                       let total = total + n in
+                       match n with
+                       | n when n = len -> Future.run_with_state (send' ~total ~pos:0 bufs) s
+                       | n -> Future.run_with_state (send' ~total ~pos:(pos + n) all_bufs) s
+                     with
+                    | Unix.Unix_error (err, _, _) as exn ->
+                        let open Unix in
+                        Future.run_with_state
+                          (Future.Promise.set
+                             p
+                             (Error
+                                (match err with
+                                | EBADF -> `E_bad_file
+                                | EACCES -> `E_access
+                                | ENOBUFS -> `E_no_buffers
+                                | EHOSTUNREACH -> `E_host_unreachable
+                                | EHOSTDOWN -> `E_host_down
+                                | ECONNREFUSED -> `E_connection_refused
+                                | _ -> `Unexpected exn)))
+                          s
+                    | exn ->
+                        Future.run_with_state (Future.Promise.set p (Error (`Unexpected exn))) s));
+              (s, Future.return ()))
     in
     let open Future.Infix_monad in
-    send' 0 bufs >>= fun () -> Future.Promise.future p
+    send' ~total:0 ~pos:0 bufs >>= fun () -> Future.Promise.future p
 
   let close t =
-    try
-      Unix.close t;
-      Future.return (Ok ())
-    with
-    | Unix.Unix_error (err, _, _) as exn ->
-        let open Unix in
-        Future.return
-          (Error
-             (match err with
-             | EBADF -> `E_bad_file
-             | ECONNRESET -> `E_connection_reset
-             | _ -> `Unexpected exn))
-    | exn -> Future.return (Error (`Unexpected exn))
+    Future.with_state (fun s ->
+        let el = Abb_fut.State.state s in
+        let timer = Luv.Timer.init ~loop:el.El.loop () |> Result.get_ok in
+        ignore
+          (Luv.Timer.start timer 0 (fun () ->
+               Luv.Handle.close timer (fun () -> try Unix.close t with _ -> ()))
+          |> Result.get_ok);
+        (s, Future.return (Ok ())))
 
   let listen t ~backlog =
     try
@@ -988,100 +953,55 @@ module Socket = struct
       let fd, _ = Unix.accept ~cloexec:true t in
       Unix.set_nonblock fd;
       Future.return (Ok fd)
-    with Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
-      let p =
-        Future.Promise.create
-          ~abort:(fun () ->
-            Future.with_state (fun s ->
-                let el = Abb_fut.State.state s in
-                let el =
-                  {
-                    el with
-                    El.reads = Fd_map.remove t el.El.reads;
-                    ignore_reads = t :: el.El.ignore_reads;
-                  }
-                in
-                let s = Abb_fut.State.set_state el s in
-                (s, Future.return ())))
-          ()
-      in
-      let handler s =
-        Future.run_with_state
-          (Future.Promise.set
-             p
-             (try
-                let fd, _ = Unix.accept t in
-                Unix.set_nonblock fd;
-                Ok fd
-              with
-             | Unix.Unix_error (err, _, _) as exn ->
-                 let open Unix in
-                 Error
-                   (match err with
-                   | EBADF -> `E_bad_file
-                   | EMFILE | ENFILE -> `E_file_table_full
-                   | EINVAL -> `E_invalid
-                   | ECONNABORTED -> `E_connection_aborted
-                   | _ -> `Unexpected exn)
-             | exn -> Error (`Unexpected exn)))
-          s
-      in
-      Future.with_state (fun s ->
-          let el = Abb_fut.State.state s in
-          let el = { el with El.reads = Fd_map.add t handler el.El.reads } in
-          let s = Abb_fut.State.set_state el s in
-          (s, Future.Promise.future p))
-
-  let readable t =
-    let p =
-      Future.Promise.create
-        ~abort:(fun () ->
-          Future.with_state (fun s ->
-              let el = Abb_fut.State.state s in
-              let el =
-                {
-                  el with
-                  El.reads = Fd_map.remove t el.El.reads;
-                  ignore_reads = t :: el.El.ignore_reads;
-                }
-              in
-              let s = Abb_fut.State.set_state el s in
-              (s, Future.return ())))
-        ()
-    in
-    let handler s = Future.run_with_state (Future.Promise.set p ()) s in
-    Future.with_state (fun s ->
-        let el = Abb_fut.State.state s in
-        let el = { el with El.reads = Fd_map.add t handler el.El.reads } in
-        let s = Abb_fut.State.set_state el s in
-        (s, Future.Promise.future p))
-
-  let writable t =
-    let p =
-      Future.Promise.create
-        ~abort:(fun () ->
-          Future.with_state (fun s ->
-              let el = Abb_fut.State.state s in
-              let el =
-                {
-                  el with
-                  El.writes = Fd_map.remove t el.El.writes;
-                  ignore_writes = t :: el.El.ignore_writes;
-                }
-              in
-              let s = Abb_fut.State.set_state el s in
-              (s, Future.return ())))
-        ()
-    in
-    let handler s = Future.run_with_state (Future.Promise.set p ()) s in
-    Future.with_state (fun s ->
-        let el = Abb_fut.State.state s in
-        let el = { el with El.writes = Fd_map.add t handler el.El.writes } in
-        let s = Abb_fut.State.set_state el s in
-        (s, Future.Promise.future p))
+    with
+    | Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
+        Future.with_state (fun s ->
+            let el = Abb_fut.State.state s in
+            let poll =
+              Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+            in
+            let p =
+              Future.Promise.create
+                ~abort:(fun () ->
+                  ignore (Luv.Poll.stop poll);
+                  Luv.Handle.close poll CCFun.id;
+                  Future.return ())
+                ()
+            in
+            Luv.Poll.start poll [ `READABLE ] (fun _result ->
+                ignore (Luv.Poll.stop poll);
+                Luv.Handle.close poll CCFun.id;
+                ignore
+                  (Future.run_with_state
+                     (Future.Promise.set
+                        p
+                        (try
+                           let fd, _ = Unix.accept ~cloexec:true t in
+                           Unix.set_nonblock fd;
+                           Ok fd
+                         with
+                        | Unix.Unix_error (err, _, _) as exn ->
+                            let open Unix in
+                            Error
+                              (match err with
+                              | EBADF -> `E_bad_file
+                              | EMFILE | ENFILE -> `E_file_table_full
+                              | EINVAL -> `E_invalid
+                              | ECONNABORTED -> `E_connection_aborted
+                              | _ -> `Unexpected exn)
+                        | exn -> Error (`Unexpected exn)))
+                     s));
+            (s, Future.Promise.future p))
+    | Unix.Unix_error (err, _, _) as exn ->
+        let open Unix in
+        Future.return
+          (Error
+             (match err with
+             | ENOTSOCK | EBADF -> `E_bad_file
+             | _ -> `Unexpected exn))
+    | exn -> Future.return (Error (`Unexpected exn))
 
   let create_sock ~kind ~domain =
-    (* FIXME Possible leak here? *)
     try
       let t = Unix.socket ~cloexec:true ~domain:(unix_of_domain domain) ~kind ~protocol:0 in
       Unix.set_nonblock t;
@@ -1100,6 +1020,42 @@ module Socket = struct
           | EPROTOTYPE -> `E_protocol_type
           | _ -> `Unexpected exn)
     | exn -> Error (`Unexpected exn)
+
+  let readable t =
+    Future.with_state (fun s ->
+        let el = Abb_fut.State.state s in
+        let poll = Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok in
+        let p =
+          Future.Promise.create
+            ~abort:(fun () ->
+              ignore (Luv.Poll.stop poll);
+              Luv.Handle.close poll CCFun.id;
+              Future.return ())
+            ()
+        in
+        Luv.Poll.start poll [ `READABLE ] (fun _result ->
+            ignore (Luv.Poll.stop poll);
+            Luv.Handle.close poll CCFun.id;
+            ignore (Future.run_with_state (Future.Promise.set p ()) s));
+        (s, Future.Promise.future p))
+
+  let writable t =
+    Future.with_state (fun s ->
+        let el = Abb_fut.State.state s in
+        let poll = Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok in
+        let p =
+          Future.Promise.create
+            ~abort:(fun () ->
+              ignore (Luv.Poll.stop poll);
+              Luv.Handle.close poll CCFun.id;
+              Future.return ())
+            ()
+        in
+        Luv.Poll.start poll [ `WRITABLE ] (fun _result ->
+            ignore (Luv.Poll.stop poll);
+            Luv.Handle.close poll CCFun.id;
+            ignore (Future.run_with_state (Future.Promise.set p ()) s));
+        (s, Future.Promise.future p))
 
   module Tcp = struct
     let to_native t = t
@@ -1135,34 +1091,29 @@ module Socket = struct
       | exn -> Error (`Unexpected exn)
 
     let connect t addr =
-      let open Future.Infix_monad in
-      let p =
-        Future.Promise.create
-          ~abort:(fun () ->
-            Future.with_state (fun s ->
-                let el = Abb_fut.State.state s in
-                let el =
-                  {
-                    el with
-                    El.writes = Fd_map.remove t el.El.writes;
-                    ignore_writes = t :: el.El.ignore_writes;
-                  }
-                in
-                let s = Abb_fut.State.set_state el s in
-                (s, Future.return ())))
-          ()
-      in
       let sa = unix_sockaddr_of_sockaddr addr in
       try
         Unix.connect t ~addr:sa;
-        Future.Promise.set p (Ok ()) >>= fun () -> Future.Promise.future p
+        Future.return (Ok ())
       with
       | Unix.Unix_error (Unix.EINPROGRESS, _, _) ->
-          let handler s = Future.run_with_state (Future.Promise.set p (Ok ())) s in
           Future.with_state (fun s ->
               let el = Abb_fut.State.state s in
-              let el = { el with El.writes = Fd_map.add t handler el.El.writes } in
-              let s = Abb_fut.State.set_state el s in
+              let poll =
+                Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+              in
+              let p =
+                Future.Promise.create
+                  ~abort:(fun () ->
+                    ignore (Luv.Poll.stop poll);
+                    Luv.Handle.close poll CCFun.id;
+                    Future.return ())
+                  ()
+              in
+              Luv.Poll.start poll [ `WRITABLE ] (fun _result ->
+                  ignore (Luv.Poll.stop poll);
+                  Luv.Handle.close poll CCFun.id;
+                  ignore (Future.run_with_state (Future.Promise.set p (Ok ())) s));
               (s, Future.Promise.future p))
       | Unix.Unix_error (err, _, _) as exn ->
           let open Unix in
@@ -1184,42 +1135,35 @@ module Socket = struct
       | exn -> Future.return (Error (`Unexpected exn))
 
     let recv t ~buf ~pos ~len =
-      let p =
-        Future.Promise.create
-          ~abort:(fun () ->
-            Future.with_state (fun s ->
-                let el = Abb_fut.State.state s in
-                let el =
-                  {
-                    el with
-                    El.reads = Fd_map.remove t el.El.reads;
-                    ignore_reads = t :: el.El.ignore_reads;
-                  }
-                in
-                let s = Abb_fut.State.set_state el s in
-                (s, Future.return ())))
-          ()
-      in
-      let handler s =
-        Future.run_with_state
-          (Future.Promise.set
-             p
-             (try Ok (Unix.recv t ~buf ~pos ~len ~mode:[]) with
-             | Unix.Unix_error (err, _, _) as exn ->
-                 let open Unix in
-                 Error
-                   (match err with
-                   | ENOTSOCK | EBADF -> `E_bad_file
-                   | ECONNRESET -> `E_connection_reset
-                   | ENOTCONN -> `E_not_connected
-                   | _ -> `Unexpected exn)
-             | exn -> Error (`Unexpected exn)))
-          s
-      in
       Future.with_state (fun s ->
           let el = Abb_fut.State.state s in
-          let el = { el with El.reads = Fd_map.add t handler el.El.reads } in
-          let s = Abb_fut.State.set_state el s in
+          let poll = Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok in
+          let p =
+            Future.Promise.create
+              ~abort:(fun () ->
+                ignore (Luv.Poll.stop poll);
+                Luv.Handle.close poll CCFun.id;
+                Future.return ())
+              ()
+          in
+          Luv.Poll.start poll [ `READABLE ] (fun _result ->
+              ignore (Luv.Poll.stop poll);
+              Luv.Handle.close poll CCFun.id;
+              ignore
+                (Future.run_with_state
+                   (Future.Promise.set
+                      p
+                      (try Ok (Unix.recv t ~buf ~pos ~len ~mode:[]) with
+                      | Unix.Unix_error (err, _, _) as exn ->
+                          let open Unix in
+                          Error
+                            (match err with
+                            | ENOTSOCK | EBADF -> `E_bad_file
+                            | ECONNRESET -> `E_connection_reset
+                            | ENOTCONN -> `E_not_connected
+                            | _ -> `Unexpected exn)
+                      | exn -> Error (`Unexpected exn)))
+                   s));
           (s, Future.Promise.future p))
 
     let send t ~bufs =
@@ -1227,56 +1171,52 @@ module Socket = struct
         Future.Promise.create
           ~abort:(fun () ->
             Future.with_state (fun s ->
-                let el = Abb_fut.State.state s in
-                let el =
-                  {
-                    el with
-                    El.writes = Fd_map.remove t el.El.writes;
-                    ignore_writes = t :: el.El.ignore_writes;
-                  }
-                in
-                let s = Abb_fut.State.set_state el s in
+                (* We don't track the poll handle here so we can't stop it on abort.
+                   The poll callback will detect the aborted promise and no-op. *)
                 (s, Future.return ())))
           ()
       in
-      let rec send' total = function
+      let rec send' ~total ~pos = function
         | [] -> Future.Promise.set p (Ok total)
-        | wb :: bufs -> (
-            try
-              let n =
-                Unix.send
-                  t
-                  ~buf:wb.Abb_intf.Write_buf.buf
-                  ~pos:wb.Abb_intf.Write_buf.pos
-                  ~len:wb.Abb_intf.Write_buf.len
-                  ~mode:[]
-              in
-              send' (total + n) bufs
-            with
-            | Unix.Unix_error (Unix.EAGAIN, _, _) | Unix.Unix_error (Unix.EWOULDBLOCK, _, _) ->
-                let handler s = Future.run_with_state (send' total (wb :: bufs)) s in
-                Future.with_state (fun s ->
-                    let el = Abb_fut.State.state s in
-                    let el = { el with El.writes = Fd_map.add t handler el.El.writes } in
-                    let s = Abb_fut.State.set_state el s in
-                    (s, Future.return ()))
-            | Unix.Unix_error (err, _, _) as exn ->
-                let open Unix in
-                Future.Promise.set
-                  p
-                  (Error
-                     (match err with
-                     | ENOTSOCK | EBADF -> `E_bad_file
-                     | EACCES -> `E_access
-                     | ENOBUFS -> `E_no_buffers
-                     | EHOSTUNREACH -> `E_host_unreachable
-                     | EHOSTDOWN -> `E_host_down
-                     | EPIPE -> `E_pipe
-                     | _ -> `Unexpected exn))
-            | exn -> Future.Promise.set p (Error (`Unexpected exn)))
+        | wb :: bufs as all_bufs ->
+            Future.with_state (fun s ->
+                let el = Abb_fut.State.state s in
+                let poll =
+                  Luv.Poll.init ~loop:el.El.loop (unsafe_int_of_file_descr t) |> Result.get_ok
+                in
+                Luv.Poll.start poll [ `WRITABLE ] (fun _result ->
+                    ignore (Luv.Poll.stop poll);
+                    Luv.Handle.close poll CCFun.id;
+                    ignore
+                      (try
+                         let len = wb.Abb_intf.Write_buf.len - pos in
+                         let n = Unix.send t ~buf:wb.Abb_intf.Write_buf.buf ~pos ~len ~mode:[] in
+                         let total = total + n in
+                         match n with
+                         | n when n = len -> Future.run_with_state (send' ~total ~pos:0 bufs) s
+                         | n -> Future.run_with_state (send' ~total ~pos:(pos + n) all_bufs) s
+                       with
+                      | Unix.Unix_error (err, _, _) as exn ->
+                          let open Unix in
+                          Future.run_with_state
+                            (Future.Promise.set
+                               p
+                               (Error
+                                  (match err with
+                                  | ENOTSOCK | EBADF -> `E_bad_file
+                                  | EACCES -> `E_access
+                                  | ENOBUFS -> `E_no_buffers
+                                  | EHOSTUNREACH -> `E_host_unreachable
+                                  | EHOSTDOWN -> `E_host_down
+                                  | EPIPE -> `E_pipe
+                                  | _ -> `Unexpected exn)))
+                            s
+                      | exn ->
+                          Future.run_with_state (Future.Promise.set p (Error (`Unexpected exn))) s));
+                (s, Future.return ()))
       in
       let open Future.Infix_monad in
-      send' 0 bufs >>= fun () -> Future.Promise.future p
+      send' ~total:0 ~pos:0 bufs >>= fun () -> Future.Promise.future p
 
     let nodelay t enabled =
       try

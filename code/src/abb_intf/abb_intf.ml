@@ -589,21 +589,14 @@ end
 module Process = struct
   module Signal = struct
     type t =
-      | SIGHUP
-      | SIGINT
-      | SIGQUIT
       | SIGABRT
+      | SIGFPE
+      | SIGHUP
+      | SIGILL
+      | SIGINT
       | SIGKILL
-      | SIGBUS
       | SIGSEGV
-      | SIGPIPE
-      | SIGALRM
       | SIGTERM
-      | SIGSTOP
-      | SIGCONT
-      | SIGCHLD
-      | SIGUSR1
-      | SIGUSR2
       | Num of int  (** If the signal cannot be put into any of the predefined ones *)
     [@@deriving show, eq]
   end

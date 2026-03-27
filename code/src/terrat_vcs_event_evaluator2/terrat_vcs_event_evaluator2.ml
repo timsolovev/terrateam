@@ -550,10 +550,16 @@ module Make (S : Terrat_vcs_provider2.S) = struct
               | Ok None -> Abb.Future.return (Error `Error)
               | Error err -> Abb.Future.return (Error err)))
     in
-    log_err ~request_id run
-    >>= function
-    | Ok (`Ok r) -> Abb.Future.return (Ok r)
-    | Ok (`Suspend_eval _) | Ok `Noop | Error _ -> Abb.Future.return (Error `Error)
+    Fc.with_finally
+      (fun () ->
+        log_err ~request_id run
+        >>= function
+        | Ok (`Ok r) -> Abb.Future.return (Ok r)
+        | Ok (`Suspend_eval _) | Ok `Noop | Error _ -> Abb.Future.return (Error `Error))
+      ~finally:(fun () ->
+        Fc.ignore
+        @@ Abb.Future.fork
+        @@ run_next_pending_compute ~request_id ~config ~storage ~exec ())
 
   let work_manifest_result ~request_id ~config ~storage ~exec ~work_manifest_id result =
     let query_work_manifest db =

@@ -2,7 +2,9 @@ let () = Curl.global_init Curl.CURLINIT_GLOBALALL
 let src = Logs.Src.create "abb_curl"
 
 module Logs = (val Logs.src_log src : Logs.LOG)
-module Int_set = CCSet.Make (CCInt)
+module Int_map = CCMap.Make (CCInt)
+
+external unsafe_int_of_file_descr : Unix.file_descr -> int = "%identity"
 
 module Method = struct
   type body = string
@@ -431,8 +433,8 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
 
     module Loop = struct
       type t = {
-        kq : Kqueue.t;
-        eventlist : Kqueue.Eventlist.t;
+        loop : Luv.Loop.t;
+        timer : Luv.Timer.t;
         trigger_eventfd : Unix.file_descr;
         wait_eventfd : Unix.file_descr;
         in_event : In_event.t Queue.t;
@@ -440,120 +442,122 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
         mutex : Mutex.t;
         mt : Curl.Multi.mt;
         curl_opts : Curl.curlOption list;
-        mutable poll_in : Int_set.t;
-        mutable poll_out : Int_set.t;
+        mutable polls : Luv.Poll.t Int_map.t;
         mutable requests : Request.t Id_map.t;
         mutable responses : Response.t Id_map.t;
         mutable handles : Curl.t Id_map.t;
-        mutable timeout : Duration.t option;
         mutable shutdown : bool;
       }
 
+      let trigger_out_events t =
+        Mutex.protect t.mutex (fun () ->
+            if Queue.length t.out_event > 0 then trigger_eventfd t.trigger_eventfd)
+
+      let rec process_finished t =
+        match Curl.Multi.remove_finished t.mt with
+        | Some (handle, exit_code) when exit_code = Curl.CURLE_OK -> (
+            let id =
+              match Curl.getinfo handle Curl.CURLINFO_PRIVATE with
+              | Curl.CURLINFO_String id -> id
+              | Curl.CURLINFO_Long _ -> assert false
+              | Curl.CURLINFO_Double _ -> assert false
+              | Curl.CURLINFO_StringList _ -> assert false
+              | Curl.CURLINFO_StringListList _ -> assert false
+              | Curl.CURLINFO_Socket _ -> assert false
+              | Curl.CURLINFO_Version _ -> assert false
+            in
+            let status =
+              match Curl.getinfo handle Curl.CURLINFO_RESPONSE_CODE with
+              | Curl.CURLINFO_Long status -> Status.of_int status
+              | Curl.CURLINFO_String _ -> assert false
+              | Curl.CURLINFO_Double _ -> assert false
+              | Curl.CURLINFO_StringList _ -> assert false
+              | Curl.CURLINFO_StringListList _ -> assert false
+              | Curl.CURLINFO_Socket _ -> assert false
+              | Curl.CURLINFO_Version _ -> assert false
+            in
+            Curl.cleanup handle;
+            match Id_map.get id t.responses with
+            | Some resp ->
+                t.responses <- Id_map.remove id t.responses;
+                t.requests <- Id_map.remove id t.requests;
+                t.handles <- Id_map.remove id t.handles;
+                Mutex.protect t.mutex (fun () ->
+                    Queue.add (Out_event.Ret (id, Ok { resp with Response.status })) t.out_event);
+                process_finished t
+            | None -> assert false)
+        | Some (handle, exit_code) -> (
+            let id =
+              match Curl.getinfo handle Curl.CURLINFO_PRIVATE with
+              | Curl.CURLINFO_String id -> id
+              | Curl.CURLINFO_Long _ -> assert false
+              | Curl.CURLINFO_Double _ -> assert false
+              | Curl.CURLINFO_StringList _ -> assert false
+              | Curl.CURLINFO_StringListList _ -> assert false
+              | Curl.CURLINFO_Socket _ -> assert false
+              | Curl.CURLINFO_Version _ -> assert false
+            in
+            Curl.cleanup handle;
+            match Id_map.get id t.responses with
+            | Some resp ->
+                t.responses <- Id_map.remove id t.responses;
+                t.requests <- Id_map.remove id t.requests;
+                t.handles <- Id_map.remove id t.handles;
+                Mutex.protect t.mutex (fun () ->
+                    Queue.add
+                      (Out_event.Ret (id, Error (`Curl_err (Curl.strerror exit_code))))
+                      t.out_event);
+                process_finished t
+            | None -> assert false)
+        | None -> ()
+
       let socket_function t fd poll =
+        let fd_int = unsafe_int_of_file_descr fd in
+        let ensure_poll events =
+          let poll_handle =
+            match Int_map.get fd_int t.polls with
+            | Some p ->
+                ignore (Luv.Poll.stop p);
+                p
+            | None ->
+                let p = Luv.Poll.init ~loop:t.loop fd_int |> Result.get_ok in
+                t.polls <- Int_map.add fd_int p t.polls;
+                p
+          in
+          ignore
+            (Luv.Poll.start poll_handle events (fun result ->
+                 match result with
+                 | Ok events ->
+                     let has_readable = List.mem `READABLE events in
+                     let has_writable = List.mem `WRITABLE events in
+                     if has_readable then ignore (Curl.Multi.action t.mt fd Curl.Multi.EV_IN);
+                     if has_writable then ignore (Curl.Multi.action t.mt fd Curl.Multi.EV_OUT);
+                     process_finished t;
+                     trigger_out_events t
+                 | Error _ ->
+                     ignore (Curl.Multi.action t.mt fd Curl.Multi.EV_IN);
+                     process_finished t;
+                     trigger_out_events t))
+        in
         match poll with
         | Curl.Multi.POLL_NONE -> ()
         | Curl.Multi.POLL_IN ->
-            Logs.debug (fun m ->
-                m "SOCKET_FUNCTION : fd=%d : POLL_IN" (Kqueue.unsafe_int_of_file_descr fd));
-            if not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_in) then (
-              let changelist =
-                Kqueue.Eventlist.of_list
-                  [
-                    Kqueue.Change.(
-                      Filter.to_kevent
-                        Action.(to_t [ Flag.Add ])
-                        (Filter.Read (Kqueue.unsafe_int_of_file_descr fd)));
-                  ]
-              in
-              t.poll_in <- Int_set.add (Kqueue.unsafe_int_of_file_descr fd) t.poll_in;
-              let ret =
-                Kqueue.kevent t.kq ~changelist ~eventlist:Kqueue.Eventlist.null ~timeout:None
-              in
-              Logs.debug (fun m -> m "RET : %d" ret))
+            Logs.debug (fun m -> m "SOCKET_FUNCTION : fd=%d : POLL_IN" fd_int);
+            ensure_poll [ `READABLE ]
         | Curl.Multi.POLL_OUT ->
-            Logs.debug (fun m ->
-                m "SOCKET_FUNCTION : fd=%d : POLL_OUT" (Kqueue.unsafe_int_of_file_descr fd));
-            if not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_out) then (
-              let changelist =
-                Kqueue.Eventlist.of_list
-                  [
-                    Kqueue.Change.(
-                      Filter.to_kevent
-                        Action.(to_t [ Flag.Add ])
-                        (Filter.Write (Kqueue.unsafe_int_of_file_descr fd)));
-                  ]
-              in
-              t.poll_out <- Int_set.add (Kqueue.unsafe_int_of_file_descr fd) t.poll_out;
-              let ret =
-                Kqueue.kevent t.kq ~changelist ~eventlist:Kqueue.Eventlist.null ~timeout:None
-              in
-              Logs.debug (fun m -> m "RET : %d" ret))
+            Logs.debug (fun m -> m "SOCKET_FUNCTION : fd=%d : POLL_OUT" fd_int);
+            ensure_poll [ `WRITABLE ]
         | Curl.Multi.POLL_INOUT ->
-            Logs.debug (fun m ->
-                m "SOCKET_FUNCTION : fd=%d : POLL_INOUT" (Kqueue.unsafe_int_of_file_descr fd));
-            if
-              (not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_in))
-              || not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_out)
-            then (
-              let changelist =
-                Kqueue.Eventlist.of_list
-                @@ CCList.flatten
-                     [
-                       (if not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_in) then
-                          [
-                            Kqueue.Change.(
-                              Filter.to_kevent
-                                Action.(to_t [ Flag.Add ])
-                                (Filter.Read (Kqueue.unsafe_int_of_file_descr fd)));
-                          ]
-                        else []);
-                       (if not (Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_out) then
-                          [
-                            Kqueue.Change.(
-                              Filter.to_kevent
-                                Action.(to_t [ Flag.Add ])
-                                (Filter.Write (Kqueue.unsafe_int_of_file_descr fd)));
-                          ]
-                        else []);
-                     ]
-              in
-              t.poll_in <- Int_set.add (Kqueue.unsafe_int_of_file_descr fd) t.poll_in;
-              t.poll_out <- Int_set.add (Kqueue.unsafe_int_of_file_descr fd) t.poll_out;
-              let ret =
-                Kqueue.kevent t.kq ~changelist ~eventlist:Kqueue.Eventlist.null ~timeout:None
-              in
-              Logs.debug (fun m -> m "RET : %d" ret))
-        | Curl.Multi.POLL_REMOVE ->
-            Logs.debug (fun m ->
-                m "SOCKET_FUNCTION : fd=%d : POLL_REMOVE" (Kqueue.unsafe_int_of_file_descr fd));
-            let changelist =
-              Kqueue.Eventlist.of_list
-              @@ CCList.flatten
-                   [
-                     (if Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_in then
-                        [
-                          Kqueue.Change.(
-                            Filter.to_kevent
-                              Action.(to_t [ Flag.Delete ])
-                              (Filter.Read (Kqueue.unsafe_int_of_file_descr fd)));
-                        ]
-                      else []);
-                     (if Int_set.mem (Kqueue.unsafe_int_of_file_descr fd) t.poll_out then
-                        [
-                          Kqueue.Change.(
-                            Filter.to_kevent
-                              Action.(to_t [ Flag.Delete ])
-                              (Filter.Write (Kqueue.unsafe_int_of_file_descr fd)));
-                        ]
-                      else []);
-                   ]
-            in
-            t.poll_in <- Int_set.remove (Kqueue.unsafe_int_of_file_descr fd) t.poll_in;
-            t.poll_out <- Int_set.remove (Kqueue.unsafe_int_of_file_descr fd) t.poll_out;
-            let ret =
-              Kqueue.kevent t.kq ~changelist ~eventlist:Kqueue.Eventlist.null ~timeout:None
-            in
-            Logs.debug (fun m -> m "RET : %d" ret)
+            Logs.debug (fun m -> m "SOCKET_FUNCTION : fd=%d : POLL_INOUT" fd_int);
+            ensure_poll [ `READABLE; `WRITABLE ]
+        | Curl.Multi.POLL_REMOVE -> (
+            Logs.debug (fun m -> m "SOCKET_FUNCTION : fd=%d : POLL_REMOVE" fd_int);
+            match Int_map.get fd_int t.polls with
+            | Some p ->
+                ignore (Luv.Poll.stop p);
+                Luv.Handle.close p CCFun.id;
+                t.polls <- Int_map.remove fd_int t.polls
+            | None -> ())
 
       let maybe_set_body_writer handle body =
         let body = CCOption.get_or ~default:"" body in
@@ -671,10 +675,6 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
         Curl.Multi.cleanup t.mt;
         t.shutdown <- true
 
-      let trigger_out_events t =
-        Mutex.protect t.mutex (fun () ->
-            if Queue.length t.out_event > 0 then trigger_eventfd t.trigger_eventfd)
-
       let rec process_in_events t =
         Logs.debug (fun m -> m "process_in_events");
         let event = Mutex.protect t.mutex (fun () -> Queue.take_opt t.in_event) in
@@ -687,117 +687,6 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
             process_in_events t
         | Some In_event.Shutdown -> process_shutdown t
         | None -> ()
-
-      let rec process_finished t =
-        match Curl.Multi.remove_finished t.mt with
-        | Some (handle, exit_code) when exit_code = Curl.CURLE_OK -> (
-            let id =
-              match Curl.getinfo handle Curl.CURLINFO_PRIVATE with
-              | Curl.CURLINFO_String id -> id
-              | Curl.CURLINFO_Long _ -> assert false
-              | Curl.CURLINFO_Double _ -> assert false
-              | Curl.CURLINFO_StringList _ -> assert false
-              | Curl.CURLINFO_StringListList _ -> assert false
-              | Curl.CURLINFO_Socket _ -> assert false
-              | Curl.CURLINFO_Version _ -> assert false
-            in
-            let status =
-              match Curl.getinfo handle Curl.CURLINFO_RESPONSE_CODE with
-              | Curl.CURLINFO_Long status -> Status.of_int status
-              | Curl.CURLINFO_String _ -> assert false
-              | Curl.CURLINFO_Double _ -> assert false
-              | Curl.CURLINFO_StringList _ -> assert false
-              | Curl.CURLINFO_StringListList _ -> assert false
-              | Curl.CURLINFO_Socket _ -> assert false
-              | Curl.CURLINFO_Version _ -> assert false
-            in
-            Curl.cleanup handle;
-            match Id_map.get id t.responses with
-            | Some resp ->
-                t.responses <- Id_map.remove id t.responses;
-                t.requests <- Id_map.remove id t.requests;
-                t.handles <- Id_map.remove id t.handles;
-                Mutex.protect t.mutex (fun () ->
-                    Queue.add (Out_event.Ret (id, Ok { resp with Response.status })) t.out_event);
-                process_finished t
-            | None -> assert false)
-        | Some (handle, exit_code) -> (
-            let id =
-              match Curl.getinfo handle Curl.CURLINFO_PRIVATE with
-              | Curl.CURLINFO_String id -> id
-              | Curl.CURLINFO_Long _ -> assert false
-              | Curl.CURLINFO_Double _ -> assert false
-              | Curl.CURLINFO_StringList _ -> assert false
-              | Curl.CURLINFO_StringListList _ -> assert false
-              | Curl.CURLINFO_Socket _ -> assert false
-              | Curl.CURLINFO_Version _ -> assert false
-            in
-            match Id_map.get id t.responses with
-            | Some resp ->
-                t.responses <- Id_map.remove id t.responses;
-                t.requests <- Id_map.remove id t.requests;
-                t.handles <- Id_map.remove id t.handles;
-                Mutex.protect t.mutex (fun () ->
-                    Queue.add
-                      (Out_event.Ret (id, Error (`Curl_err (Curl.strerror exit_code))))
-                      t.out_event);
-                process_finished t
-            | None -> assert false)
-        | None -> ()
-
-      let rec loop t =
-        Logs.debug (fun m -> m "LOOPING");
-        let timeout =
-          CCOption.map
-            (fun duration ->
-              let sec = Duration.to_f duration in
-              let frac, sec = modf sec in
-              let nsec = frac *. 1e9 in
-              Kqueue.Timeout.create ~sec:(CCFloat.to_int sec) ~nsec:(CCFloat.to_int nsec))
-            t.timeout
-        in
-        Logs.debug (fun m -> m "WAIT : timeout=%a" (CCOption.pp Duration.pp) t.timeout);
-        let start = Mtime_clock.elapsed () in
-        let ret =
-          Kqueue.kevent t.kq ~changelist:Kqueue.Eventlist.null ~eventlist:t.eventlist ~timeout
-        in
-        Logs.debug (fun m -> m "RET : %d" ret);
-        assert (ret >= 0);
-        let end_ = Mtime_clock.elapsed () in
-        let wait_time = Mtime.Span.(to_float_ns (abs_diff start end_)) /. 1e9 in
-        t.timeout <-
-          CCOption.map
-            (fun timeout -> Duration.of_f (CCFloat.max 0.0 (Duration.to_f timeout -. wait_time)))
-            t.timeout;
-        if ret > 0 then (
-          let eventfd_event = ref false in
-          Kqueue.Eventlist.iter
-            ~f:(fun event ->
-              match Kqueue.Event.of_kevent event with
-              | Kqueue.Event.Read r
-                when Kqueue.unsafe_file_descr_of_int r.Kqueue.Event.Read.descr = t.wait_eventfd ->
-                  Logs.debug (fun m -> m "WAIT_EVENTFD : fd=%d" r.Kqueue.Event.Read.descr);
-                  consume_eventfd t.wait_eventfd;
-                  eventfd_event := true;
-                  ()
-              | Kqueue.Event.Read r ->
-                  Logs.debug (fun m -> m "POLL_IN : fd=%d" r.Kqueue.Event.Read.descr);
-                  let fd = Kqueue.unsafe_file_descr_of_int r.Kqueue.Event.Read.descr in
-                  ignore (Curl.Multi.action t.mt fd Curl.Multi.EV_IN)
-              | Kqueue.Event.Write w ->
-                  Logs.debug (fun m -> m "POLL_OUT : fd=%d" w.Kqueue.Event.Write.descr);
-                  let fd = Kqueue.unsafe_file_descr_of_int w.Kqueue.Event.Write.descr in
-                  ignore (Curl.Multi.action t.mt fd Curl.Multi.EV_OUT)
-              | _ -> ())
-            t.eventlist;
-          if !eventfd_event && ret = 1 then Curl.Multi.action_timeout t.mt)
-        else Curl.Multi.action_timeout t.mt;
-        process_in_events t;
-        Logs.debug (fun m -> m "in events processed");
-        if not t.shutdown then (
-          process_finished t;
-          trigger_out_events t;
-          loop t)
 
       let curlopts_of_env () =
         CCList.filter_map
@@ -821,10 +710,12 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
         UnixLabels.set_nonblock trigger_loop_eventfd;
         UnixLabels.set_nonblock wait_server_eventfd;
         UnixLabels.set_nonblock trigger_server_eventfd;
+        let loop = Luv.Loop.init () |> Result.get_ok in
+        let timer = Luv.Timer.init ~loop () |> Result.get_ok in
         let t =
           {
-            kq = Kqueue.create ();
-            eventlist = Kqueue.Eventlist.create 1024;
+            loop;
+            timer;
             trigger_eventfd = trigger_loop_eventfd;
             wait_eventfd = wait_loop_eventfd;
             in_event = Queue.create ();
@@ -832,12 +723,10 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
             mutex = Mutex.create ();
             mt = Curl.Multi.create ();
             curl_opts = curlopts_of_env ();
-            poll_in = Int_set.empty;
-            poll_out = Int_set.empty;
+            polls = Int_map.empty;
             requests = Id_map.empty;
             responses = Id_map.empty;
             handles = Id_map.empty;
-            timeout = Some (Duration.of_sec 0);
             shutdown = false;
           }
         in
@@ -845,32 +734,43 @@ module Make (Abb : Abb_intf.S with type Native.t = Unix.file_descr) = struct
         Curl.Multi.set_timer_function t.mt (function
           | -1 ->
               Logs.debug (fun m -> m "TIMER : DISABLE");
-              t.timeout <- None
-          | timeout ->
-              Logs.debug (fun m -> m "TIMER : SET : %d" timeout);
-              t.timeout <- Some (Duration.of_ms timeout));
+              ignore (Luv.Timer.stop t.timer)
+          | timeout_ms ->
+              Logs.debug (fun m -> m "TIMER : SET : %d" timeout_ms);
+              ignore (Luv.Timer.stop t.timer);
+              ignore
+                (Luv.Timer.start t.timer timeout_ms (fun () ->
+                     Curl.Multi.action_timeout t.mt;
+                     process_finished t;
+                     trigger_out_events t)));
         ignore
           (Domain.spawn (fun () ->
                try
-                 Kqueue.Eventlist.set_from_list
-                   t.eventlist
-                   [
-                     Kqueue.Change.(
-                       Filter.to_kevent
-                         Action.(to_t [ Flag.Add ])
-                         (Filter.Read (Kqueue.unsafe_int_of_file_descr t.wait_eventfd)));
-                   ];
-                 let ret =
-                   Kqueue.kevent
-                     t.kq
-                     ~changelist:t.eventlist
-                     ~eventlist:Kqueue.Eventlist.null
-                     ~timeout:None
+                 let wait_poll =
+                   Luv.Poll.init ~loop:t.loop (unsafe_int_of_file_descr t.wait_eventfd)
+                   |> Result.get_ok
                  in
-                 if ret <> 0 then (
-                   Logs.err (fun m -> m "kevent_error");
-                   raise (Failure "kevent error"));
-                 loop t
+                 ignore
+                   (Luv.Poll.start wait_poll [ `READABLE ] (fun _result ->
+                        consume_eventfd t.wait_eventfd;
+                        process_in_events t;
+                        if t.shutdown then (
+                          ignore (Luv.Timer.stop t.timer);
+                          Luv.Handle.close t.timer CCFun.id;
+                          ignore (Luv.Poll.stop wait_poll);
+                          Luv.Handle.close wait_poll CCFun.id;
+                          Int_map.iter
+                            (fun _ p ->
+                              ignore (Luv.Poll.stop p);
+                              Luv.Handle.close p CCFun.id)
+                            t.polls;
+                          t.polls <- Int_map.empty)
+                        else (
+                          process_finished t;
+                          trigger_out_events t)));
+                 ignore (Curl.Multi.action_timeout t.mt);
+                 ignore (Luv.Loop.run ~loop:t.loop ());
+                 ignore (Luv.Loop.close t.loop)
                with exn ->
                  Logs.err (fun m ->
                      m "--- %s %s ---" (Printexc.to_string exn) (Printexc.get_backtrace ()))));

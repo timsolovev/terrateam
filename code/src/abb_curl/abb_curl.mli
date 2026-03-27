@@ -1,11 +1,10 @@
 (** Curl interface using the multi interface. This runs each [Connector] in its own domain with its
-    own event loop. This is because libcurl expects that every operation requested in the
+    own luv event loop. This is because libcurl expects that every operation requested in the
     [socket_function] callback is completed by the end of the callback. This is not possible in Abb
     because we do not have access to the scheduler in the callback. This is especially problematic
-    because after the [POLL_REMOVE] request, libcurl might close the file descriptor (the
-    [closesocketfunction] does not help here because libcurl manages other file descriptors that the
-    callback is not used on) before we remove it from kqueue. So, instead, we implement its own
-    event loop that can interact directly with the kqueue in the [socket_function] callback. *)
+    because after the [POLL_REMOVE] request, libcurl might close the file descriptor before we
+    remove it from the event loop. So, instead, we implement its own luv event loop that can
+    interact directly with the poll handles in the [socket_function] callback. *)
 
 module Method : sig
   type body = string

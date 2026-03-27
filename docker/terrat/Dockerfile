@@ -28,6 +28,9 @@ RUN apk add --no-cache \
     libssh2-dev \
     libunistring-static \
     libunistring \
+    libuv \
+    libuv-dev \
+    libuv-static \
     m4 \
     make \
     mercurial \
@@ -52,13 +55,6 @@ RUN apk add --no-cache \
 
 # Initialize opam
 RUN opam init -ay --disable-sandboxing --bare
-
-# Build libkqueue
-COPY ./vendor/libkqueue /mono/vendor/libkqueue
-WORKDIR /mono/vendor/libkqueue
-RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib $PWD && \
-    make && \
-    make install
 
 # Copy source files
 COPY ./ /mono
@@ -89,7 +85,7 @@ RUN eval $(opam env) && \
     opam install -j$(nproc --all) -y --deps-only --no-depexts monorepo && \
     ulimit -s 524288 && ulimit -a && \
     time pds -d && \
-    time make -j$(nproc --all) test test-terrat release-terrat release-ttm && \
+    time make -j$(nproc --all) test-terrat release-terrat release-ttm && \
     mv build /build-cache
 
 # Use provided BASE_IMAGE if specified, otherwise use the build-base stage
@@ -105,8 +101,8 @@ WORKDIR /mono/code
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./build && \
     eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k release_terrat_code_indexer test \
-        || time make -j1 release_terrat_code_indexer test) && \
+    (time make -j$(nproc --all) -k release_terrat_code_indexer \
+        || time make -j1 release_terrat_code_indexer) && \
     find . -name '*.tap' -exec cat '{}' \;
 
 # Build target for ttm
@@ -127,8 +123,8 @@ WORKDIR /mono/code
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./build && \
     eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k test test-terrat release_terrat_ee release_iris \
-     || time make -j1 test test-terrat release_terrat_ee release_iris) && \
+    (time make -j$(nproc --all) -k test-terrat release_terrat_ee release_iris \
+     || time make -j1 test-terrat release_terrat_ee release_iris) && \
     find . -name '*.tap' -exec cat '{}' \;
 
 # Build target for terrat-oss
@@ -137,8 +133,8 @@ WORKDIR /mono/code
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./build && \
     eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k test test-terrat release_terrat_oss release_iris \
-     || time make -j1 test test-terrat release_terrat_oss release_iris) && \
+    (time make -j$(nproc --all) -k test-terrat release_terrat_oss release_iris \
+     || time make -j1 test-terrat release_terrat_oss release_iris) && \
     find . -name '*.tap' -exec cat '{}' \;
 
 # Final code-indexer image
@@ -189,8 +185,6 @@ RUN chown -R terrat:terrat /etc/service /usr/local/share/terrat /etc/nginx /var/
 COPY docker/terrat/service/terrat /etc/service/terrat/run
 COPY docker/terrat/service/nginx /etc/service/nginx/run
 COPY docker/terrat/nginx.conf.template /etc/nginx/nginx.conf.template
-COPY --from=terrat-ee-build /usr/lib/libkqueue.so /usr/lib/libkqueue.so
-COPY --from=terrat-ee-build /usr/lib/libkqueue.so.0 /usr/lib/libkqueue.so.0
 COPY --from=terrat-ee-build /mono/code/build/release/terrat_ee/terrat_ee.native /usr/local/bin/terrat
 COPY --from=terrat-ee-build /mono/code/build/release/iris/dist/ /usr/local/share/terrat/ui/assets/
 USER terrat
@@ -231,8 +225,6 @@ RUN chown -R terrat:terrat /etc/service /usr/local/share/terrat /etc/nginx /var/
 COPY docker/terrat/service/terrat /etc/service/terrat/run
 COPY docker/terrat/service/nginx /etc/service/nginx/run
 COPY docker/terrat/nginx.conf.template /etc/nginx/nginx.conf.template
-COPY --from=terrat-oss-build /usr/lib/libkqueue.so /usr/lib/libkqueue.so
-COPY --from=terrat-oss-build /usr/lib/libkqueue.so.0 /usr/lib/libkqueue.so.0
 COPY --from=terrat-oss-build /mono/code/build/release/terrat_oss/terrat_oss.native /usr/local/bin/terrat
 COPY --from=terrat-oss-build /mono/code/build/release/iris/dist/ /usr/local/share/terrat/ui/assets/
 USER terrat
