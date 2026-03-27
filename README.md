@@ -12,6 +12,15 @@
   <a href="https://opensource.org/licenses/MPL-2.0"><img alt="License: MPL-2.0" src="https://img.shields.io/badge/License-MPL--2.0-blue.svg"></a>
 </p>
 
+> [!IMPORTANT]
+> **Terrateam is now part of Stategraph.**
+>
+> Stategraph replaces the flat state file with a real database for faster plans, parallel execution, and better visibility into infrastructure.
+>
+> Use Terrateam on its own or together with Stategraph.
+>
+> → Learn more: https://stategraph.com
+
 ---
 
 ## Open-Source Terraform automation in pull requests
