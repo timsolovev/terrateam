@@ -118,35 +118,41 @@ struct
     let changes =
       run ~name:"changes" (fun s { Bs.Fetcher.fetch } ->
           let open Irm in
-          Fc.Result.all2 (fetch Keys.dest_branch_name) (fetch Keys.branch_name)
-          >>= function
-          | dest_branch_name, branch_name when S.Api.Ref.equal dest_branch_name branch_name ->
-              fetch Keys.repo_tree_branch
-              >>= fun tree ->
-              Abb.Future.return
-                (Ok (CCList.map (fun filename -> Terrat_change.Diff.Change { filename }) tree))
-          | dest_branch_name, branch_name ->
-              fetch Keys.client
-              >>= fun client ->
-              fetch Keys.repo
-              >>= fun repo ->
-              time_it
-                s
-                (fun m log_id time ->
-                  m
-                    "%s : FETCH_DIFF_FILES : repo = %s : base_branch = %s : branch = %s : time=%f"
-                    log_id
-                    (S.Api.Repo.to_string repo)
-                    (S.Api.Ref.to_string dest_branch_name)
-                    (S.Api.Ref.to_string branch_name)
-                    time)
-                (fun () ->
-                  S.Api.fetch_diff_files
-                    ~request_id:(Builder.log_id s)
-                    ~base_ref:dest_branch_name
-                    ~branch_ref:branch_name
-                    repo
-                    client))
+          let go () =
+            Fc.Result.all2 (fetch Keys.dest_branch_name) (fetch Keys.branch_name)
+            >>= function
+            | dest_branch_name, branch_name when S.Api.Ref.equal dest_branch_name branch_name ->
+                fetch Keys.repo_tree_branch
+                >>= fun tree ->
+                Abb.Future.return
+                  (Ok (CCList.map (fun filename -> Terrat_change.Diff.Change { filename }) tree))
+            | dest_branch_name, branch_name ->
+                fetch Keys.client
+                >>= fun client ->
+                fetch Keys.repo
+                >>= fun repo ->
+                time_it
+                  s
+                  (fun m log_id time ->
+                    m
+                      "%s : FETCH_DIFF_FILES : repo = %s : base_branch = %s : branch = %s : time=%f"
+                      log_id
+                      (S.Api.Repo.to_string repo)
+                      (S.Api.Ref.to_string dest_branch_name)
+                      (S.Api.Ref.to_string branch_name)
+                      time)
+                  (fun () ->
+                    S.Api.fetch_diff_files
+                      ~request_id:(Builder.log_id s)
+                      ~base_ref:dest_branch_name
+                      ~branch_ref:branch_name
+                      repo
+                      client)
+          in
+          go ()
+          >>= fun diff ->
+          Logs.info (fun m -> m "%s : CHANGES : %d" (Builder.log_id s) (CCList.length diff));
+          Abb.Future.return (Ok diff))
 
     let missing_autoplan_matches =
       run ~name:"missing_autoplan_matches" (fun _ _ ->

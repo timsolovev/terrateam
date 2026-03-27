@@ -522,129 +522,166 @@ struct
                    all_unapplied_matches,
                    working_layer ))
           in
-          let module Tjc = Terrat_job_context in
-          let open Irm in
-          Fc.Result.all3
-            (fetch Keys.repo_config)
-            (fetch Keys.repo_tree_branch)
-            (fetch Keys.repo_index_branch)
-          >>= fun (repo_config, repo_tree, repo_index) ->
-          fetch Keys.out_of_change_applies
-          >>= fun out_of_change_applies ->
-          fetch Keys.applied_dirspaces
-          >>= fun applied_dirspaces ->
-          fetch Keys.dest_branch_name
-          >>= fun dest_branch_name ->
-          fetch Keys.branch_name
-          >>= fun branch_name ->
-          fetch Keys.job
-          >>= fun job ->
-          let tag_query =
+          let go () =
+            let module Tjc = Terrat_job_context in
+            let open Irm in
+            Fc.Result.all3
+              (fetch Keys.repo_config)
+              (fetch Keys.repo_tree_branch)
+              (fetch Keys.repo_index_branch)
+            >>= fun (repo_config, repo_tree, repo_index) ->
+            fetch Keys.out_of_change_applies
+            >>= fun out_of_change_applies ->
+            fetch Keys.applied_dirspaces
+            >>= fun applied_dirspaces ->
+            fetch Keys.dest_branch_name
+            >>= fun dest_branch_name ->
+            fetch Keys.branch_name
+            >>= fun branch_name ->
+            fetch Keys.job
+            >>= fun job ->
+            let tag_query =
+              let module T = Tjc.Job.Type_ in
+              match job.Tjc.Job.type_ with
+              | T.Apply { tag_query; kind = _; force = _ } | T.Plan { tag_query; kind = _ } ->
+                  tag_query
+              | T.Autoapply
+              | T.Autoplan
+              | T.Gate_approval _
+              | T.Index
+              | T.Repo_config
+              | T.Unlock _
+              | T.Push -> Terrat_tag_query.any
+            in
+            fetch Keys.repo_index_branch
+            >>= fun index ->
+            fetch Keys.derived_repo_config
+            >>= fun (_, repo_config) ->
+            fetch Keys.changes
+            >>= fun diff ->
+            Abbs_time_it.run
+              (fun t ->
+                Logs.info (fun m -> m "%s : COMPUTE_APPROVED : time=%f" (Builder.log_id s) t))
+              (fun () ->
+                compute_matches
+                  ~repo_config
+                  ~tag_query
+                  ~out_of_change_applies
+                  ~applied_dirspaces
+                  ~diff
+                  ~repo_tree
+                  ~index
+                  ())
+            >>= fun ( working_set_matches,
+                      all_matches,
+                      all_tag_query_matches,
+                      all_unapplied_matches,
+                      working_layer )
+                  ->
             let module T = Tjc.Job.Type_ in
             match job.Tjc.Job.type_ with
-            | T.Apply { tag_query; kind = _; force = _ } | T.Plan { tag_query; kind = _ } ->
-                tag_query
-            | T.Autoapply
-            | T.Autoplan
-            | T.Gate_approval _
-            | T.Index
-            | T.Repo_config
-            | T.Unlock _
-            | T.Push -> Terrat_tag_query.any
+            | T.Autoplan ->
+                fetch Keys.is_draft_pr
+                >>= fun is_draft_pr ->
+                let working_set_matches =
+                  CCList.filter
+                    (fun {
+                           Terrat_change_match3.Dirspace_config.when_modified =
+                             {
+                               Terrat_base_repo_config_v1.When_modified.autoplan;
+                               autoplan_draft_pr;
+                               _;
+                             };
+                           _;
+                         }
+                       -> autoplan && ((not is_draft_pr) || autoplan_draft_pr))
+                    working_set_matches
+                in
+                let open Irm in
+                fetch Keys.missing_autoplan_matches
+                >>= fun missing_autoplan_matches ->
+                missing_autoplan_matches' missing_autoplan_matches working_set_matches
+                >>= fun working_set_matches ->
+                Abb.Future.return
+                  (Ok
+                     {
+                       Keys.Matches.working_set_matches;
+                       all_matches;
+                       all_tag_query_matches;
+                       all_unapplied_matches;
+                       working_layer;
+                     })
+            | T.Autoapply ->
+                let module V1 = Terrat_base_repo_config_v1 in
+                let module Tcm = Terrat_change_match3 in
+                let module Dc = Tcm.Dirspace_config in
+                let module S = V1.Stacks.Stack in
+                let module Oc = V1.Stacks.Rules in
+                let working_set_matches =
+                  CCList.filter
+                    (fun {
+                           Dc.stack_config = { S.rules = { Oc.auto_apply; _ }; _ };
+                           when_modified = { V1.When_modified.autoapply; _ };
+                           _;
+                         }
+                       -> autoapply || CCOption.get_or ~default:false auto_apply)
+                    working_set_matches
+                in
+                Abb.Future.return
+                  (Ok
+                     {
+                       Keys.Matches.working_set_matches;
+                       all_matches;
+                       all_tag_query_matches;
+                       all_unapplied_matches;
+                       working_layer;
+                     })
+            | T.Apply _ | T.Plan _ ->
+                Abb.Future.return
+                  (Ok
+                     {
+                       Keys.Matches.working_set_matches;
+                       all_matches;
+                       all_tag_query_matches;
+                       all_unapplied_matches;
+                       working_layer;
+                     })
+            | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false
           in
-          fetch Keys.repo_index_branch
-          >>= fun index ->
-          fetch Keys.derived_repo_config
-          >>= fun (_, repo_config) ->
-          fetch Keys.changes
-          >>= fun diff ->
-          Abbs_time_it.run
-            (fun t -> Logs.info (fun m -> m "%s : COMPUTE_APPROVED : time=%f" (Builder.log_id s) t))
-            (fun () ->
-              compute_matches
-                ~repo_config
-                ~tag_query
-                ~out_of_change_applies
-                ~applied_dirspaces
-                ~diff
-                ~repo_tree
-                ~index
-                ())
-          >>= fun ( working_set_matches,
-                    all_matches,
-                    all_tag_query_matches,
-                    all_unapplied_matches,
-                    working_layer )
+          let open Irm in
+          let module M = Keys.Matches in
+          go ()
+          >>= fun ({
+                     M.working_set_matches;
+                     all_matches;
+                     all_unapplied_matches;
+                     all_tag_query_matches;
+                     working_layer;
+                   } as matches)
                 ->
-          let module T = Tjc.Job.Type_ in
-          match job.Tjc.Job.type_ with
-          | T.Autoplan ->
-              fetch Keys.is_draft_pr
-              >>= fun is_draft_pr ->
-              let working_set_matches =
-                CCList.filter
-                  (fun {
-                         Terrat_change_match3.Dirspace_config.when_modified =
-                           {
-                             Terrat_base_repo_config_v1.When_modified.autoplan;
-                             autoplan_draft_pr;
-                             _;
-                           };
-                         _;
-                       }
-                     -> autoplan && ((not is_draft_pr) || autoplan_draft_pr))
-                  working_set_matches
-              in
-              let open Irm in
-              fetch Keys.missing_autoplan_matches
-              >>= fun missing_autoplan_matches ->
-              missing_autoplan_matches' missing_autoplan_matches working_set_matches
-              >>= fun working_set_matches ->
-              Abb.Future.return
-                (Ok
-                   {
-                     Keys.Matches.working_set_matches;
-                     all_matches;
-                     all_tag_query_matches;
-                     all_unapplied_matches;
-                     working_layer;
-                   })
-          | T.Autoapply ->
-              let module V1 = Terrat_base_repo_config_v1 in
-              let module Tcm = Terrat_change_match3 in
-              let module Dc = Tcm.Dirspace_config in
-              let module S = V1.Stacks.Stack in
-              let module Oc = V1.Stacks.Rules in
-              let working_set_matches =
-                CCList.filter
-                  (fun {
-                         Dc.stack_config = { S.rules = { Oc.auto_apply; _ }; _ };
-                         when_modified = { V1.When_modified.autoapply; _ };
-                         _;
-                       }
-                     -> autoapply || CCOption.get_or ~default:false auto_apply)
-                  working_set_matches
-              in
-              Abb.Future.return
-                (Ok
-                   {
-                     Keys.Matches.working_set_matches;
-                     all_matches;
-                     all_tag_query_matches;
-                     all_unapplied_matches;
-                     working_layer;
-                   })
-          | T.Apply _ | T.Plan _ ->
-              Abb.Future.return
-                (Ok
-                   {
-                     Keys.Matches.working_set_matches;
-                     all_matches;
-                     all_tag_query_matches;
-                     all_unapplied_matches;
-                     working_layer;
-                   })
-          | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false)
+          let sum_layers = CCListLabels.fold_left ~init:0 ~f:(fun acc v -> acc + CCList.length v) in
+          Logs.info (fun m ->
+              m
+                "%s : MATCHES : working_set_matches=%d"
+                (Builder.log_id s)
+                (CCList.length working_set_matches));
+          Logs.info (fun m ->
+              m "%s : MATCHES : all_matches=%d" (Builder.log_id s) (sum_layers all_matches));
+          Logs.info (fun m ->
+              m
+                "%s : MATCHES : all_unapplied_matches=%d"
+                (Builder.log_id s)
+                (sum_layers all_unapplied_matches));
+          Logs.info (fun m ->
+              m
+                "%s : MATCHES : all_tag_query_matches=%d"
+                (Builder.log_id s)
+                (sum_layers all_tag_query_matches));
+          Logs.info (fun m ->
+              m "%s : MATCHES : working_layer=%d" (Builder.log_id s) (CCList.length working_layer));
+          Logs.info (fun m ->
+              m "%s : MATCHES : num_layers=%d" (Builder.log_id s) (CCList.length all_matches));
+          Abb.Future.return (Ok matches))
 
     let working_set_matches =
       run ~name:"working_set_matches" (fun s { Bs.Fetcher.fetch } ->

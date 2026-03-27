@@ -452,7 +452,13 @@ struct
           >>= fun pull_request ->
           Builder.run_db s ~f:(fun db -> query_pull_request_out_of_change_applies s db pull_request))
 
-    let changes = run ~name:"changes" (fun _s { Bs.Fetcher.fetch } -> fetch Keys.pull_request_diff)
+    let changes =
+      run ~name:"changes" (fun s { Bs.Fetcher.fetch } ->
+          let open Irm in
+          fetch Keys.pull_request_diff
+          >>= fun diff ->
+          Logs.info (fun m -> m "%s : CHANGES : %d" (Builder.log_id s) (CCList.length diff));
+          Abb.Future.return (Ok diff))
 
     let missing_autoplan_matches =
       run ~name:"missing_autoplan_matches" (fun s { Bs.Fetcher.fetch } ->
