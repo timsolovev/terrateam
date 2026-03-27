@@ -7,6 +7,7 @@
   import type { StackWithRuns, PRWithStacks, RepositoryWithStacks, DashboardMetrics, Dirspace, TimelineEvent } from './types';
   import { loadRecentStacksData, groupStacksByPR, groupStacksByRepositoryAndStack, computeDashboardMetrics, generateTimelineData } from './utils/stacksDataLoader';
   import { selectedInstallation } from './stores';
+  import { LoadingSpinner } from './components';
   import { onMount } from 'svelte';
 
   // Route params (provided by router, may be unused)
@@ -124,16 +125,16 @@
 <PageLayout activeItem="stacks" title="Stacks" subtitle="Infrastructure stacks across active pull requests">
   <div class="space-y-4">
     <!-- Shared Filters & Controls -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4">
       <!-- Top row: Time range and Refresh -->
       <div class="flex items-center gap-3 mb-3">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Time:</span>
+        <span class="text-sm font-medium text-[var(--sg-text-muted)]">Time:</span>
         <div class="inline-flex rounded-md shadow-sm" role="group">
           <button
             on:click={() => changeTimeRange(7)}
             class="px-3 py-1.5 text-sm font-medium rounded-l-md border {timeRange === 7
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+              ? 'bg-[var(--sg-accent-button)] text-white border-[var(--sg-accent)]'
+              : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)]'}"
             aria-label="Last 7 days"
             aria-pressed={timeRange === 7}
           >
@@ -142,8 +143,8 @@
           <button
             on:click={() => changeTimeRange(14)}
             class="px-3 py-1.5 text-sm font-medium border-t border-b {timeRange === 14
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+              ? 'bg-[var(--sg-accent-button)] text-white border-[var(--sg-accent)]'
+              : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)]'}"
             aria-label="Last 14 days"
             aria-pressed={timeRange === 14}
           >
@@ -152,8 +153,8 @@
           <button
             on:click={() => changeTimeRange(30)}
             class="px-3 py-1.5 text-sm font-medium rounded-r-md border {timeRange === 30
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+              ? 'bg-[var(--sg-accent-button)] text-white border-[var(--sg-accent)]'
+              : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)]'}"
             aria-label="Last 30 days"
             aria-pressed={timeRange === 30}
           >
@@ -162,7 +163,7 @@
         </div>
         <button
           on:click={loadStacks}
-          class="ml-auto inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          class="ml-auto inline-flex items-center px-3 py-1.5 border border-[var(--sg-border)] shadow-sm text-sm font-medium rounded-md text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] transition-colors"
           disabled={isLoading}
           aria-label="Refresh stacks"
         >
@@ -177,7 +178,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <!-- Search -->
         <div>
-          <label for="search" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label for="search" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">
             Search
           </label>
           <input
@@ -185,19 +186,19 @@
             type="text"
             bind:value={searchQuery}
             placeholder="PR title, number, or stack..."
-            class="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-1.5 text-sm border border-[var(--sg-border)] rounded-md bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder-[var(--sg-text-dim)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent"
           />
         </div>
 
         <!-- Repository filter -->
         <div>
-          <label for="repo-filter" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+          <label for="repo-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">
             Repository
           </label>
           <select
             id="repo-filter"
             bind:value={repoFilter}
-            class="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-1.5 text-sm border border-[var(--sg-border)] rounded-md bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent"
           >
             <option value="">All repositories</option>
             {#each uniqueRepos as repo}
@@ -212,7 +213,7 @@
         <div class="mt-3">
           <button
             on:click={resetFilters}
-            class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"
+            class="text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent)] font-medium transition-colors"
           >
             Reset Filters
           </button>
@@ -221,13 +222,13 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="border-b border-gray-200 dark:border-gray-700">
+    <div class="border-b border-[var(--sg-border)]">
       <div class="-mb-px flex space-x-8" role="tablist" aria-label="Tabs">
         <button
           on:click={() => setActiveTab('dashboard')}
           class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {activeTab === 'dashboard'
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
           role="tab"
           aria-selected={activeTab === 'dashboard'}
           aria-controls="dashboard-panel"
@@ -237,8 +238,8 @@
         <button
           on:click={() => setActiveTab('prs')}
           class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {activeTab === 'prs'
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
           role="tab"
           aria-selected={activeTab === 'prs'}
           aria-controls="prs-panel"
@@ -248,8 +249,8 @@
         <button
           on:click={() => setActiveTab('repos')}
           class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {activeTab === 'repos'
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
           role="tab"
           aria-selected={activeTab === 'repos'}
           aria-controls="repos-panel"
@@ -259,8 +260,8 @@
         <button
           on:click={() => setActiveTab('timeline')}
           class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {activeTab === 'timeline'
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
           role="tab"
           aria-selected={activeTab === 'timeline'}
           aria-controls="timeline-panel"
@@ -284,27 +285,21 @@
             />
           {:else if isLoading}
             <div class="text-center py-12">
-              <div
-                class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto mb-4"
-                role="status"
-                aria-label="Loading dashboard"
-              >
-                <span class="sr-only">Loading dashboard...</span>
-              </div>
-              <p class="text-gray-500 dark:text-gray-400">Loading dashboard data...</p>
+              <LoadingSpinner size="xl" centered={false} />
+              <p class="mt-4 text-[var(--sg-text-dim)]">Loading dashboard data...</p>
             </div>
           {:else if error}
-            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800" role="alert">
+            <div class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]" role="alert">
               <div class="flex">
                 <div class="ml-3">
-                  <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Error loading dashboard</h3>
-                  <div class="mt-2 text-sm text-red-700 dark:text-red-300">{error}</div>
+                  <h3 class="text-sm font-medium text-[var(--sg-error)]">Error loading dashboard</h3>
+                  <div class="mt-2 text-sm text-[var(--sg-error)]">{error}</div>
                 </div>
               </div>
             </div>
           {:else}
             <div class="text-center py-12">
-              <p class="text-gray-500 dark:text-gray-400">No dashboard data available</p>
+              <p class="text-[var(--sg-text-dim)]">No dashboard data available</p>
             </div>
           {/if}
         </div>

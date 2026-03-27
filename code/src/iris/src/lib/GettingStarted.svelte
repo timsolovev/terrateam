@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
   import type { Installation, Repository, GitLabGroup, ServerConfig } from './types';
   import { repositoryService } from './services/repository-service';
-  import { Icon } from './components';
+  import { Icon, LoadingSpinner } from './components';
   import { currentVCSProvider } from './stores';
   import { get } from 'svelte/store';
   import { VCS_PROVIDERS } from './vcs/providers';
@@ -1024,8 +1024,8 @@
     <!-- Progress Bar -->
     <div class="mb-8">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Setup Progress</span>
-        <span class="text-sm text-gray-500 dark:text-gray-400">
+        <span class="text-sm font-medium text-[var(--sg-text)]">Setup Progress</span>
+        <span class="text-sm text-[var(--sg-text-dim)]">
           {#if currentStep === 'assessment'}
             Analyzing your setup...
           {:else if currentStep === 'path-selection'}
@@ -1045,9 +1045,9 @@
           {/if}
         </span>
       </div>
-      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div class="w-full bg-[var(--sg-bg-2)] rounded-full h-2">
         <div
-          class="bg-blue-600 h-2 rounded-full transition-all duration-300 {
+          class="bg-[var(--sg-accent-button)] h-2 rounded-full transition-all duration-300 {
             currentStep === 'assessment' ? 'w-[10%]' :
             currentStep === 'path-selection' ? 'w-1/4' :
             currentStep === 'github-demo-setup' || currentStep === 'gitlab-demo-setup' || currentStep === 'github-repo-setup' || currentStep === 'gitlab-setup' ? 'w-[60%]' :
@@ -1061,29 +1061,29 @@
     <!-- Header -->
     <div class="text-center mb-6 sm:mb-8">
       <img src="/assets/images/logo-symbol.svg" alt="Terrateam" class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4" />
-      <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-blue-600 dark:text-blue-400">Getting Started with Terrateam</h1>
-      <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">We'll help you set up Terraform automation in minutes</p>
+      <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-[var(--sg-accent)]">Getting Started with Terrateam</h1>
+      <p class="text-sm sm:text-base text-[var(--sg-text-dim)]">We'll help you set up Terraform automation in minutes</p>
     </div>
 
     <!-- Wizard Content -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+    <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 sm:p-6">
 
       {#if currentStep === 'assessment'}
         <!-- Assessment Step -->
         <div class="text-center py-8 sm:py-12">
-          <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4 sm:mb-6">
-            <Icon icon="mdi:magnify" class="text-blue-600 dark:text-blue-400" width="28" />
+          <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-[var(--sg-accent-bg)] rounded-full mb-4 sm:mb-6">
+            <Icon icon="mdi:magnify" class="text-[var(--sg-accent)]" width="28" />
           </div>
-          <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Analyzing Your Setup</h2>
-          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">We're checking your current Terrateam configuration...</p>
+          <h2 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)] mb-2">Analyzing Your Setup</h2>
+          <p class="text-sm sm:text-base text-[var(--sg-text-dim)] mb-4 sm:mb-6">We're checking your current Terrateam configuration...</p>
 
           {#if isLoadingAssessment}
             <div class="flex items-center justify-center">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <LoadingSpinner size="lg" centered={false} />
             </div>
           {:else if assessmentError}
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-              <p class="text-yellow-800 dark:text-yellow-200 text-sm">{assessmentError}</p>
+            <div class="bg-[var(--sg-warning-bg)] border border-[var(--sg-warning)] rounded-lg p-4">
+              <p class="text-[var(--sg-warning)] text-sm">{assessmentError}</p>
             </div>
           {/if}
         </div>
@@ -1091,16 +1091,16 @@
       {:else if currentStep === 'path-selection'}
         <!-- Path Selection Step -->
         <div class="mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Choose Your Setup Path</h2>
+            <h2 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)] mb-4">Choose Your Setup Path</h2>
 
             <!-- Assessment Results -->
             {#if !assessmentError}
-              <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-                <h3 class="font-medium text-blue-900 dark:text-blue-100 mb-2">What we found:</h3>
-                <div class="space-y-1 text-sm text-blue-800 dark:text-blue-200">
+              <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                <h3 class="font-medium text-[var(--sg-accent)] mb-2">What we found:</h3>
+                <div class="space-y-1 text-sm text-[var(--sg-accent)]">
                   <div class="flex items-center">
                     <Icon icon={hasInstallations ? "mdi:check" : "mdi:close"}
-                                  class={hasInstallations ? "text-green-600" : "text-gray-400"}
+                                  class={hasInstallations ? "text-[var(--sg-success)]" : "text-[var(--sg-text-dim)]"}
                                   width="16" />
                     <span class="ml-2">
                       {hasInstallations ? `Found ${installations.length} ${VCS_PROVIDERS[currentProvider].displayName} installation${installations.length > 1 ? 's' : ''}` : `No ${VCS_PROVIDERS[currentProvider].displayName} installations found`}
@@ -1108,7 +1108,7 @@
                   </div>
                   <div class="flex items-center">
                     <Icon icon={hasConfiguredRepos ? "mdi:check" : "mdi:close"}
-                                  class={hasConfiguredRepos ? "text-green-600" : "text-gray-400"}
+                                  class={hasConfiguredRepos ? "text-[var(--sg-success)]" : "text-[var(--sg-text-dim)]"}
                                   width="16" />
                     <span class="ml-2">
                       {hasConfiguredRepos ? 'Found configured repositories' : 'No configured repositories found'}
@@ -1117,13 +1117,13 @@
                 </div>
 
                 {#if recommendedPath === 'demo'}
-                  <p class="mt-3 text-sm font-medium text-blue-900 dark:text-blue-100 flex items-center">
-                    <Icon icon="mdi:lightbulb" class="text-yellow-500 mr-2" width="16" />
+                  <p class="mt-3 text-sm font-medium text-[var(--sg-accent)] flex items-center">
+                    <Icon icon="mdi:lightbulb" class="text-[var(--sg-warning)] mr-2" width="16" />
                   We recommend starting with the demo to learn how Terrateam works
                 </p>
               {:else}
-                <p class="mt-3 text-sm font-medium text-blue-900 dark:text-blue-100 flex items-center">
-                  <Icon icon="mdi:lightbulb" class="text-yellow-500 mr-2" width="16" />
+                <p class="mt-3 text-sm font-medium text-[var(--sg-accent)] flex items-center">
+                  <Icon icon="mdi:lightbulb" class="text-[var(--sg-warning)] mr-2" width="16" />
                   We recommend setting up your existing repository
                 </p>
               {/if}
@@ -1136,33 +1136,33 @@
           <!-- Demo Path -->
           <button
             on:click={() => selectPath('demo')}
-            class="text-left p-4 sm:p-6 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors {recommendedPath === 'demo' ? 'ring-2 ring-blue-500 border-blue-500' : ''}"
+            class="text-left p-4 sm:p-6 border-2 border-[var(--sg-border)] rounded-lg hover:border-[var(--sg-accent)] transition-colors {recommendedPath === 'demo' ? 'ring-2 ring-[var(--sg-accent)] border-[var(--sg-accent)]' : ''}"
           >
             <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center justify-center w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <Icon icon="mdi:flash" class="text-green-600 dark:text-green-400" width="20" />
+              <div class="flex items-center justify-center w-10 h-10 bg-[var(--sg-success-bg)] rounded-lg">
+                <Icon icon="mdi:flash" class="text-[var(--sg-success)]" width="20" />
               </div>
               {#if recommendedPath === 'demo'}
-                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-medium">Recommended</span>
+                <span class="bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] text-xs px-2 py-1 rounded-full font-medium">Recommended</span>
               {/if}
             </div>
 
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Try the Demo</h3>
-            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-2">Try the Demo</h3>
+            <p class="text-[var(--sg-text-dim)] text-sm mb-4">
               Learn Terrateam with a safe sandbox environment. No cloud credentials needed.
             </p>
 
             <div class="space-y-2">
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 No cloud setup required
               </div>
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 See Terraform plans instantly
               </div>
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 2-3 minutes to complete
               </div>
             </div>
@@ -1171,33 +1171,33 @@
           <!-- Repository Path -->
           <button
             on:click={() => selectPath('repo')}
-            class="text-left p-4 sm:p-6 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors {recommendedPath === 'repo' ? 'ring-2 ring-blue-500 border-blue-500' : ''}"
+            class="text-left p-4 sm:p-6 border-2 border-[var(--sg-border)] rounded-lg hover:border-[var(--sg-accent)] transition-colors {recommendedPath === 'repo' ? 'ring-2 ring-[var(--sg-accent)] border-[var(--sg-accent)]' : ''}"
           >
             <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Icon icon="mdi:source-repository" class="text-blue-600 dark:text-blue-400" width="20" />
+              <div class="flex items-center justify-center w-10 h-10 bg-[var(--sg-accent-bg)] rounded-lg">
+                <Icon icon="mdi:source-repository" class="text-[var(--sg-accent)]" width="20" />
               </div>
               {#if recommendedPath === 'repo'}
-                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-medium">Recommended</span>
+                <span class="bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] text-xs px-2 py-1 rounded-full font-medium">Recommended</span>
               {/if}
             </div>
 
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Connect Your Repository</h3>
-            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-2">Connect Your Repository</h3>
+            <p class="text-[var(--sg-text-dim)] text-sm mb-4">
               Set up Terrateam with your existing Terraform code and real infrastructure.
             </p>
 
             <div class="space-y-2">
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 Works with existing repos
               </div>
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 Real infrastructure automation
               </div>
-              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <Icon icon="mdi:check" class="text-green-500 mr-2" width="16" />
+              <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                 5-10 minutes to complete
               </div>
             </div>
@@ -1208,10 +1208,10 @@
         <!-- GitHub Demo Setup Wizard -->
         <div class="mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">GitHub Demo Setup</h2>
+            <h2 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)]">GitHub Demo Setup</h2>
             <button
               on:click={goBack}
-              class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center self-start sm:self-auto"
+              class="text-xs md:text-sm text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] flex items-center self-start sm:self-auto"
             >
               <Icon icon="mdi:arrow-left" class="mr-1" width="16" />
               Back
@@ -1235,13 +1235,13 @@
               ]) as stepInfo}
                 <div class="flex items-center {stepInfo.index < 4 ? 'flex-1' : ''}">
                   <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium
-                              {currentDemoStep === stepInfo.step ? 'bg-blue-600 text-white' :
+                              {currentDemoStep === stepInfo.step ? 'bg-[var(--sg-accent-button)] text-white' :
                                (stepInfo.step === 'fork' && demoStepCompleted.fork) ||
                                (stepInfo.step === 'enable-actions' && demoStepCompleted['enable-actions']) ||
                                (stepInfo.step === 'install-app' && demoStepCompleted['install-app']) ||
                                (stepInfo.step === 'make-changes' && demoStepCompleted['make-changes'])
-                               ? 'bg-green-600 text-white' :
-                               'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'}">
+                               ? 'bg-[var(--sg-success)] text-white' :
+                               'bg-[var(--sg-bg-2)] text-[var(--sg-text-dim)]'}">
                     {#if (stepInfo.step === 'fork' && demoStepCompleted.fork) ||
                          (stepInfo.step === 'enable-actions' && demoStepCompleted['enable-actions']) ||
                          (stepInfo.step === 'install-app' && demoStepCompleted['install-app']) ||
@@ -1257,56 +1257,56 @@
                       (stepInfo.step === 'enable-actions' && demoStepCompleted['enable-actions']) ||
                       (stepInfo.step === 'install-app' && demoStepCompleted['install-app']) ||
                       (stepInfo.step === 'make-changes' && demoStepCompleted['make-changes'])
-                      ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-600'}"></div>
+                      ? 'bg-[var(--sg-success)]' : 'bg-[var(--sg-bg-2)]'}"></div>
                   {/if}
                 </div>
               {/each}
             </div>
-            <div class="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-center text-xs sm:text-sm text-[var(--sg-text-dim)]">
               Step {['install-app', 'fork', 'enable-actions', 'make-changes', 'success'].indexOf(currentDemoStep) + 1} of 5
             </div>
           </div>
 
           <!-- Step Content -->
           {#if currentDemoStep === 'install-app'}
-            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-success-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-success)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:download" class="text-white" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-green-900 dark:text-green-100 mb-2 text-center sm:text-left">Step 1: Install Terrateam GitHub App</h3>
-                  <p class="text-sm sm:text-base text-green-800 dark:text-green-200 mb-4 text-center sm:text-left">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-success)] mb-2 text-center sm:text-left">Step 1: Install Terrateam GitHub App</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-success)] mb-4 text-center sm:text-left">
                     Install the Terrateam GitHub App on your organization to enable Terraform automation.
                   </p>
 
                   {#if hasInstallations}
-                    <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 sm:p-4 mb-4 border border-green-200 dark:border-green-700">
+                    <div class="bg-[var(--sg-success-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-success)]">
                       <div class="flex items-start sm:items-center">
-                        <Icon icon="mdi:check-circle" class="text-green-600 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" width="20" />
-                        <span class="text-xs sm:text-sm text-green-800 dark:text-green-200 font-medium">
+                        <Icon icon="mdi:check-circle" class="text-[var(--sg-success)] mr-2 flex-shrink-0 mt-0.5 sm:mt-0" width="20" />
+                        <span class="text-xs sm:text-sm text-[var(--sg-success)] font-medium">
                           Great! We detected {installations.length} GitHub installation{installations.length > 1 ? 's' : ''}.
                         </span>
                       </div>
                     </div>
                   {:else}
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-green-200 dark:border-green-700">
+                    <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-success)]">
                       <div class="flex items-center justify-between">
                         <div>
-                          <div class="font-medium text-gray-900 dark:text-gray-100">Terrateam GitHub App</div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">Enables Terraform automation in your repositories</div>
+                          <div class="font-medium text-[var(--sg-text)]">Terrateam GitHub App</div>
+                          <div class="text-sm text-[var(--sg-text-dim)]">Enables Terraform automation in your repositories</div>
                         </div>
-                        <Icon icon="mdi:github" class="text-gray-400" width="24" />
+                        <Icon icon="mdi:github" class="text-[var(--sg-text-dim)]" width="24" />
                       </div>
                     </div>
                   {/if}
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 sm:p-4 mb-4 border border-blue-200 dark:border-blue-700">
+                  <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-accent)]">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0" width="20" />
-                      <div class="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5 flex-shrink-0" width="20" />
+                      <div class="text-xs sm:text-sm text-[var(--sg-accent)]">
                         <p class="font-medium mb-1">Demo in a different organization?</p>
                         <p>You can install the app on any organization where you want to run the demo.</p>
                       </div>
@@ -1316,7 +1316,7 @@
                   <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <button
                       on:click={() => openExternalLink(githubAppUrl, 'github_app_install')}
-                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
+                      class="bg-[var(--sg-success)] hover:bg-[var(--sg-success)] text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
                     >
                       <Icon icon="mdi:download" class="mr-2" width="16" />
                       Install GitHub App
@@ -1324,7 +1324,7 @@
                     <button
                       on:click={checkAppInstallation}
                       disabled={checkingAppInstallation}
-                      class="border border-green-600 text-green-600 dark:text-green-400 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-green-50 dark:hover:bg-green-900/30 disabled:opacity-50 flex items-center justify-center"
+                      class="border border-[var(--sg-success)] text-[var(--sg-success)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--sg-success-bg)] disabled:opacity-50 flex items-center justify-center"
                     >
                       {#if checkingAppInstallation}
                         <Icon icon="mdi:loading" class="animate-spin mr-2" width="16" />
@@ -1341,26 +1341,26 @@
             </div>
 
           {:else if currentDemoStep === 'fork'}
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-accent-button)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:source-fork" class="text-white" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2 text-center sm:text-left">Step 2: Fork the Demo Repository</h3>
-                  <p class="text-sm sm:text-base text-blue-800 dark:text-blue-200 mb-4 text-center sm:text-left">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-accent)] mb-2 text-center sm:text-left">Step 2: Fork the Demo Repository</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-accent)] mb-4 text-center sm:text-left">
                     Fork our demo repository to your GitHub account. This gives you your own copy to experiment with.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 mb-4 border border-blue-200 dark:border-blue-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-accent)]">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div class="flex-1 min-w-0">
-                        <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base">terrateam-demo/kick-the-tires</div>
-                        <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Safe demo repository with null resources</div>
+                        <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base">terrateam-demo/kick-the-tires</div>
+                        <div class="text-xs sm:text-sm text-[var(--sg-text-dim)]">Safe demo repository with null resources</div>
                       </div>
-                      <Icon icon="mdi:github" class="text-gray-400 hidden sm:block flex-shrink-0" width="24" />
+                      <Icon icon="mdi:github" class="text-[var(--sg-text-dim)] hidden sm:block flex-shrink-0" width="24" />
                     </div>
                   </div>
 
@@ -1372,20 +1372,20 @@
                           : 'https://github.com/terrateam-demo/kick-the-tires';
                         openExternalLink(repoUrl);
                       }}
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
+                      class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
                     >
                       <Icon icon="mdi:source-fork" class="mr-2" width="16" />
                       Fork {terminology.repository}
                     </button>
                     <button
                       on:click={() => markDemoStepComplete('fork')}
-                      class="border border-blue-600 text-blue-600 dark:text-blue-400 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                      class="border border-[var(--sg-accent)] text-[var(--sg-accent)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--sg-accent-bg)]"
                     >
                       I've forked it
                     </button>
                     <button
                       on:click={() => goToDemoStep('install-app')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -1395,32 +1395,32 @@
             </div>
 
           {:else if currentDemoStep === 'enable-actions'}
-            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-warning)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:play-circle" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">Step 3: Enable GitHub Actions</h3>
-                  <p class="text-orange-800 dark:text-orange-200 mb-4">
+                  <h3 class="text-lg font-semibold text-[var(--sg-warning)] mb-2">Step 3: Enable GitHub Actions</h3>
+                  <p class="text-[var(--sg-warning)] mb-4">
                     Forked repositories disable workflows by default for security. Let's enable them.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-orange-200 dark:border-orange-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-warning)]">
                     <div class="space-y-2 text-sm">
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-1-circle" class="text-orange-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Go to your forked repository</span>
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-warning)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Go to your forked repository</span>
                       </div>
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-2-circle" class="text-orange-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Click the <strong>Actions</strong> tab</span>
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-warning)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Click the <strong>Actions</strong> tab</span>
                       </div>
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-3-circle" class="text-orange-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Click <strong>"I understand my workflows, go ahead and enable them"</strong></span>
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-warning)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Click <strong>"I understand my workflows, go ahead and enable them"</strong></span>
                       </div>
                     </div>
                   </div>
@@ -1428,13 +1428,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markDemoStepComplete('enable-actions')}
-                      class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       Actions Enabled
                     </button>
                     <button
                       on:click={() => goToDemoStep('fork')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -1444,64 +1444,64 @@
             </div>
 
           {:else if currentDemoStep === 'make-changes'}
-            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-purple)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:file-edit" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-purple-900 dark:text-purple-100 mb-3 text-center sm:text-left">Step 4: Make Your First Change</h3>
-                  <p class="text-sm sm:text-base text-purple-800 dark:text-purple-200 mb-6 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)] mb-3 text-center sm:text-left">Step 4: Make Your First Change</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-purple)] mb-6 text-center sm:text-left">
                     Now let's make a change to see Terrateam in action! We'll edit a file and create a pull request.
                   </p>
 
-                  <div class="bg-purple-50 dark:bg-purple-900/10 rounded-lg p-4 sm:p-5 mb-4 border border-purple-200 dark:border-purple-700">
+                  <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-5 mb-4 border border-[var(--sg-purple)]">
                     <div class="space-y-6">
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
+                          <div class="w-8 h-8 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
                         </div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 mb-2 text-sm sm:text-base text-center sm:text-left">Edit <code class="bg-purple-100 dark:bg-purple-800/30 px-1.5 py-0.5 rounded text-xs font-mono">dev/main.tf</code></div>
-                          <div class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed text-center sm:text-left">
-                            Change <code class="bg-purple-100 dark:bg-purple-800/30 px-1.5 py-0.5 rounded text-xs font-mono break-all">null_resource_count = 0</code> to <code class="bg-purple-100 dark:bg-purple-800/30 px-1.5 py-0.5 rounded text-xs font-mono break-all">null_resource_count = 1</code>
+                          <div class="font-medium text-[var(--sg-text)] mb-2 text-sm sm:text-base text-center sm:text-left">Edit <code class="bg-[var(--sg-purple-bg)] px-1.5 py-0.5 rounded text-xs font-mono">dev/main.tf</code></div>
+                          <div class="text-[var(--sg-text-dim)] text-xs sm:text-sm leading-relaxed text-center sm:text-left">
+                            Change <code class="bg-[var(--sg-purple-bg)] px-1.5 py-0.5 rounded text-xs font-mono break-all">null_resource_count = 0</code> to <code class="bg-[var(--sg-purple-bg)] px-1.5 py-0.5 rounded text-xs font-mono break-all">null_resource_count = 1</code>
                           </div>
                         </div>
                       </div>
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
+                          <div class="w-8 h-8 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
                         </div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base text-center sm:text-left">Create a new branch and push your changes</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base text-center sm:text-left">Create a new branch and push your changes</div>
                         </div>
                       </div>
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
+                          <div class="w-8 h-8 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
                         </div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base text-center sm:text-left">Open a pull request</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base text-center sm:text-left">Open a pull request</div>
                         </div>
                       </div>
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
+                          <div class="w-8 h-8 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
                         </div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base text-center sm:text-left">Watch Terrateam automatically comment with the plan!</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base text-center sm:text-left">Watch Terrateam automatically comment with the plan!</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 sm:p-4 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 sm:p-4 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:lightbulb" class="text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0" width="18" />
-                      <div class="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Pro tip:</strong> When you're ready to apply the changes, comment <code class="bg-blue-100 dark:bg-blue-800 px-1.5 py-0.5 rounded text-xs">terrateam apply</code> on your PR.
+                      <Icon icon="mdi:lightbulb" class="text-[var(--sg-accent)] mr-2 mt-0.5 flex-shrink-0" width="18" />
+                      <div class="text-xs sm:text-sm text-[var(--sg-accent)]">
+                        <strong>Pro tip:</strong> When you're ready to apply the changes, comment <code class="bg-[var(--sg-accent-bg)] px-1.5 py-0.5 rounded text-xs">terrateam apply</code> on your PR.
                       </div>
                     </div>
                   </div>
@@ -1509,13 +1509,13 @@
                   <div class="flex flex-col sm:flex-row gap-3">
                     <button
                       on:click={() => markDemoStepComplete('make-changes')}
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-purple)] hover:opacity-90 text-white px-4 py-2.5 rounded-lg text-sm font-medium"
                     >
                       I've created a PR
                     </button>
                     <button
                       on:click={() => goToDemoStep('enable-actions')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -1526,30 +1526,30 @@
 
           {:else if currentDemoStep === 'success'}
             <div class="text-center py-12">
-              <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
-                <Icon icon="mdi:check-circle" class="text-green-600 dark:text-green-400" width="32" />
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-[var(--sg-success-bg)] rounded-full mb-6">
+                <Icon icon="mdi:check-circle" class="text-[var(--sg-success)]" width="32" />
               </div>
-              <h3 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center">
-                <Icon icon="mdi:party-popper" class="text-purple-600 dark:text-purple-400 mr-2" width="28" />
+              <h3 class="text-2xl font-semibold text-[var(--sg-text)] mb-2 flex items-center justify-center">
+                <Icon icon="mdi:party-popper" class="text-[var(--sg-purple)] mr-2" width="28" />
                 Demo Complete!
               </h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-6">
+              <p class="text-[var(--sg-text-dim)] mb-6">
                 You've successfully set up the Terrateam demo and seen how Terraform automation works with pull requests.
               </p>
 
-              <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 mb-6 max-w-md mx-auto">
-                <h4 class="font-semibold text-green-900 dark:text-green-100 mb-3">What you've learned:</h4>
-                <div class="space-y-2 text-sm text-green-800 dark:text-green-200">
+              <div class="bg-[var(--sg-success-bg)] rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h4 class="font-semibold text-[var(--sg-success)] mb-3">What you've learned:</h4>
+                <div class="space-y-2 text-sm text-[var(--sg-success)]">
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     How to set up Terrateam with GitHub
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     Automatic Terraform plans on PRs
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     How to apply changes with commands
                   </div>
                 </div>
@@ -1558,13 +1558,13 @@
               <div class="flex justify-center space-x-4">
                 <button
                   on:click={() => {currentStep = 'path-selection'; selectedPath = null; currentDemoStep = 'install-app';}}
-                  class="border border-gray-300 text-gray-600 dark:text-gray-400 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                  class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-6 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                 >
                   Start Over
                 </button>
                 <button
                   on:click={() => selectPath('repo')}
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium"
+                  class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-6 py-2 rounded-lg text-sm font-medium"
                 >
                   Set Up My Repository
                 </button>
@@ -1577,10 +1577,10 @@
         <!-- GitLab Demo Setup Wizard -->
         <div class="mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 text-center sm:text-left">GitLab Demo Setup</h2>
+            <h2 class="text-xl sm:text-2xl font-semibold text-[var(--sg-text)] text-center sm:text-left">GitLab Demo Setup</h2>
             <button
               on:click={goBack}
-              class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center sm:justify-start"
+              class="text-sm text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] flex items-center justify-center sm:justify-start"
             >
               <Icon icon="mdi:arrow-left" class="mr-1" width="16" />
               Back
@@ -1602,7 +1602,7 @@
               ] as stepInfo}
                 <div class="flex justify-center">
                   <div class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium
-                              {currentGitLabDemoStep === stepInfo.step ? 'bg-blue-600 text-white' :
+                              {currentGitLabDemoStep === stepInfo.step ? 'bg-[var(--sg-accent-button)] text-white' :
                                (stepInfo.step === 'select-group' && gitlabDemoStepCompleted['select-group']) ||
                                (stepInfo.step === 'fork' && gitlabDemoStepCompleted.fork) ||
                                (stepInfo.step === 'submit-token' && gitlabDemoStepCompleted['submit-token']) ||
@@ -1610,8 +1610,8 @@
                                (stepInfo.step === 'push-test' && gitlabDemoStepCompleted['push-test']) ||
                                (stepInfo.step === 'configure-variables' && gitlabDemoStepCompleted['configure-variables']) ||
                                (stepInfo.step === 'make-changes' && gitlabDemoStepCompleted['make-changes'])
-                               ? 'bg-green-600 text-white' :
-                               'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'}">
+                               ? 'bg-[var(--sg-success)] text-white' :
+                               'bg-[var(--sg-bg-2)] text-[var(--sg-text-dim)]'}">
                     {#if (stepInfo.step === 'select-group' && gitlabDemoStepCompleted['select-group']) ||
                          (stepInfo.step === 'fork' && gitlabDemoStepCompleted.fork) ||
                          (stepInfo.step === 'submit-token' && gitlabDemoStepCompleted['submit-token']) ||
@@ -1627,46 +1627,46 @@
                 </div>
               {/each}
             </div>
-            <div class="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-center text-xs sm:text-sm text-[var(--sg-text-dim)]">
               Step {['select-group', 'fork', 'configure-webhook', 'push-test', 'submit-token', 'configure-variables', 'make-changes', 'success'].indexOf(currentGitLabDemoStep) + 1} of 9
             </div>
           </div>
 
           <!-- GitLab Demo Step Content -->
           {#if currentGitLabDemoStep === 'select-group'}
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="mb-6">
-                <h3 class="text-lg sm:text-xl font-semibold text-blue-900 dark:text-blue-100 mb-3 text-center sm:text-left">
+                <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-accent)] mb-3 text-center sm:text-left">
                   Select a GitLab Group
                 </h3>
-                <p class="text-sm sm:text-base text-blue-800 dark:text-blue-200 text-center sm:text-left">
+                <p class="text-sm sm:text-base text-[var(--sg-accent)] text-center sm:text-left">
                   Choose which GitLab group you'll use for the demo. You'll fork the demo project into this group.
                 </p>
               </div>
 
               {#if isLoadingGitLabGroups}
                 <div class="flex justify-center py-8">
-                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <LoadingSpinner size="lg" centered={false} />
                 </div>
               {:else if gitlabGroupsError}
-                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-                  <p class="text-red-800 dark:text-red-200 text-sm">{gitlabGroupsError}</p>
+                <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
+                  <p class="text-[var(--sg-error)] text-sm">{gitlabGroupsError}</p>
                 </div>
                 <button
                   on:click={loadGitLabGroups}
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   Try Again
                 </button>
               {:else if gitlabDemoGroups.length === 0}
-                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div class="bg-[var(--sg-warning-bg)] border border-[var(--sg-warning)] rounded-lg p-4">
                   <div class="flex items-start">
-                    <Icon icon="mdi:alert" class="text-yellow-600 dark:text-yellow-400 mr-2 mt-0.5" width="20" />
+                    <Icon icon="mdi:alert" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="20" />
                     <div>
-                      <p class="text-yellow-800 dark:text-yellow-200 text-sm font-medium mb-1">
+                      <p class="text-[var(--sg-warning)] text-sm font-medium mb-1">
                         No GitLab groups found
                       </p>
-                      <p class="text-yellow-700 dark:text-yellow-300 text-xs">
+                      <p class="text-[var(--sg-warning)] text-xs">
                         Terrateam requires a GitLab group to operate. Personal namespaces are not supported.
                         Please create a group or ask to be added to an existing group first.
                       </p>
@@ -1680,12 +1680,12 @@
                       on:click={() => selectGitLabDemoGroup(group)}
                       class="w-full text-left p-3 rounded-lg border transition-colors
                              {selectedGitLabDemoGroup?.id === group.id
-                               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                               : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                               ? 'border-[var(--sg-accent)] bg-[var(--sg-accent-bg)]'
+                               : 'border-[var(--sg-border)] hover:border-[var(--sg-accent)] hover:bg-[var(--sg-bg-2)]'}"
                     >
                       <div class="flex items-center">
-                        <Icon icon="mdi:folder-account" class="text-blue-600 mr-3" width="20" />
-                        <span class="font-medium text-gray-900 dark:text-gray-100">{group.name}</span>
+                        <Icon icon="mdi:folder-account" class="text-[var(--sg-accent)] mr-3" width="20" />
+                        <span class="font-medium text-[var(--sg-text)]">{group.name}</span>
                       </div>
                     </button>
                   {/each}
@@ -1694,18 +1694,18 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'fork'}
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <Icon icon="mdi:source-fork" class="text-blue-600 dark:text-blue-400" width="24" />
+                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-accent-bg)] rounded-lg">
+                    <Icon icon="mdi:source-fork" class="text-[var(--sg-accent)]" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-blue-900 dark:text-blue-100 mb-3 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-accent)] mb-3 text-center sm:text-left">
                     Fork the Demo Project
                   </h3>
-                  <p class="text-sm sm:text-base text-blue-800 dark:text-blue-200 mb-6 text-center sm:text-left">
+                  <p class="text-sm sm:text-base text-[var(--sg-accent)] mb-6 text-center sm:text-left">
                     Fork our demo GitLab project to {selectedGitLabDemoGroup ? `the ${selectedGitLabDemoGroup.name} group` : 'your account'}. This contains a simple Terraform configuration you can experiment with safely.
                   </p>
 
@@ -1713,15 +1713,15 @@
                     <div>
                       <button
                         on:click={() => openExternalLink('https://gitlab.com/terrateam-demo/kick-the-tires')}
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center w-full sm:w-auto"
+                        class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center w-full sm:w-auto"
                       >
                         <Icon icon="mdi:source-fork" class="mr-2" width="16" />
                         Fork Project
                       </button>
                     </div>
 
-                    <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4">
-                      <label for="forked-project-path" class="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                    <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4">
+                      <label for="forked-project-path" class="block text-sm font-medium text-[var(--sg-accent)] mb-2">
                         After forking, enter your project path:
                       </label>
                       <input
@@ -1729,7 +1729,7 @@
                         type="text"
                         bind:value={forkedProjectPath}
                         placeholder="groupname/kick-the-tires"
-                        class="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full px-3 py-2 border border-[var(--sg-accent)] rounded-lg bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder-[var(--sg-text-dim)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)]"
                       />
                     </div>
 
@@ -1741,7 +1741,7 @@
                           alert('Please enter your forked project path');
                         }
                       }}
-                      class="border border-blue-600 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                      class="border border-[var(--sg-accent)] text-[var(--sg-accent)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-accent-bg)]"
                     >
                       Continue
                     </button>
@@ -1751,45 +1751,45 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'submit-token'}
-            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-warning)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:key" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">Submit GitLab Access Token</h3>
-                  <p class="text-orange-800 dark:text-orange-200 mb-4">
+                  <h3 class="text-lg font-semibold text-[var(--sg-warning)] mb-2">Submit GitLab Access Token</h3>
+                  <p class="text-[var(--sg-warning)] mb-4">
                     Provide a GitLab access token with API access to allow Terrateam to manage your repositories.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-orange-200 dark:border-orange-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-warning)]">
                     <div class="space-y-3 text-sm">
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-1-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Go to GitLab Settings → Access Tokens</div>
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Go to GitLab Settings → Access Tokens</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-2-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Create a new access token with <strong>"api"</strong> scope</div>
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Create a new access token with <strong>"api"</strong> scope</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-3-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Set an appropriate expiration date</div>
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Set an appropriate expiration date</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-4-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Copy the generated token and paste it below</div>
+                        <Icon icon="mdi:numeric-4-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Copy the generated token and paste it below</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="mb-4">
-                    <label for="gitlab-demo-access-token" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label for="gitlab-demo-access-token" class="block text-sm font-medium text-[var(--sg-text-muted)] mb-2">
                       Access Token
                     </label>
                     <input
@@ -1797,28 +1797,28 @@
                       type="password"
                       bind:value={gitlabAccessToken}
                       placeholder="Enter your GitLab access token"
-                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                             focus:ring-2 focus:ring-orange-500 focus:border-orange-500
+                      class="w-full px-4 py-2 border border-[var(--sg-border)] rounded-lg
+                             bg-[var(--sg-bg-1)] text-[var(--sg-text)]
+                             focus:ring-2 focus:ring-[var(--sg-warning)] focus:border-[var(--sg-warning)]
                              disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isSubmittingGitLabToken || gitlabTokenSubmitted}
                     />
                   </div>
 
                   {#if gitlabTokenError}
-                    <div class="bg-red-50 dark:bg-red-900/30 rounded p-3 mb-4">
+                    <div class="bg-[var(--sg-error-bg)] rounded p-3 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:alert-circle" class="text-red-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-sm text-red-800 dark:text-red-200">{gitlabTokenError}</div>
+                        <Icon icon="mdi:alert-circle" class="text-[var(--sg-error)] mr-2 mt-0.5" width="16" />
+                        <div class="text-sm text-[var(--sg-error)]">{gitlabTokenError}</div>
                       </div>
                     </div>
                   {/if}
 
                   {#if gitlabTokenSubmitted}
-                    <div class="bg-green-50 dark:bg-green-900/30 rounded p-3 mb-4">
+                    <div class="bg-[var(--sg-success-bg)] rounded p-3 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:check-circle" class="text-green-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-sm text-green-800 dark:text-green-200">
+                        <Icon icon="mdi:check-circle" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
+                        <div class="text-sm text-[var(--sg-success)]">
                           <strong>Success!</strong> Access token submitted successfully.
                         </div>
                       </div>
@@ -1828,18 +1828,18 @@
                   <div class="flex items-center justify-end space-x-3">
                     <button
                       on:click={() => goToGitLabDemoStep('fork')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
                     <button
                       on:click={submitGitLabDemoAccessToken}
                       disabled={isSubmittingGitLabToken || gitlabTokenSubmitted || !gitlabAccessToken.trim()}
-                      class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                       {#if isSubmittingGitLabToken}
-                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Submitting...
+                        <LoadingSpinner size="sm" color="white" centered={false} />
+                        <span class="ml-2">Submitting...</span>
                       {:else if gitlabTokenSubmitted}
                         <Icon icon="mdi:check" class="mr-2" width="16" />
                         Submitted
@@ -1853,38 +1853,38 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'configure-webhook'}
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                    <Icon icon="mdi:webhook" class="text-yellow-600 dark:text-yellow-400" width="24" />
+                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-warning-bg)] rounded-lg">
+                    <Icon icon="mdi:webhook" class="text-[var(--sg-warning)]" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-yellow-900 dark:text-yellow-100 mb-3 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-warning)] mb-3 text-center sm:text-left">
                     Configure Webhook
                   </h3>
-                  <p class="text-sm sm:text-base text-yellow-800 dark:text-yellow-200 mb-6 text-center sm:text-left">
+                  <p class="text-sm sm:text-base text-[var(--sg-warning)] mb-6 text-center sm:text-left">
                     Add a webhook to your forked project so Terrateam can respond to merge requests and code changes.
                   </p>
 
-                  <div class="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-4 sm:p-5 mb-4">
-                    <h4 class="font-semibold text-yellow-900 dark:text-yellow-100 mb-3 text-center sm:text-left">Instructions:</h4>
-                    <ol class="list-decimal list-inside space-y-3 text-sm text-yellow-800 dark:text-yellow-200">
+                  <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-5 mb-4">
+                    <h4 class="font-semibold text-[var(--sg-warning)] mb-3 text-center sm:text-left">Instructions:</h4>
+                    <ol class="list-decimal list-inside space-y-3 text-sm text-[var(--sg-warning)]">
                       <li>
                         <a
                           href="{serverConfig?.gitlab?.web_base_url || 'https://gitlab.com'}/{forkedProjectPath}/-/hooks"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="inline-flex items-center font-medium text-yellow-700 dark:text-yellow-300 underline hover:text-yellow-600 dark:hover:text-yellow-200 break-words"
+                          class="inline-flex items-center font-medium text-[var(--sg-warning)] underline hover:text-[var(--sg-warning)] break-words"
                         >
                           <span>Open your project webhooks</span>
                           <Icon icon="mdi:open-in-new" class="ml-1 flex-shrink-0" width="16" />
                         </a>
                       </li>
                       <li>Click <strong>Add new webhook</strong></li>
-                      <li>URL: <code class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded text-xs break-all">{webhookUrl || 'Loading...'}</code></li>
-                      <li>Secret token: <code class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded text-xs break-all">{webhookSecret || 'Loading...'}</code></li>
+                      <li>URL: <code class="bg-[var(--sg-warning-bg)] px-1 rounded text-xs break-all">{webhookUrl || 'Loading...'}</code></li>
+                      <li>Secret token: <code class="bg-[var(--sg-warning-bg)] px-1 rounded text-xs break-all">{webhookSecret || 'Loading...'}</code></li>
                       <li>Enable these triggers:
                         <ul class="list-disc list-inside ml-4 mt-1">
                           <li>Push events</li>
@@ -1897,10 +1897,10 @@
                   </div>
 
                   {#if webhookVerificationError}
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-4">
+                    <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:alert-circle" class="text-red-600 dark:text-red-400 mr-2 mt-0.5" width="20" />
-                        <p class="text-sm text-red-800 dark:text-red-200">{webhookVerificationError}</p>
+                        <Icon icon="mdi:alert-circle" class="text-[var(--sg-error)] mr-2 mt-0.5" width="20" />
+                        <p class="text-sm text-[var(--sg-error)]">{webhookVerificationError}</p>
                       </div>
                     </div>
                   {/if}
@@ -1909,7 +1909,7 @@
                     <button
                       on:click={checkWebhook}
                       disabled={checkingWebhook}
-                      class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-full sm:w-auto"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-full sm:w-auto"
                     >
                       {#if checkingWebhook}
                         <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -1924,7 +1924,7 @@
                     </button>
                     <button
                       on:click={() => markGitLabDemoStepComplete('configure-webhook')}
-                      class="border border-yellow-600 text-yellow-600 dark:text-yellow-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-50 dark:hover:bg-yellow-900/30 w-full sm:w-auto text-center"
+                      class="border border-[var(--sg-warning)] text-[var(--sg-warning)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-warning-bg)] w-full sm:w-auto text-center"
                     >
                       Skip Verification
                     </button>
@@ -1934,22 +1934,22 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'push-test'}
-            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                    <Icon icon="mdi:test-tube" class="text-indigo-600 dark:text-indigo-400" width="24" />
+                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-accent-bg)] rounded-lg">
+                    <Icon icon="mdi:test-tube" class="text-[var(--sg-accent)]" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-indigo-900 dark:text-indigo-100 mb-3 text-center sm:text-left">Test Webhook Connection</h3>
-                  <p class="text-sm sm:text-base text-indigo-800 dark:text-indigo-200 mb-6 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-accent)] mb-3 text-center sm:text-left">Test Webhook Connection</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-accent)] mb-6 text-center sm:text-left">
                     Let's verify the webhook is properly configured by triggering a test event.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-5 mb-4 border border-indigo-200 dark:border-indigo-700">
-                    <h4 class="font-semibold text-gray-900 dark:text-gray-100 mb-3 text-center sm:text-left">Instructions:</h4>
-                    <ol class="list-decimal list-inside space-y-3 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 sm:p-5 mb-4 border border-[var(--sg-accent)]">
+                    <h4 class="font-semibold text-[var(--sg-text)] mb-3 text-center sm:text-left">Instructions:</h4>
+                    <ol class="list-decimal list-inside space-y-3 text-sm sm:text-base text-[var(--sg-text-muted)]">
                       <li>
                         Navigate to your repository settings
                         {#if forkedProjectPath}
@@ -1958,7 +1958,7 @@
                               href="https://gitlab.com/{forkedProjectPath}/-/hooks"
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:underline text-xs"
+                              class="inline-flex items-center text-[var(--sg-accent)] hover:underline text-xs"
                             >
                               Open Webhooks Settings
                               <Icon icon="mdi:open-in-new" class="ml-1" width="12" />
@@ -1973,21 +1973,21 @@
                   </div>
 
                   {#if demoPushTestError}
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-                      <p class="text-red-800 dark:text-red-200 text-sm">{demoPushTestError}</p>
+                    <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-error)] text-sm">{demoPushTestError}</p>
                     </div>
                   {/if}
 
                   {#if demoPushTestSuccess}
-                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-                      <p class="text-green-800 dark:text-green-200 text-sm">✅ Webhook received! Your installation is now active.</p>
+                    <div class="bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-success)] text-sm">✅ Webhook received! Your installation is now active.</p>
                     </div>
                   {/if}
 
-                  <div class="bg-indigo-100 dark:bg-indigo-900/30 rounded-lg p-3 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-indigo-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-indigo-800 dark:text-indigo-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-accent)]">
                         <strong>Why this step?</strong> Testing the webhook ensures it's properly configured and can communicate with Terrateam.
                       </div>
                     </div>
@@ -1997,13 +1997,13 @@
                     <button
                       on:click={() => checkDemoPushTestStatus()}
                       disabled={isDemoCheckingPushTest}
-                      class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] disabled:bg-[var(--sg-bg-2)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       {isDemoCheckingPushTest ? 'Checking...' : 'Check Status'}
                     </button>
                     <button
                       on:click={() => markGitLabDemoStepComplete('push-test')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Skip for Now
                     </button>
@@ -2013,30 +2013,30 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'configure-variables'}
-            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                    <Icon icon="mdi:cog" class="text-purple-600 dark:text-purple-400" width="24" />
+                  <div class="flex items-center justify-center w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-purple-bg)] rounded-lg">
+                    <Icon icon="mdi:cog" class="text-[var(--sg-purple)]" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-purple-900 dark:text-purple-100 mb-3 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)] mb-3 text-center sm:text-left">
                     Configure CI/CD Variables
                   </h3>
-                  <p class="text-sm sm:text-base text-purple-800 dark:text-purple-200 mb-6 text-center sm:text-left">
+                  <p class="text-sm sm:text-base text-[var(--sg-purple)] mb-6 text-center sm:text-left">
                     Configure project settings to allow Terrateam to pass credentials securely to your Terraform runs.
                   </p>
 
-                  <div class="bg-purple-100 dark:bg-purple-900/30 rounded-lg p-4 sm:p-5 mb-4">
-                    <h4 class="font-semibold text-purple-900 dark:text-purple-100 mb-3 text-center sm:text-left">Instructions:</h4>
-                    <ol class="list-decimal list-inside space-y-3 text-sm sm:text-base text-purple-800 dark:text-purple-200">
+                  <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-5 mb-4">
+                    <h4 class="font-semibold text-[var(--sg-text)] mb-3 text-center sm:text-left">Instructions:</h4>
+                    <ol class="list-decimal list-inside space-y-3 text-sm sm:text-base text-[var(--sg-purple)]">
                       <li>
                         <a
                           href="https://gitlab.com/{forkedProjectPath}/-/settings/ci_cd"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="inline-flex items-center font-medium text-purple-700 dark:text-purple-300 underline hover:text-purple-600 dark:hover:text-purple-200 break-words"
+                          class="inline-flex items-center font-medium text-[var(--sg-purple)] underline hover:opacity-80 break-words"
                         >
                           <span>Open your project CI/CD settings</span>
                           <Icon icon="mdi:open-in-new" class="ml-1 flex-shrink-0" width="16" />
@@ -2049,10 +2049,10 @@
                     </ol>
                   </div>
 
-                  <div class="bg-amber-50 dark:bg-amber-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-warning-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:shield-lock" class="text-amber-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-amber-800 dark:text-amber-200">
+                      <Icon icon="mdi:shield-lock" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-warning)]">
                         <strong>Why this is needed:</strong> This setting allows Terrateam to run pipelines with variables that contain your cloud credentials and Terraform configuration.
                       </div>
                     </div>
@@ -2061,14 +2061,14 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markGitLabDemoStepComplete('configure-variables')}
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+                      class="bg-[var(--sg-purple)] hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
                     >
                       <Icon icon="mdi:check" class="mr-2" width="16" />
                       Variables Configured
                     </button>
                     <button
                       on:click={() => goToGitLabDemoStep('configure-webhook')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2078,67 +2078,67 @@
             </div>
 
           {:else if currentGitLabDemoStep === 'make-changes'}
-            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-purple)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:file-edit" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-purple-900 dark:text-purple-100 mb-3 text-center sm:text-left">Make Your First Change</h3>
-                  <p class="text-sm sm:text-base text-purple-800 dark:text-purple-200 mb-6 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)] mb-3 text-center sm:text-left">Make Your First Change</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-purple)] mb-6 text-center sm:text-left">
                     Now let's make a change to see Terrateam in action! We'll edit a file and create a merge request in your
                     <a
                       href="https://gitlab.com/{forkedProjectPath}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="font-medium text-purple-700 dark:text-purple-300 underline hover:text-purple-600 dark:hover:text-purple-200"
+                      class="font-medium text-[var(--sg-purple)] underline hover:opacity-80"
                     >
                       forked repository
                     </a>.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-purple-200 dark:border-purple-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-purple)]">
                     <div class="space-y-3 text-sm">
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-1-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">
+                          <div class="text-[var(--sg-text-muted)]">
                             Edit
                             <a
                               href="https://gitlab.com/{forkedProjectPath}/-/edit/main/dev/main.tf"
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="inline-flex items-center font-mono bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded text-purple-700 dark:text-purple-300 underline hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                              class="inline-flex items-center font-mono bg-[var(--sg-purple-bg)] px-2 py-0.5 rounded text-[var(--sg-purple)] underline hover:opacity-80 transition-colors"
                             >
                               dev/main.tf
                               <Icon icon="mdi:open-in-new" class="ml-1" width="14" />
                             </a>
                           </div>
-                          <div class="text-gray-500 dark:text-gray-400 text-xs">Change <code>null_resource_count = 0</code> to <code>null_resource_count = 1</code></div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">Change <code>null_resource_count = 0</code> to <code>null_resource_count = 1</code></div>
                         </div>
                       </div>
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-2-circle" class="text-purple-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Create a new branch and push your changes</span>
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-purple)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Create a new branch and push your changes</span>
                       </div>
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-3-circle" class="text-purple-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Open a merge request</span>
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-purple)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Open a merge request</span>
                       </div>
                       <div class="flex items-center">
-                        <Icon icon="mdi:numeric-4-circle" class="text-purple-600 mr-2" width="16" />
-                        <span class="text-gray-700 dark:text-gray-300">Watch Terrateam automatically comment with the plan!</span>
+                        <Icon icon="mdi:numeric-4-circle" class="text-[var(--sg-purple)] mr-2" width="16" />
+                        <span class="text-[var(--sg-text-muted)]">Watch Terrateam automatically comment with the plan!</span>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:lightbulb" class="text-blue-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Pro tip:</strong> When you're ready to apply the changes, comment <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">terrateam apply</code> on your MR.
+                      <Icon icon="mdi:lightbulb" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-accent)]">
+                        <strong>Pro tip:</strong> When you're ready to apply the changes, comment <code class="bg-[var(--sg-accent-bg)] px-1 rounded">terrateam apply</code> on your MR.
                       </div>
                     </div>
                   </div>
@@ -2146,13 +2146,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markGitLabDemoStepComplete('make-changes')}
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-purple)] hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       I've created an MR
                     </button>
                     <button
                       on:click={() => goToGitLabDemoStep('configure-variables')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2163,36 +2163,36 @@
 
           {:else if currentGitLabDemoStep === 'success'}
             <div class="text-center py-12">
-              <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
-                <Icon icon="mdi:check-circle" class="text-green-600 dark:text-green-400" width="32" />
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-[var(--sg-success-bg)] rounded-full mb-6">
+                <Icon icon="mdi:check-circle" class="text-[var(--sg-success)]" width="32" />
               </div>
 
-              <h3 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center justify-center">
-                <Icon icon="mdi:party-popper" class="mr-2 text-green-600 dark:text-green-400" width="28" />
+              <h3 class="text-2xl font-semibold text-[var(--sg-text)] mb-4 flex items-center justify-center">
+                <Icon icon="mdi:party-popper" class="mr-2 text-[var(--sg-success)]" width="28" />
                 GitLab Demo Complete!
               </h3>
 
-              <p class="text-gray-600 dark:text-gray-400 mb-6">
+              <p class="text-[var(--sg-text-dim)] mb-6">
                 You've successfully set up the Terrateam demo and seen how Terraform automation works with GitLab merge requests.
               </p>
 
-              <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 mb-6 max-w-md mx-auto">
-                <h4 class="font-semibold text-green-900 dark:text-green-100 mb-3">What you've learned:</h4>
-                <div class="space-y-2 text-sm text-green-800 dark:text-green-200">
+              <div class="bg-[var(--sg-success-bg)] rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h4 class="font-semibold text-[var(--sg-success)] mb-3">What you've learned:</h4>
+                <div class="space-y-2 text-sm text-[var(--sg-success)]">
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     How to set up Terrateam with GitLab
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     Automatic plans on merge requests
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     GitLab CI/CD integration
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     Bot-managed Terraform workflows
                   </div>
                 </div>
@@ -2201,13 +2201,13 @@
               <div class="flex justify-center space-x-4">
                 <button
                   on:click={() => {selectedPath = null; currentStep = 'path-selection'; currentGitLabDemoStep = 'fork';}}
-                  class="border border-gray-300 text-gray-600 dark:text-gray-400 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                  class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-6 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                 >
                   Start Over
                 </button>
                 <button
                   on:click={() => selectPath('repo')}
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium"
+                  class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-6 py-2 rounded-lg text-sm font-medium"
                 >
                   Set Up My Project
                 </button>
@@ -2220,10 +2220,10 @@
         <!-- Repository Setup Wizard -->
         <div class="mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">Repository Setup</h2>
+            <h2 class="text-lg sm:text-xl font-semibold text-[var(--sg-text)]">Repository Setup</h2>
             <button
               on:click={goBack}
-              class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center self-start sm:self-auto"
+              class="text-xs md:text-sm text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] flex items-center self-start sm:self-auto"
             >
               <Icon icon="mdi:arrow-left" class="mr-1" width="16" />
               Back
@@ -2243,14 +2243,14 @@
               ] as stepInfo}
                 <div class="flex items-center {stepInfo.index < 5 ? 'flex-1' : ''}">
                   <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-medium
-                              {currentRepoStep === stepInfo.step ? 'bg-blue-600 text-white' :
+                              {currentRepoStep === stepInfo.step ? 'bg-[var(--sg-accent-button)] text-white' :
                                (stepInfo.step === 'install-app' && repoStepCompleted['install-app']) ||
                                (stepInfo.step === 'select-repo' && repoStepCompleted['select-repo']) ||
                                (stepInfo.step === 'add-workflow' && repoStepCompleted['add-workflow']) ||
                                (stepInfo.step === 'configure' && repoStepCompleted.configure) ||
                                (stepInfo.step === 'test' && repoStepCompleted.test)
-                               ? 'bg-green-600 text-white' :
-                               'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'}">
+                               ? 'bg-[var(--sg-success)] text-white' :
+                               'bg-[var(--sg-bg-2)] text-[var(--sg-text-dim)]'}">
                     {#if (stepInfo.step === 'install-app' && repoStepCompleted['install-app']) ||
                          (stepInfo.step === 'select-repo' && repoStepCompleted['select-repo']) ||
                          (stepInfo.step === 'add-workflow' && repoStepCompleted['add-workflow']) ||
@@ -2268,56 +2268,56 @@
                       (stepInfo.step === 'add-workflow' && repoStepCompleted['add-workflow']) ||
                       (stepInfo.step === 'configure' && repoStepCompleted.configure) ||
                       (stepInfo.step === 'test' && repoStepCompleted.test)
-                      ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-600'}"></div>
+                      ? 'bg-[var(--sg-success)]' : 'bg-[var(--sg-bg-2)]'}"></div>
                   {/if}
                 </div>
               {/each}
             </div>
-            <div class="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-center text-xs sm:text-sm text-[var(--sg-text-dim)]">
               Step {['install-app', 'select-repo', 'add-workflow', 'configure', 'test', 'success'].indexOf(currentRepoStep) + 1} of 6
             </div>
           </div>
 
           <!-- Repository Step Content -->
           {#if currentRepoStep === 'install-app'}
-            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-success-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-success)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:download" class="text-white" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-green-900 dark:text-green-100 mb-2 text-center sm:text-left">Step 1: Install Terrateam GitHub App</h3>
-                  <p class="text-sm sm:text-base text-green-800 dark:text-green-200 mb-4 text-center sm:text-left">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-success)] mb-2 text-center sm:text-left">Step 1: Install Terrateam GitHub App</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-success)] mb-4 text-center sm:text-left">
                     Install the Terrateam GitHub App on your organization to enable Terraform automation.
                   </p>
 
                   {#if hasInstallations}
-                    <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 sm:p-4 mb-4 border border-green-200 dark:border-green-700">
+                    <div class="bg-[var(--sg-success-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-success)]">
                       <div class="flex items-start sm:items-center">
-                        <Icon icon="mdi:check-circle" class="text-green-600 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" width="20" />
-                        <span class="text-xs sm:text-sm text-green-800 dark:text-green-200 font-medium">
+                        <Icon icon="mdi:check-circle" class="text-[var(--sg-success)] mr-2 flex-shrink-0 mt-0.5 sm:mt-0" width="20" />
+                        <span class="text-xs sm:text-sm text-[var(--sg-success)] font-medium">
                           Great! We detected {installations.length} GitHub installation{installations.length > 1 ? 's' : ''}.
                         </span>
                       </div>
                     </div>
                   {:else}
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-green-200 dark:border-green-700">
+                    <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-success)]">
                       <div class="flex items-center justify-between">
                         <div>
-                          <div class="font-medium text-gray-900 dark:text-gray-100">Terrateam GitHub App</div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">Enables Terraform automation in your repositories</div>
+                          <div class="font-medium text-[var(--sg-text)]">Terrateam GitHub App</div>
+                          <div class="text-sm text-[var(--sg-text-dim)]">Enables Terraform automation in your repositories</div>
                         </div>
-                        <Icon icon="mdi:github" class="text-gray-400" width="24" />
+                        <Icon icon="mdi:github" class="text-[var(--sg-text-dim)]" width="24" />
                       </div>
                     </div>
                   {/if}
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 sm:p-4 mb-4 border border-blue-200 dark:border-blue-700">
+                  <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-accent)]">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0" width="20" />
-                      <div class="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5 flex-shrink-0" width="20" />
+                      <div class="text-xs sm:text-sm text-[var(--sg-accent)]">
                         <p class="font-medium mb-1">Repository in a different organization?</p>
                         <p>You can install the app on any organization where your repository is located.</p>
                       </div>
@@ -2327,7 +2327,7 @@
                   <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <button
                       on:click={() => openExternalLink(githubAppUrl, 'github_app_install')}
-                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
+                      class="bg-[var(--sg-success)] hover:bg-[var(--sg-success)] text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center"
                     >
                       <Icon icon="mdi:download" class="mr-2" width="16" />
                       Install GitHub App
@@ -2335,7 +2335,7 @@
                     <button
                       on:click={checkRepoAppInstallation}
                       disabled={checkingAppInstallation}
-                      class="border border-green-600 text-green-600 dark:text-green-400 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-green-50 dark:hover:bg-green-900/30 disabled:opacity-50 flex items-center justify-center"
+                      class="border border-[var(--sg-success)] text-[var(--sg-success)] px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[var(--sg-success-bg)] disabled:opacity-50 flex items-center justify-center"
                     >
                       {#if checkingAppInstallation}
                         <Icon icon="mdi:loading" class="animate-spin mr-2" width="16" />
@@ -2352,29 +2352,29 @@
             </div>
 
           {:else if currentRepoStep === 'select-repo'}
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-accent-button)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:source-repository" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Step 2: Select Repository</h3>
-                  <p class="text-blue-800 dark:text-blue-200 mb-4">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-accent)] mb-2">Step 2: Select Repository</h3>
+                  <p class="text-[var(--sg-accent)] mb-4">
                     Choose the repository where you want to enable Terrateam automation.
                   </p>
 
                   {#if installations.length > 1}
                     <div class="mb-4">
-                      <label for="organization-select" class="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">{VCS_PROVIDERS[currentProvider].displayName} {terminology.organization}:</label>
+                      <label for="organization-select" class="block text-sm font-medium text-[var(--sg-accent)] mb-2">{VCS_PROVIDERS[currentProvider].displayName} {terminology.organization}:</label>
                       <select
                         id="organization-select"
                         bind:value={selectedInstallationId}
                         on:change={() => {
                           selectedInstallation = installations.find(i => i.id === selectedInstallationId) || null;
                         }}
-                        class="w-full p-2 border border-blue-200 dark:border-blue-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        class="w-full p-2 border border-[var(--sg-accent)] rounded-lg bg-[var(--sg-bg-1)] text-[var(--sg-text)]"
                       >
                         <option value="">Select a {terminology.organization}...</option>
                         {#each installations as installation}
@@ -2387,10 +2387,10 @@
                       {selectedInstallation = installations[0]}
                       {selectedInstallationId = installations[0].id}
                     {/if}
-                    <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 mb-4 border border-blue-200 dark:border-blue-700">
+                    <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 mb-4 border border-[var(--sg-accent)]">
                       <div class="flex items-center">
-                        <Icon icon="mdi:github" class="text-blue-600 mr-2" width="16" />
-                        <span class="text-blue-800 dark:text-blue-200 font-medium">{installations[0].name}</span>
+                        <Icon icon="mdi:github" class="text-[var(--sg-accent)] mr-2" width="16" />
+                        <span class="text-[var(--sg-accent)] font-medium">{installations[0].name}</span>
                       </div>
                     </div>
                   {/if}
@@ -2398,46 +2398,46 @@
                   {#if selectedInstallation}
                     <div class="mb-4">
                       <div class="flex items-center justify-between mb-2">
-                        <span class="block text-sm font-medium text-blue-900 dark:text-blue-100">Choose Repository:</span>
+                        <span class="block text-sm font-medium text-[var(--sg-accent)]">Choose Repository:</span>
                         <button
                           on:click={refreshRepositories}
                           disabled={isLoadingRepos}
-                          class="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+                          class="text-xs text-[var(--sg-accent)] hover:underline disabled:opacity-50"
                         >
                           {isLoadingRepos ? 'Refreshing...' : 'Refresh'}
                         </button>
                       </div>
 
-                      <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 mb-3 border border-blue-200 dark:border-blue-700">
+                      <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 mb-3 border border-[var(--sg-accent)]">
                         <div class="flex items-start">
-                          <Icon icon="mdi:information" class="text-blue-600 dark:text-blue-400 mr-2 mt-0.5" width="16" />
-                          <div class="text-sm text-blue-800 dark:text-blue-200">
+                          <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                          <div class="text-sm text-[var(--sg-accent)]">
                             <p class="font-medium mb-1">Repository Access</p>
-                            <p>Only repositories where the GitHub app is installed and enabled will appear here. If you don't see your repository, you may need to <button on:click={() => openExternalLink(githubAppUrl)} class="font-medium text-blue-700 dark:text-blue-300 underline hover:text-blue-600 dark:hover:text-blue-200">configure app access</button> first.</p>
+                            <p>Only repositories where the GitHub app is installed and enabled will appear here. If you don't see your repository, you may need to <button on:click={() => openExternalLink(githubAppUrl)} class="font-medium text-[var(--sg-accent)] underline hover:text-[var(--sg-accent-hover)]">configure app access</button> first.</p>
                           </div>
                         </div>
                       </div>
 
                       {#if isLoadingRepos}
                         <div class="flex items-center justify-center p-8">
-                          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                          <LoadingSpinner size="md" centered={false} />
                         </div>
                       {:else if repoLoadError}
-                        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                          <p class="text-red-800 dark:text-red-200 text-sm">{repoLoadError}</p>
+                        <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4">
+                          <p class="text-[var(--sg-error)] text-sm">{repoLoadError}</p>
                         </div>
                       {:else if repositories.length === 0}
-                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                        <div class="bg-[var(--sg-warning-bg)] border border-[var(--sg-warning)] rounded-lg p-4">
                           <div class="flex items-start">
-                            <Icon icon="mdi:alert" class="text-yellow-600 mr-3 mt-0.5" width="20" />
+                            <Icon icon="mdi:alert" class="text-[var(--sg-warning)] mr-3 mt-0.5" width="20" />
                             <div class="flex-1">
-                              <p class="text-yellow-800 dark:text-yellow-200 text-sm font-medium mb-2">No repositories found</p>
-                              <p class="text-yellow-700 dark:text-yellow-300 text-sm mb-3">
+                              <p class="text-[var(--sg-warning)] text-sm font-medium mb-2">No repositories found</p>
+                              <p class="text-[var(--sg-warning)] text-sm mb-3">
                                 The GitHub App doesn't have access to any repositories in this organization. You may need to configure repository access.
                               </p>
                               <button
                                 on:click={() => openExternalLink(githubAppUrl, 'github_app_install')}
-                                class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm font-medium flex items-center"
+                                class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-3 py-2 rounded text-sm font-medium flex items-center"
                               >
                                 <Icon icon="mdi:cog" class="mr-2" width="16" />
                                 Configure App Access
@@ -2446,19 +2446,19 @@
                           </div>
                         </div>
                       {:else}
-                        <div class="max-h-60 overflow-y-auto border border-blue-200 dark:border-blue-700 rounded-lg">
+                        <div class="max-h-60 overflow-y-auto border border-[var(--sg-accent)] rounded-lg">
                           {#each repositories as repo}
                             <button
                               on:click={() => selectRepository(repo)}
-                              class="w-full text-left p-3 border-b border-blue-100 dark:border-blue-800 last:border-b-0 hover:bg-blue-50 dark:hover:bg-blue-900/30 {selectedRepository?.id === repo.id ? 'bg-blue-100 dark:bg-blue-900/50' : ''}"
+                              class="w-full text-left p-3 border-b border-[var(--sg-accent)] last:border-b-0 hover:bg-[var(--sg-accent-bg)] {selectedRepository?.id === repo.id ? 'bg-[var(--sg-accent-bg)]' : ''}"
                             >
                               <div class="flex items-center justify-between">
                                 <div>
-                                  <div class="font-medium text-gray-900 dark:text-gray-100">{repo.name}</div>
-                                  <div class="text-sm text-gray-600 dark:text-gray-400">Repository setup: {repo.setup ? 'Complete' : 'Pending'}</div>
+                                  <div class="font-medium text-[var(--sg-text)]">{repo.name}</div>
+                                  <div class="text-sm text-[var(--sg-text-dim)]">Repository setup: {repo.setup ? 'Complete' : 'Pending'}</div>
                                 </div>
                                 {#if selectedRepository?.id === repo.id}
-                                  <Icon icon="mdi:check-circle" class="text-blue-600" width="20" />
+                                  <Icon icon="mdi:check-circle" class="text-[var(--sg-accent)]" width="20" />
                                 {/if}
                               </div>
                             </button>
@@ -2472,14 +2472,14 @@
                     {#if selectedRepository}
                       <button
                         on:click={() => markRepoStepComplete('select-repo')}
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                        class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                       >
                         Continue with {selectedRepository.name}
                       </button>
                     {/if}
                     <button
                       on:click={() => goToRepoStep('install-app')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2489,28 +2489,28 @@
             </div>
 
           {:else if currentRepoStep === 'add-workflow'}
-            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-warning)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:file-plus" class="text-white" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg sm:text-xl font-semibold text-orange-900 dark:text-orange-100 mb-3 text-center sm:text-left">Step 3: Add GitHub Actions Workflow</h3>
-                  <p class="text-sm sm:text-base text-orange-800 dark:text-orange-200 mb-6 text-center sm:text-left">
+                  <h3 class="text-lg sm:text-xl font-semibold text-[var(--sg-warning)] mb-3 text-center sm:text-left">Step 3: Add GitHub Actions Workflow</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-warning)] mb-6 text-center sm:text-left">
                     Add the Terrateam workflow file to your repository's default branch to enable automation.
                   </p>
 
-                  <div class="bg-orange-50 dark:bg-orange-900/10 rounded-lg p-4 sm:p-5 mb-4 border border-orange-200 dark:border-orange-700">
+                  <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-5 mb-4 border border-[var(--sg-warning)]">
                     <div class="space-y-6">
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
+                          <div class="w-8 h-8 bg-[var(--sg-warning)] rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base mb-2 text-center sm:text-left">Create a new branch in <strong class="break-all">{selectedRepository?.name}</strong></div>
-                          <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto">
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base mb-2 text-center sm:text-left">Create a new branch in <strong class="break-all">{selectedRepository?.name}</strong></div>
+                          <div class="bg-[var(--sg-bg-2)] p-3 rounded overflow-x-auto">
                             <code class="text-xs sm:text-sm font-mono whitespace-nowrap">git checkout -b add-terrateam-workflow</code>
                           </div>
                         </div>
@@ -2518,11 +2518,11 @@
 
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
+                          <div class="w-8 h-8 bg-[var(--sg-warning)] rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base mb-2 text-center sm:text-left">Create the workflow directory and file</div>
-                          <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto text-xs sm:text-sm">
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base mb-2 text-center sm:text-left">Create the workflow directory and file</div>
+                          <div class="bg-[var(--sg-bg-2)] p-3 rounded overflow-x-auto text-xs sm:text-sm">
                             <code class="font-mono">
                               <span class="block">mkdir -p .github/workflows</span>
                               <span class="block mt-2">curl -o .github/workflows/terrateam.yml \</span>
@@ -2534,11 +2534,11 @@
 
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
+                          <div class="w-8 h-8 bg-[var(--sg-warning)] rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base mb-2 text-center sm:text-left">Commit and push the workflow</div>
-                          <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto text-xs sm:text-sm">
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base mb-2 text-center sm:text-left">Commit and push the workflow</div>
+                          <div class="bg-[var(--sg-bg-2)] p-3 rounded overflow-x-auto text-xs sm:text-sm">
                             <code class="font-mono">
                               <span class="block">git add .github/workflows/terrateam.yml</span>
                               <span class="block mt-2">git commit -m "Add Terrateam workflow"</span>
@@ -2550,19 +2550,19 @@
 
                       <div class="flex flex-col sm:flex-row sm:items-start gap-3">
                         <div class="flex-shrink-0 flex justify-center sm:block">
-                          <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
+                          <div class="w-8 h-8 bg-[var(--sg-warning)] rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
                         </div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base text-center sm:text-left">Create a pull request and merge it to your default branch</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm sm:text-base text-center sm:text-left">Create a pull request and merge it to your default branch</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-blue-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-blue-800 dark:text-blue-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-accent)]">
                         <strong>Important:</strong> The workflow file must be in your default branch (usually <code>main</code> or <code>master</code>) to be active.
                       </div>
                     </div>
@@ -2571,13 +2571,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markRepoStepComplete('add-workflow')}
-                      class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       Workflow Added
                     </button>
                     <button
                       on:click={() => goToRepoStep('select-repo')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2587,46 +2587,46 @@
             </div>
 
           {:else if currentRepoStep === 'configure'}
-            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-purple)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:cog" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2 text-center sm:text-left">Step 4: Configure Cloud Credentials</h3>
-                  <p class="text-sm sm:text-base text-purple-800 dark:text-purple-200 mb-4 text-center sm:text-left">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-text)] mb-2 text-center sm:text-left">Step 4: Configure Cloud Credentials</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-purple)] mb-4 text-center sm:text-left">
                     Set up cloud provider credentials so Terrateam can manage your infrastructure.
                   </p>
 
-                  <div class="bg-purple-50 dark:bg-purple-900/10 rounded-lg p-3 sm:p-4 mb-4 border border-purple-200 dark:border-purple-700">
+                  <div class="bg-[var(--sg-purple-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-purple)]">
                     <div class="space-y-4">
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">1</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">1</div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Go to your repository settings</div>
-                          <div class="text-gray-600 dark:text-gray-400 text-xs">Settings → Secrets and variables → Actions</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Go to your repository settings</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">Settings → Secrets and variables → Actions</div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">2</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">2</div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Add your cloud provider credentials as repository secrets</div>
-                          <div class="bg-gray-100 dark:bg-gray-800 rounded p-2 text-xs">
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Add your cloud provider credentials as repository secrets</div>
+                          <div class="bg-[var(--sg-bg-2)] rounded p-2 text-xs">
                             <div class="space-y-2 font-mono">
                               <div>
-                                <span class="font-bold text-gray-700 dark:text-gray-300">AWS:</span>
-                                <div class="ml-2 text-gray-600 dark:text-gray-400">AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY</div>
+                                <span class="font-bold text-[var(--sg-text-muted)]">AWS:</span>
+                                <div class="ml-2 text-[var(--sg-text-dim)]">AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY</div>
                               </div>
                               <div>
-                                <span class="font-bold text-gray-700 dark:text-gray-300">GCP:</span>
-                                <div class="ml-2 text-gray-600 dark:text-gray-400">GOOGLE_CREDENTIALS (service account JSON)</div>
+                                <span class="font-bold text-[var(--sg-text-muted)]">GCP:</span>
+                                <div class="ml-2 text-[var(--sg-text-dim)]">GOOGLE_CREDENTIALS (service account JSON)</div>
                               </div>
                               <div>
-                                <span class="font-bold text-gray-700 dark:text-gray-300">Azure:</span>
-                                <div class="ml-2 text-gray-600 dark:text-gray-400 break-words">ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID</div>
+                                <span class="font-bold text-[var(--sg-text-muted)]">Azure:</span>
+                                <div class="ml-2 text-[var(--sg-text-dim)] break-words">ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID</div>
                               </div>
                             </div>
                           </div>
@@ -2634,19 +2634,19 @@
                       </div>
 
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">3</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-purple)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">3</div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Make sure your Terraform configurations are ready</div>
-                          <div class="text-gray-600 dark:text-gray-400 text-xs">Valid .tf files with proper provider configurations</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Make sure your Terraform configurations are ready</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">Valid .tf files with proper provider configurations</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-amber-50 dark:bg-amber-900/30 rounded-lg p-3 sm:p-4 mb-4">
+                  <div class="bg-[var(--sg-warning-bg)] rounded-lg p-3 sm:p-4 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:shield-lock" class="text-amber-600 dark:text-amber-400 mr-2 mt-0.5 flex-shrink-0" width="18" />
-                      <div class="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
+                      <Icon icon="mdi:shield-lock" class="text-[var(--sg-warning)] mr-2 mt-0.5 flex-shrink-0" width="18" />
+                      <div class="text-xs sm:text-sm text-[var(--sg-warning)]">
                         <strong>Security tip:</strong> Consider using OIDC for enhanced security instead of static credentials. Check our cloud provider guides for OIDC setup instructions.
                       </div>
                     </div>
@@ -2655,13 +2655,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markRepoStepComplete('configure')}
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-purple)] hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       Credentials Configured
                     </button>
                     <button
                       on:click={() => goToRepoStep('add-workflow')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2671,34 +2671,34 @@
             </div>
 
           {:else if currentRepoStep === 'test'}
-            <div class="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-success-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-teal-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-success)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:test-tube" class="text-white" width="24" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-teal-900 dark:text-teal-100 mb-2 text-center sm:text-left">Step 5: Test Your Setup</h3>
-                  <p class="text-sm sm:text-base text-teal-800 dark:text-teal-200 mb-4 text-center sm:text-left">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-success)] mb-2 text-center sm:text-left">Step 5: Test Your Setup</h3>
+                  <p class="text-sm sm:text-base text-[var(--sg-success)] mb-4 text-center sm:text-left">
                     Let's test your Terrateam setup by making a change and creating a pull request.
                   </p>
 
-                  <div class="bg-teal-50 dark:bg-teal-900/10 rounded-lg p-3 sm:p-4 mb-4 border border-teal-200 dark:border-teal-700">
+                  <div class="bg-[var(--sg-success-bg)] rounded-lg p-3 sm:p-4 mb-4 border border-[var(--sg-success)]">
                     <div class="space-y-4">
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-teal-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">1</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-success)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">1</div>
                         <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Make a change to any <code class="bg-teal-100 dark:bg-teal-800/30 px-1.5 py-0.5 rounded text-xs font-mono">.tf</code> file in your repository</div>
-                          <div class="text-gray-600 dark:text-gray-400 text-xs">Even a small comment change will work for testing</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Make a change to any <code class="bg-[var(--sg-success-bg)] px-1.5 py-0.5 rounded text-xs font-mono">.tf</code> file in your repository</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">Even a small comment change will work for testing</div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-teal-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">2</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-success)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">2</div>
                         <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Create a new branch and commit your changes</div>
-                          <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Create a new branch and commit your changes</div>
+                          <div class="bg-[var(--sg-bg-2)] p-2 rounded overflow-x-auto">
                             <code class="text-xs font-mono">
                               <span class="block">git checkout -b test-terrateam</span>
                               <span class="block mt-1">git add -A</span>
@@ -2710,26 +2710,26 @@
                       </div>
 
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-teal-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">3</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-success)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">3</div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1">Open a pull request</div>
-                          <div class="text-gray-600 dark:text-gray-400 text-xs">Terrateam should automatically comment with the terraform plan!</div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm mb-1">Open a pull request</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">Terrateam should automatically comment with the terraform plan!</div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <div class="flex-shrink-0 w-7 h-7 bg-teal-600 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">4</div>
+                        <div class="flex-shrink-0 w-7 h-7 bg-[var(--sg-success)] rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 mt-0.5">4</div>
                         <div class="flex-1">
-                          <div class="font-medium text-gray-900 dark:text-gray-100 text-sm">If you want to apply the changes, comment <code class="bg-teal-100 dark:bg-teal-800/30 px-1.5 py-0.5 rounded text-xs font-mono">terrateam apply</code></div>
+                          <div class="font-medium text-[var(--sg-text)] text-sm">If you want to apply the changes, comment <code class="bg-[var(--sg-success-bg)] px-1.5 py-0.5 rounded text-xs font-mono">terrateam apply</code></div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-green-50 dark:bg-green-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-success-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:lightbulb" class="text-green-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-green-800 dark:text-green-200">
+                      <Icon icon="mdi:lightbulb" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-success)]">
                         <strong>Success indicators:</strong> Look for Terrateam's bot comment with the terraform plan output and green status checks.
                       </div>
                     </div>
@@ -2738,13 +2738,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markRepoStepComplete('test')}
-                      class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-success)] hover:bg-[var(--sg-success)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       It Works!
                     </button>
                     <button
                       on:click={() => goToRepoStep('configure')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -2755,53 +2755,53 @@
 
           {:else if currentRepoStep === 'success'}
             <div class="text-center py-12">
-              <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
-                <Icon icon="mdi:check-circle" class="text-green-600 dark:text-green-400" width="32" />
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-[var(--sg-success-bg)] rounded-full mb-6">
+                <Icon icon="mdi:check-circle" class="text-[var(--sg-success)]" width="32" />
               </div>
-              <h3 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center">
-                <Icon icon="mdi:party-popper" class="text-purple-600 dark:text-purple-400 mr-2" width="28" />
+              <h3 class="text-2xl font-semibold text-[var(--sg-text)] mb-2 flex items-center justify-center">
+                <Icon icon="mdi:party-popper" class="text-[var(--sg-purple)] mr-2" width="28" />
                 Repository Setup Complete!
               </h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-6 px-4">
+              <p class="text-[var(--sg-text-dim)] mb-6 px-4">
                 Terrateam is now configured for<br class="sm:hidden">
-                <strong class="text-blue-600 dark:text-blue-400 break-all">{selectedRepository?.name}</strong>.<br class="sm:hidden">
+                <strong class="text-[var(--sg-accent)] break-all">{selectedRepository?.name}</strong>.<br class="sm:hidden">
                 You're ready to automate your Terraform workflows!
               </p>
 
-              <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 mb-6 max-w-md mx-auto">
-                <h4 class="font-semibold text-green-900 dark:text-green-100 mb-3">What you've set up:</h4>
-                <div class="space-y-2 text-sm text-green-800 dark:text-green-200">
+              <div class="bg-[var(--sg-success-bg)] rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h4 class="font-semibold text-[var(--sg-success)] mb-3">What you've set up:</h4>
+                <div class="space-y-2 text-sm text-[var(--sg-success)]">
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     GitHub App installed and configured
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     Terrateam workflow active in your repository
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     Cloud credentials securely configured
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2" width="16" />
                     Automated Terraform plans on pull requests
                   </div>
                 </div>
               </div>
 
-              <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 mb-6 max-w-md mx-auto">
-                <h4 class="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center">
-                  <Icon icon="mdi:rocket-launch" class="text-blue-600 dark:text-blue-400 mr-2" width="20" />
+              <div class="bg-[var(--sg-accent-bg)] rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h4 class="font-semibold text-[var(--sg-accent)] mb-3 flex items-center">
+                  <Icon icon="mdi:rocket-launch" class="text-[var(--sg-accent)] mr-2" width="20" />
                   Ready for Advanced Configuration?
                 </h4>
-                <p class="text-sm text-blue-800 dark:text-blue-200 mb-4">
+                <p class="text-sm text-[var(--sg-accent)] mb-4">
                   Take your Terrateam setup to the next level with our Configuration Wizard.
                   Generate custom workflows, set up advanced features, and optimize for your specific use case.
                 </p>
                 <button
                   on:click={openConfigurationWizard}
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-center"
+                  class="w-full bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-center"
                 >
                   <Icon icon="mdi:auto-fix" class="mr-2" width="20" />
                   Open Configuration Wizard
@@ -2811,13 +2811,13 @@
               <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
                 <button
                   on:click={() => window.location.hash = '#/repositories'}
-                  class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-sm font-medium w-full sm:w-auto"
+                  class="bg-[var(--sg-bg-2)] hover:bg-[var(--sg-bg-2)] text-white px-6 py-3 rounded-lg text-sm font-medium w-full sm:w-auto"
                 >
                   View My Repositories
                 </button>
                 <button
                   on:click={() => openExternalLink('https://docs.terrateam.io/')}
-                  class="border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 w-full sm:w-auto"
+                  class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-6 py-3 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)] w-full sm:w-auto"
                 >
                   Read Documentation
                 </button>
@@ -2830,10 +2830,10 @@
         <!-- GitLab Setup Wizard -->
         <div class="mb-6">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">GitLab Setup</h2>
+            <h2 class="text-lg md:text-xl font-semibold text-[var(--sg-text)]">GitLab Setup</h2>
             <button
               on:click={goBack}
-              class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center"
+              class="text-xs md:text-sm text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] flex items-center"
             >
               <Icon icon="mdi:arrow-left" class="mr-1" width="16" />
               Back
@@ -2855,7 +2855,7 @@
               ] as stepInfo}
                 <div class="flex justify-center">
                   <div class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium
-                              {currentGitLabStep === stepInfo.step ? 'bg-blue-600 text-white' :
+                              {currentGitLabStep === stepInfo.step ? 'bg-[var(--sg-accent-button)] text-white' :
                                (stepInfo.step === 'select-group' && gitlabStepCompleted['select-group']) ||
                                (stepInfo.step === 'select-repo' && gitlabStepCompleted['select-repo']) ||
                                (stepInfo.step === 'submit-token' && gitlabStepCompleted['submit-token']) ||
@@ -2863,8 +2863,8 @@
                                (stepInfo.step === 'push-test' && gitlabStepCompleted['push-test']) ||
                                (stepInfo.step === 'configure-variables' && gitlabStepCompleted['configure-variables']) ||
                                (stepInfo.step === 'add-pipeline' && gitlabStepCompleted['add-pipeline'])
-                               ? 'bg-green-600 text-white' :
-                               'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'}">
+                               ? 'bg-[var(--sg-success)] text-white' :
+                               'bg-[var(--sg-bg-2)] text-[var(--sg-text-dim)]'}">
                     {#if (stepInfo.step === 'select-group' && gitlabStepCompleted['select-group']) ||
                          (stepInfo.step === 'select-repo' && gitlabStepCompleted['select-repo']) ||
                          (stepInfo.step === 'submit-token' && gitlabStepCompleted['submit-token']) ||
@@ -2880,61 +2880,61 @@
                 </div>
               {/each}
             </div>
-            <div class="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <div class="text-center text-xs sm:text-sm text-[var(--sg-text-dim)]">
               Step {['select-group', 'select-repo', 'configure-webhook', 'submit-token', 'push-test', 'configure-variables', 'add-pipeline', 'success'].indexOf(currentGitLabStep) + 1} of 9
             </div>
           </div>
 
           <!-- GitLab Step Content -->
           {#if currentGitLabStep === 'select-group'}
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-accent-button)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:account-group" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Select GitLab Group</h3>
-                  <p class="text-blue-800 dark:text-blue-200 mb-4">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-accent)] mb-2">Select GitLab Group</h3>
+                  <p class="text-[var(--sg-accent)] mb-4">
                     Choose the GitLab group where you want to connect your repository.
                   </p>
 
                   {#if isLoadingGitLabSetupGroups}
                     <div class="flex items-center justify-center p-8">
-                      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      <LoadingSpinner size="md" centered={false} />
                     </div>
                   {:else if gitlabSetupGroupsError}
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-                      <p class="text-red-800 dark:text-red-200 text-sm">{gitlabSetupGroupsError}</p>
+                    <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-error)] text-sm">{gitlabSetupGroupsError}</p>
                     </div>
                     <div class="flex items-center space-x-3">
                       <button
                         on:click={loadGitLabSetupGroups}
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                        class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                       >
                         Retry
                       </button>
                     </div>
                   {:else if gitlabGroups.length === 0}
-                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
-                      <p class="text-yellow-800 dark:text-yellow-200 text-sm">
+                    <div class="bg-[var(--sg-warning-bg)] border border-[var(--sg-warning)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-warning)] text-sm">
                         No GitLab groups found. You need to be a member of a GitLab group to connect repositories.
                       </p>
                     </div>
                   {:else}
-                    <div class="max-h-60 overflow-y-auto border border-blue-200 dark:border-blue-700 rounded-lg mb-4">
+                    <div class="max-h-60 overflow-y-auto border border-[var(--sg-accent)] rounded-lg mb-4">
                       {#each gitlabGroups as group}
                         <button
                           on:click={() => selectGitLabGroup(group)}
-                          class="w-full text-left p-3 border-b border-blue-100 dark:border-blue-800 last:border-b-0 hover:bg-blue-50 dark:hover:bg-blue-900/30 {selectedGitLabGroup?.id === group.id ? 'bg-blue-100 dark:bg-blue-900/50' : ''}"
+                          class="w-full text-left p-3 border-b border-[var(--sg-accent)] last:border-b-0 hover:bg-[var(--sg-accent-bg)] {selectedGitLabGroup?.id === group.id ? 'bg-[var(--sg-accent-bg)]' : ''}"
                         >
                           <div class="flex items-center justify-between">
                             <div>
-                              <div class="font-medium text-gray-900 dark:text-gray-100">{group.name}</div>
+                              <div class="font-medium text-[var(--sg-text)]">{group.name}</div>
                             </div>
                             {#if selectedGitLabGroup?.id === group.id}
-                              <Icon icon="mdi:check-circle" class="text-blue-600" width="20" />
+                              <Icon icon="mdi:check-circle" class="text-[var(--sg-accent)]" width="20" />
                             {/if}
                           </div>
                         </button>
@@ -2945,7 +2945,7 @@
                       <div class="flex items-center space-x-3">
                         <button
                           on:click={() => markGitLabStepComplete('select-group')}
-                          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                          class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                         >
                           Continue with {selectedGitLabGroup.name}
                         </button>
@@ -2957,37 +2957,37 @@
             </div>
 
           {:else if currentGitLabStep === 'select-repo'}
-            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-success-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-success)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:source-repository" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-green-900 dark:text-green-100 mb-2">Select Repository</h3>
-                  <p class="text-green-800 dark:text-green-200 mb-4">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-success)] mb-2">Select Repository</h3>
+                  <p class="text-[var(--sg-success)] mb-4">
                     Choose the repository where you want to enable Terrateam automation.
                   </p>
 
                   {#if selectedGitLabGroup}
-                    <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 mb-4 border border-green-200 dark:border-green-700">
+                    <div class="bg-[var(--sg-success-bg)] rounded-lg p-3 mb-4 border border-[var(--sg-success)]">
                       <div class="flex items-center">
-                        <Icon icon="mdi:account-group" class="text-green-600 mr-2" width="16" />
-                        <span class="text-green-800 dark:text-green-200 font-medium">{selectedGitLabGroup.name}</span>
+                        <Icon icon="mdi:account-group" class="text-[var(--sg-success)] mr-2" width="16" />
+                        <span class="text-[var(--sg-success)] font-medium">{selectedGitLabGroup.name}</span>
                       </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-green-200 dark:border-green-700">
-                      <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Add Repository</h4>
+                    <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-success)]">
+                      <h4 class="text-sm font-medium text-[var(--sg-text)] mb-3">Add Repository</h4>
                       <div class="space-y-3">
                         <div>
-                          <label for="gitlab-project-name" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                          <label for="gitlab-project-name" class="block text-sm text-[var(--sg-text-muted)] mb-1">
                             Enter your repository name
                           </label>
                           <div class="flex flex-col gap-3">
                             <div class="flex items-center min-w-0">
-                              <span class="px-2 sm:px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-lg text-gray-600 dark:text-gray-400 text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
+                              <span class="px-2 sm:px-3 py-2 bg-[var(--sg-bg-2)] border border-r-0 border-[var(--sg-border)] rounded-l-lg text-[var(--sg-text-dim)] text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
                                 {selectedGitLabGroup?.name}/
                               </span>
                               <input
@@ -2995,7 +2995,7 @@
                                 type="text"
                                 bind:value={manualGitLabProject}
                                 placeholder="my-terraform-repo"
-                                class="flex-1 min-w-0 px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-r-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-xs sm:text-sm"
+                                class="flex-1 min-w-0 px-2 sm:px-3 py-2 border border-[var(--sg-border)] rounded-r-lg bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder-[var(--sg-text-dim)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-success)] focus:border-transparent text-xs sm:text-sm"
                                 on:keypress={(e) => {
                                   if (e.key === 'Enter' && manualGitLabProject.trim()) {
                                     addGitLabProject();
@@ -3006,7 +3006,7 @@
                             <button
                               on:click={addGitLabProject}
                               disabled={!manualGitLabProject.trim() || isAddingGitLabProject}
-                              class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium"
+                              class="w-full px-4 py-2 bg-[var(--sg-success)] text-white rounded-lg hover:bg-[var(--sg-success)] disabled:bg-[var(--sg-bg-2)] disabled:cursor-not-allowed text-sm font-medium"
                             >
                               {isAddingGitLabProject ? 'Adding...' : 'Continue'}
                             </button>
@@ -3020,7 +3020,7 @@
                   <div class="flex items-center space-x-3 mt-4">
                     <button
                       on:click={() => goToGitLabStep('select-group')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -3030,45 +3030,45 @@
             </div>
 
           {:else if currentGitLabStep === 'submit-token'}
-            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-warning)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:key" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">Submit GitLab Access Token</h3>
-                  <p class="text-orange-800 dark:text-orange-200 mb-4">
+                  <h3 class="text-lg font-semibold text-[var(--sg-warning)] mb-2">Submit GitLab Access Token</h3>
+                  <p class="text-[var(--sg-warning)] mb-4">
                     Provide a GitLab access token with API access to allow Terrateam to manage your repositories.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-orange-200 dark:border-orange-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-warning)]">
                     <div class="space-y-3 text-sm">
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-1-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Go to GitLab Settings → Access Tokens</div>
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Go to GitLab Settings → Access Tokens</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-2-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Create a new access token with <strong>"api"</strong> scope</div>
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Create a new access token with <strong>"api"</strong> scope</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-3-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Set an appropriate expiration date</div>
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Set an appropriate expiration date</div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-4-circle" class="text-orange-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-gray-700 dark:text-gray-300">Copy the generated token and paste it below</div>
+                        <Icon icon="mdi:numeric-4-circle" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                        <div class="text-[var(--sg-text-muted)]">Copy the generated token and paste it below</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="mb-4">
-                    <label for="gitlab-access-token" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label for="gitlab-access-token" class="block text-sm font-medium text-[var(--sg-text-muted)] mb-2">
                       Access Token
                     </label>
                     <input
@@ -3076,28 +3076,28 @@
                       type="password"
                       bind:value={gitlabAccessToken}
                       placeholder="Enter your GitLab access token"
-                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                             focus:ring-2 focus:ring-orange-500 focus:border-orange-500
+                      class="w-full px-4 py-2 border border-[var(--sg-border)] rounded-lg
+                             bg-[var(--sg-bg-1)] text-[var(--sg-text)]
+                             focus:ring-2 focus:ring-[var(--sg-warning)] focus:border-[var(--sg-warning)]
                              disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isSubmittingGitLabToken || gitlabTokenSubmitted}
                     />
                   </div>
 
                   {#if gitlabTokenError}
-                    <div class="bg-red-50 dark:bg-red-900/30 rounded p-3 mb-4">
+                    <div class="bg-[var(--sg-error-bg)] rounded p-3 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:alert-circle" class="text-red-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-sm text-red-800 dark:text-red-200">{gitlabTokenError}</div>
+                        <Icon icon="mdi:alert-circle" class="text-[var(--sg-error)] mr-2 mt-0.5" width="16" />
+                        <div class="text-sm text-[var(--sg-error)]">{gitlabTokenError}</div>
                       </div>
                     </div>
                   {/if}
 
                   {#if gitlabTokenSubmitted}
-                    <div class="bg-green-50 dark:bg-green-900/30 rounded p-3 mb-4">
+                    <div class="bg-[var(--sg-success-bg)] rounded p-3 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:check-circle" class="text-green-600 mr-2 mt-0.5" width="16" />
-                        <div class="text-sm text-green-800 dark:text-green-200">
+                        <Icon icon="mdi:check-circle" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
+                        <div class="text-sm text-[var(--sg-success)]">
                           <strong>Success!</strong> Access token submitted successfully.
                         </div>
                       </div>
@@ -3107,18 +3107,18 @@
                   <div class="flex items-center justify-end space-x-3">
                     <button
                       on:click={() => goToGitLabStep('select-repo')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
                     <button
                       on:click={submitGitLabAccessToken}
                       disabled={isSubmittingGitLabToken || gitlabTokenSubmitted || !gitlabAccessToken.trim()}
-                      class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                       {#if isSubmittingGitLabToken}
-                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Submitting...
+                        <LoadingSpinner size="sm" color="white" centered={false} />
+                        <span class="ml-2">Submitting...</span>
                       {:else if gitlabTokenSubmitted}
                         <Icon icon="mdi:check" class="mr-2" width="16" />
                         Submitted
@@ -3132,38 +3132,38 @@
             </div>
 
           {:else if currentGitLabStep === 'configure-webhook'}
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-6">
+            <div class="bg-[var(--sg-warning-bg)] rounded-lg p-6">
               <div class="flex items-start">
                 <div class="flex-shrink-0">
-                  <div class="flex items-center justify-center w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                    <Icon icon="mdi:webhook" class="text-yellow-600 dark:text-yellow-400" width="20" />
+                  <div class="flex items-center justify-center w-10 h-10 bg-[var(--sg-warning-bg)] rounded-lg">
+                    <Icon icon="mdi:webhook" class="text-[var(--sg-warning)]" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-base md:text-lg font-medium text-yellow-900 dark:text-yellow-100 mb-2">
+                  <h3 class="text-base md:text-lg font-medium text-[var(--sg-warning)] mb-2">
                     Configure Webhook
                   </h3>
-                  <p class="text-yellow-800 dark:text-yellow-200 mb-4">
+                  <p class="text-[var(--sg-warning)] mb-4">
                     Add a webhook to your project so Terrateam can respond to merge requests and code changes.
                   </p>
 
-                  <div class="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-4 mb-4">
-                    <h4 class="font-medium text-yellow-900 dark:text-yellow-100 mb-2">Instructions:</h4>
-                    <ol class="list-decimal list-inside space-y-2 text-sm text-yellow-800 dark:text-yellow-200">
+                  <div class="bg-[var(--sg-warning-bg)] rounded-lg p-4 mb-4">
+                    <h4 class="font-medium text-[var(--sg-warning)] mb-2">Instructions:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-[var(--sg-warning)]">
                       <li>
                         <a
                           href="{serverConfig?.gitlab?.web_base_url || 'https://gitlab.com'}/{selectedGitLabGroup?.name || ''}/{manualGitLabProject || ''}/-/hooks"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="inline-flex items-center font-medium text-yellow-700 dark:text-yellow-300 underline hover:text-yellow-600 dark:hover:text-yellow-200"
+                          class="inline-flex items-center font-medium text-[var(--sg-warning)] underline hover:text-[var(--sg-warning)]"
                         >
                           Open your project webhooks
                           <Icon icon="mdi:open-in-new" class="ml-1" width="16" />
                         </a>
                       </li>
                       <li>Click <strong>Add new webhook</strong></li>
-                      <li>URL: <code class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded break-all">{webhookUrl || 'Loading...'}</code></li>
-                      <li>Secret token: <code class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded break-all">{webhookSecret || 'Loading...'}</code></li>
+                      <li>URL: <code class="bg-[var(--sg-warning-bg)] px-1 rounded break-all">{webhookUrl || 'Loading...'}</code></li>
+                      <li>Secret token: <code class="bg-[var(--sg-warning-bg)] px-1 rounded break-all">{webhookSecret || 'Loading...'}</code></li>
                       <li>Enable these triggers:
                         <ul class="list-disc list-inside ml-4 mt-1">
                           <li>Push events</li>
@@ -3176,10 +3176,10 @@
                   </div>
 
                   {#if webhookVerificationError}
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-4">
+                    <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
                       <div class="flex items-start">
-                        <Icon icon="mdi:alert-circle" class="text-red-600 dark:text-red-400 mr-2 mt-0.5" width="20" />
-                        <p class="text-sm text-red-800 dark:text-red-200">{webhookVerificationError}</p>
+                        <Icon icon="mdi:alert-circle" class="text-[var(--sg-error)] mr-2 mt-0.5" width="20" />
+                        <p class="text-sm text-[var(--sg-error)]">{webhookVerificationError}</p>
                       </div>
                     </div>
                   {/if}
@@ -3188,7 +3188,7 @@
                     <button
                       on:click={verifyWebhook}
                       disabled={checkingWebhook}
-                      class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      class="bg-[var(--sg-warning)] hover:bg-[var(--sg-warning)] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                       {#if checkingWebhook}
                         <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -3203,7 +3203,7 @@
                     </button>
                     <button
                       on:click={() => markGitLabStepComplete('configure-webhook')}
-                      class="border border-yellow-600 text-yellow-600 dark:text-yellow-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-50 dark:hover:bg-yellow-900/30"
+                      class="border border-[var(--sg-warning)] text-[var(--sg-warning)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-warning-bg)]"
                     >
                       Skip Verification
                     </button>
@@ -3213,22 +3213,22 @@
             </div>
 
           {:else if currentGitLabStep === 'push-test'}
-            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-6">
+            <div class="bg-[var(--sg-accent-bg)] rounded-lg p-6">
               <div class="flex items-start">
                 <div class="flex-shrink-0">
-                  <div class="flex items-center justify-center w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                    <Icon icon="mdi:test-tube" class="text-indigo-600 dark:text-indigo-400" width="20" />
+                  <div class="flex items-center justify-center w-10 h-10 bg-[var(--sg-accent-bg)] rounded-lg">
+                    <Icon icon="mdi:test-tube" class="text-[var(--sg-accent)]" width="20" />
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-2">Test Webhook Connection</h3>
-                  <p class="text-indigo-800 dark:text-indigo-200 mb-4">
+                  <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-accent)] mb-2">Test Webhook Connection</h3>
+                  <p class="text-[var(--sg-accent)] mb-4">
                     Let's verify the webhook is properly configured by triggering a test event.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-indigo-200 dark:border-indigo-700">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">Instructions:</h4>
-                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-accent)]">
+                    <h4 class="font-medium text-[var(--sg-text)] mb-3">Instructions:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-[var(--sg-text-muted)]">
                       <li>
                         Navigate to your repository settings
                         {#if selectedGitLabGroup && manualGitLabProject}
@@ -3237,7 +3237,7 @@
                               href="https://gitlab.com/{selectedGitLabGroup.name}/{manualGitLabProject}/-/hooks"
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:underline text-xs"
+                              class="inline-flex items-center text-[var(--sg-accent)] hover:underline text-xs"
                             >
                               Open Webhooks Settings
                               <Icon icon="mdi:open-in-new" class="ml-1" width="12" />
@@ -3252,21 +3252,21 @@
                   </div>
 
                   {#if pushTestError}
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-                      <p class="text-red-800 dark:text-red-200 text-sm">{pushTestError}</p>
+                    <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-error)] text-sm">{pushTestError}</p>
                     </div>
                   {/if}
 
                   {#if pushTestSuccess}
-                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-                      <p class="text-green-800 dark:text-green-200 text-sm">✅ Webhook received! Your installation is now active.</p>
+                    <div class="bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg p-4 mb-4">
+                      <p class="text-[var(--sg-success)] text-sm">✅ Webhook received! Your installation is now active.</p>
                     </div>
                   {/if}
 
-                  <div class="bg-indigo-100 dark:bg-indigo-900/30 rounded-lg p-3 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded-lg p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-indigo-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-indigo-800 dark:text-indigo-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-accent)]">
                         <strong>Why this step?</strong> Testing the webhook ensures it's properly configured and can communicate with Terrateam.
                       </div>
                     </div>
@@ -3276,13 +3276,13 @@
                     <button
                       on:click={() => checkPushTestStatus()}
                       disabled={isCheckingPushTest}
-                      class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] disabled:bg-[var(--sg-bg-2)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       {isCheckingPushTest ? 'Checking...' : 'Check Status'}
                     </button>
                     <button
                       on:click={() => markGitLabStepComplete('push-test')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Skip for Now
                     </button>
@@ -3292,32 +3292,32 @@
             </div>
 
           {:else if currentGitLabStep === 'configure-variables'}
-            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6">
+            <div class="bg-[var(--sg-purple-bg)] rounded-lg p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-start gap-4">
                 <div class="flex-shrink-0 flex justify-center sm:block">
-                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <div class="w-12 h-12 sm:w-10 sm:h-10 bg-[var(--sg-purple)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:cog" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">Configure CI/CD Variables</h3>
-                  <p class="text-purple-800 dark:text-purple-200 mb-4">
+                  <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-2">Configure CI/CD Variables</h3>
+                  <p class="text-[var(--sg-purple)] mb-4">
                     Configure project settings to allow Terrateam to pass credentials securely to your Terraform runs.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-purple-200 dark:border-purple-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-purple)]">
                     <div class="space-y-3 text-sm">
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-1-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Go to your GitLab project CI/CD settings</div>
-                          <div class="text-gray-500 dark:text-gray-400 text-xs">
+                          <div class="text-[var(--sg-text-muted)]">Go to your GitLab project CI/CD settings</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">
                             {#if selectedGitLabGroup && manualGitLabProject}
                               <a
                                 href="https://gitlab.com/{selectedGitLabGroup.name}/{manualGitLabProject}/-/settings/ci_cd"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:underline"
+                                class="inline-flex items-center text-[var(--sg-purple)] hover:underline"
                               >
                                 Project → Settings → CI/CD
                                 <Icon icon="mdi:open-in-new" class="ml-1" width="12" />
@@ -3330,40 +3330,40 @@
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-2-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Expand the <strong>Variables</strong> section</div>
+                          <div class="text-[var(--sg-text-muted)]">Expand the <strong>Variables</strong> section</div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-3-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Find <strong>"Minimum role to use pipeline variables"</strong></div>
+                          <div class="text-[var(--sg-text-muted)]">Find <strong>"Minimum role to use pipeline variables"</strong></div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-4-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-4-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Select <strong>Developer</strong> from the dropdown</div>
-                          <div class="text-gray-500 dark:text-gray-400 text-xs">This allows Terrateam to use pipeline variables</div>
+                          <div class="text-[var(--sg-text-muted)]">Select <strong>Developer</strong> from the dropdown</div>
+                          <div class="text-[var(--sg-text-dim)] text-xs">This allows Terrateam to use pipeline variables</div>
                         </div>
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-5-circle" class="text-purple-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-5-circle" class="text-[var(--sg-purple)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Click <strong>Save changes</strong></div>
+                          <div class="text-[var(--sg-text-muted)]">Click <strong>Save changes</strong></div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-amber-50 dark:bg-amber-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-warning-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:shield-lock" class="text-amber-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-amber-800 dark:text-amber-200">
+                      <Icon icon="mdi:shield-lock" class="text-[var(--sg-warning)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-warning)]">
                         <strong>Important:</strong> This allows Terrateam to run pipelines with variables containing your cloud credentials and Terraform configuration.
                       </div>
                     </div>
@@ -3372,13 +3372,13 @@
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markGitLabStepComplete('configure-variables')}
-                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-purple)] hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       CI/CD Configured
                     </button>
                     <button
                       on:click={() => goToGitLabStep('configure-webhook')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -3388,32 +3388,32 @@
             </div>
 
           {:else if currentGitLabStep === 'add-pipeline'}
-            <div class="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-6">
+            <div class="bg-[var(--sg-success-bg)] rounded-lg p-6">
               <div class="flex items-start">
                 <div class="flex-shrink-0">
-                  <div class="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center">
+                  <div class="w-10 h-10 bg-[var(--sg-success)] rounded-lg flex items-center justify-center">
                     <Icon icon="mdi:file-code" class="text-white" width="20" />
                   </div>
                 </div>
                 <div class="ml-4 flex-1">
-                  <h3 class="text-lg font-semibold text-teal-900 dark:text-teal-100 mb-2">Add .gitlab-ci.yml File</h3>
-                  <p class="text-teal-800 dark:text-teal-200 mb-4">
+                  <h3 class="text-lg font-semibold text-[var(--sg-success)] mb-2">Add .gitlab-ci.yml File</h3>
+                  <p class="text-[var(--sg-success)] mb-4">
                     Add the Terrateam CI/CD template to your repository to enable Terraform automation.
                   </p>
 
-                  <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 border border-teal-200 dark:border-teal-700">
+                  <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 mb-4 border border-[var(--sg-success)]">
                     <div class="space-y-3 text-sm">
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-1-circle" class="text-teal-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-1-circle" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">
-                            Create or edit <code class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">.gitlab-ci.yml</code> in
+                          <div class="text-[var(--sg-text-muted)]">
+                            Create or edit <code class="bg-[var(--sg-bg-2)] px-2 py-1 rounded">.gitlab-ci.yml</code> in
                             {#if selectedGitLabGroup && manualGitLabProject}
                               <a
                                 href="https://gitlab.com/{selectedGitLabGroup.name}/{manualGitLabProject}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex items-center font-medium text-teal-700 dark:text-teal-300 underline hover:text-teal-600 dark:hover:text-teal-200"
+                                class="inline-flex items-center font-medium text-[var(--sg-success)] underline hover:text-[var(--sg-success)]"
                               >
                                 your repository root
                                 <Icon icon="mdi:open-in-new" class="ml-1" width="14" />
@@ -3426,10 +3426,10 @@
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-2-circle" class="text-teal-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-2-circle" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Add this content:</div>
-                          <div class="mt-2 bg-gray-50 dark:bg-gray-700 p-3 rounded border relative">
+                          <div class="text-[var(--sg-text-muted)]">Add this content:</div>
+                          <div class="mt-2 bg-[var(--sg-bg-0)] p-3 rounded border relative">
                             <button
                               on:click={() => {
                                 const yamlContent = `# .gitlab-ci.yml - Using the terrateam template
@@ -3470,12 +3470,12 @@ terrateam_job:
                                 copiedYaml = true;
                                 setTimeout(() => copiedYaml = false, 2000);
                               }}
-                              class="absolute top-2 right-2 px-2 py-1 {copiedYaml ? 'bg-green-600' : 'bg-teal-600 hover:bg-teal-700'} text-white rounded text-xs flex items-center transition-colors"
+                              class="absolute top-2 right-2 px-2 py-1 {copiedYaml ? 'bg-[var(--sg-success)]' : 'bg-[var(--sg-success)] hover:bg-[var(--sg-success)]'} text-white rounded text-xs flex items-center transition-colors"
                             >
                               <Icon icon={copiedYaml ? "mdi:check" : "mdi:content-copy"} class="mr-1" width="14" />
                               {copiedYaml ? 'Copied!' : 'Copy'}
                             </button>
-                            <pre class="text-xs text-gray-800 dark:text-gray-200 overflow-x-auto pr-16"><code># .gitlab-ci.yml - Using the terrateam template
+                            <pre class="text-xs text-[var(--sg-text)] overflow-x-auto pr-16"><code># .gitlab-ci.yml - Using the terrateam template
 spec:
   inputs:
     TERRATEAM_TRIGGER:
@@ -3514,18 +3514,18 @@ terrateam_job:
                       </div>
 
                       <div class="flex items-start">
-                        <Icon icon="mdi:numeric-3-circle" class="text-teal-600 mr-2 mt-0.5" width="16" />
+                        <Icon icon="mdi:numeric-3-circle" class="text-[var(--sg-success)] mr-2 mt-0.5" width="16" />
                         <div>
-                          <div class="text-gray-700 dark:text-gray-300">Commit and push to your default branch</div>
+                          <div class="text-[var(--sg-text-muted)]">Commit and push to your default branch</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="bg-blue-50 dark:bg-blue-900/30 rounded p-3 mb-4">
+                  <div class="bg-[var(--sg-accent-bg)] rounded p-3 mb-4">
                     <div class="flex items-start">
-                      <Icon icon="mdi:information" class="text-blue-600 mr-2 mt-0.5" width="16" />
-                      <div class="text-sm text-blue-800 dark:text-blue-200">
+                      <Icon icon="mdi:information" class="text-[var(--sg-accent)] mr-2 mt-0.5" width="16" />
+                      <div class="text-sm text-[var(--sg-accent)]">
                         <strong>Note:</strong> If you already have a .gitlab-ci.yml file, you'll need to integrate these rules with your existing jobs. Contact support for help with complex setups.
                       </div>
                     </div>
@@ -3534,13 +3534,13 @@ terrateam_job:
                   <div class="flex items-center space-x-3">
                     <button
                       on:click={() => markGitLabStepComplete('add-pipeline')}
-                      class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                      class="bg-[var(--sg-success)] hover:bg-[var(--sg-success)] text-white px-4 py-2 rounded-lg text-sm font-medium"
                     >
                       Pipeline Added
                     </button>
                     <button
                       on:click={() => goToGitLabStep('configure-variables')}
-                      class="border border-gray-300 text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                     >
                       Go Back
                     </button>
@@ -3551,38 +3551,38 @@ terrateam_job:
 
           {:else if currentGitLabStep === 'success'}
             <div class="text-center py-12">
-              <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
-                <Icon icon="mdi:check-circle" class="text-green-600 dark:text-green-400" width="32" />
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-[var(--sg-success-bg)] rounded-full mb-6">
+                <Icon icon="mdi:check-circle" class="text-[var(--sg-success)]" width="32" />
               </div>
-              <h3 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center justify-center">
-                <Icon icon="mdi:party-popper" class="text-purple-600 dark:text-purple-400 mr-2" width="28" />
+              <h3 class="text-2xl font-semibold text-[var(--sg-text)] mb-2 flex items-center justify-center">
+                <Icon icon="mdi:party-popper" class="text-[var(--sg-purple)] mr-2" width="28" />
                 GitLab Setup Complete!
               </h3>
-              <p class="text-gray-600 dark:text-gray-400 mb-6">
+              <p class="text-[var(--sg-text-dim)] mb-6">
                 Terrateam is now configured for <strong>{selectedGitLabGroup?.name || 'your GitLab group'}</strong>. You're ready to automate your Terraform workflows!
               </p>
 
-              <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 mb-6 max-w-md mx-auto">
-                <h4 class="font-semibold text-green-900 dark:text-green-100 mb-3">What you've set up:</h4>
-                <div class="space-y-2 text-sm text-green-800 dark:text-green-200">
+              <div class="bg-[var(--sg-success-bg)] rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <h4 class="font-semibold text-[var(--sg-success)] mb-3">What you've set up:</h4>
+                <div class="space-y-2 text-sm text-[var(--sg-success)]">
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     GitLab group selected and configured
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     Terrateam bot added as Developer
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     Webhook configured for events
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     CI/CD variables configured
                   </div>
                   <div class="flex items-center">
-                    <Icon icon="mdi:check" class="text-green-600 mr-2 flex-shrink-0" width="16" />
+                    <Icon icon="mdi:check" class="text-[var(--sg-success)] mr-2 flex-shrink-0" width="16" />
                     GitLab CI pipeline added
                   </div>
                 </div>
@@ -3591,13 +3591,13 @@ terrateam_job:
               <div class="flex justify-center space-x-4">
                 <button
                   on:click={() => window.location.hash = '#/repositories'}
-                  class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg text-sm font-medium"
+                  class="bg-[var(--sg-bg-2)] hover:bg-[var(--sg-bg-2)] text-white px-6 py-2 rounded-lg text-sm font-medium"
                 >
                   View Repositories
                 </button>
                 <button
                   on:click={() => openExternalLink('https://docs.terrateam.io/')}
-                  class="border border-gray-300 text-gray-600 dark:text-gray-400 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                  class="border border-[var(--sg-border)] text-[var(--sg-text-dim)] px-6 py-2 rounded-lg text-sm font-medium hover:bg-[var(--sg-bg-2)]"
                 >
                   Read Documentation
                 </button>
@@ -3611,18 +3611,18 @@ terrateam_job:
 
     <!-- Help Section -->
     <div class="text-center mt-8">
-      <p class="text-sm text-gray-500 dark:text-gray-400">
+      <p class="text-sm text-[var(--sg-text-dim)]">
         Need help? Check the
         <button
           on:click={() => openExternalLink('https://docs.terrateam.io/')}
-          class="text-blue-600 dark:text-blue-400 hover:underline"
+          class="text-[var(--sg-accent)] hover:underline"
         >
           documentation
         </button>
         or get help on
         <button
           on:click={() => openExternalLink('https://terrateam.io/slack')}
-          class="text-blue-600 dark:text-blue-400 hover:underline"
+          class="text-[var(--sg-accent)] hover:underline"
         >
           Slack
         </button>.

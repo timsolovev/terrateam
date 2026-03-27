@@ -41,17 +41,17 @@
   function getRunStateBadgeClasses(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failure':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'running':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'queued':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'aborted':
-        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400';
+        return 'bg-[var(--sg-orange-bg)] text-[var(--sg-orange)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -95,7 +95,7 @@
 </script>
 
 <tr
-  class="hover:bg-gray-50 dark:hover:bg-gray-900/30 border-b border-gray-200 dark:border-gray-700 cursor-pointer transition-colors"
+  class="hover:bg-[var(--sg-bg-2)] border-b border-[var(--sg-border)] cursor-pointer transition-colors"
   on:click={handleClick}
   role="button"
   tabindex="0"
@@ -103,7 +103,7 @@
   aria-label="View details for {event.runType} run {event.prNumber ? `on PR #${event.prNumber}` : `in ${event.repo}`}"
 >
   <!-- Time -->
-  <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap" title={formatFullTimestamp(event.timestamp)}>
+  <td class="px-3 py-2 text-xs text-[var(--sg-text-dim)] whitespace-nowrap" title={formatFullTimestamp(event.timestamp)}>
     {formatTime(event.timestamp)}
   </td>
 
@@ -111,7 +111,7 @@
   <td class="px-3 py-2">
     <div class="flex items-center gap-2">
       <span class="text-base" aria-hidden="true">{getRunTypeIcon(event.runType)}</span>
-      <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{formatRunType(event.runType)}</span>
+      <span class="text-xs font-medium text-[var(--sg-text-muted)]">{formatRunType(event.runType)}</span>
     </div>
   </td>
 
@@ -123,21 +123,21 @@
   </td>
 
   <!-- PR -->
-  <td class="px-3 py-2 text-xs text-gray-700 dark:text-gray-300">
+  <td class="px-3 py-2 text-xs text-[var(--sg-text-muted)]">
     {#if event.prNumber}
       <div class="flex flex-col">
         <span class="font-medium">#{event.prNumber}</span>
         {#if event.prTitle}
-          <span class="text-gray-500 dark:text-gray-500 truncate max-w-xs">{event.prTitle}</span>
+          <span class="text-[var(--sg-text-dim)] truncate max-w-xs">{event.prTitle}</span>
         {/if}
       </div>
     {:else}
-      <span class="text-gray-400 dark:text-gray-600">-</span>
+      <span class="text-[var(--sg-text-dim)]">-</span>
     {/if}
   </td>
 
   <!-- Repo -->
-  <td class="px-3 py-2 text-xs font-mono text-gray-600 dark:text-gray-400">
+  <td class="px-3 py-2 text-xs font-mono text-[var(--sg-text-dim)]">
     {event.repo}
   </td>
 
@@ -145,20 +145,20 @@
   <td class="px-3 py-2">
     <div class="flex flex-col gap-0.5">
       {#if event.stackName}
-        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{event.stackName}</span>
+        <span class="text-xs font-medium text-[var(--sg-text-muted)]">{event.stackName}</span>
       {/if}
-      <span class="text-xs font-mono bg-gray-100 dark:bg-gray-900/50 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400 inline-block">
+      <span class="text-xs font-mono bg-[var(--sg-bg-2)] px-1.5 py-0.5 rounded text-[var(--sg-text-dim)] inline-block">
         {event.dir}:{event.workspace}
       </span>
     </div>
   </td>
 
   <!-- User -->
-  <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
+  <td class="px-3 py-2 text-xs text-[var(--sg-text-dim)]">
     {#if event.user}
       @{event.user}
     {:else}
-      <span class="text-gray-400 dark:text-gray-600">-</span>
+      <span class="text-[var(--sg-text-dim)]">-</span>
     {/if}
   </td>
 </tr>

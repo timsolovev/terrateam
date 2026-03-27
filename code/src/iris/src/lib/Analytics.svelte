@@ -7,6 +7,7 @@
   import PageLayout from './components/layout/PageLayout.svelte';
   import Card from './components/ui/Card.svelte';
   import LoadingSpinner from './components/ui/LoadingSpinner.svelte';
+  import EmptyState from './components/ui/EmptyState.svelte';
   import type { Dirspace, Repository } from './types';
   import { navigateToRun, navigateToRuns } from './utils/navigation';
 
@@ -858,19 +859,19 @@
   }
 
   function getSuccessRateColor(rate: number): string {
-    if (rate >= 90) return 'text-green-600 dark:text-green-400';
-    if (rate >= 70) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+    if (rate >= 90) return 'text-[var(--sg-success)]';
+    if (rate >= 70) return 'text-[var(--sg-warning)]';
+    return 'text-[var(--sg-error)]';
   }
 
   function getStepCategoryColor(category: string): string {
     switch (category) {
-      case 'Core': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-600';
-      case 'Setup': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-600';
-      case 'Validation': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-600';
-      case 'Execution': return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 border-purple-200 dark:border-purple-600';
-      case 'Cleanup': return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
-      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
+      case 'Core': return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border-[var(--sg-accent)]';
+      case 'Setup': return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] border-[var(--sg-success)]';
+      case 'Validation': return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border-[var(--sg-warning)]';
+      case 'Execution': return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)] border-[var(--sg-purple)]';
+      case 'Cleanup': return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)] border-[var(--sg-border)]';
+      default: return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)] border-[var(--sg-border)]';
     }
   }
 
@@ -893,29 +894,29 @@
   
   <!-- Tab Navigation -->
   <div class="mb-4 md:mb-6">
-    <div class="border-b border-gray-200 dark:border-gray-700">
+    <div class="border-b border-[var(--sg-border)]">
       <nav class="-mb-px flex flex-wrap gap-2 sm:gap-0 sm:space-x-8">
         <button
           on:click={() => activeTab = 'repository'}
           class="py-2 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 {activeTab === 'repository' 
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]' 
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
         >
           🏢 Repository Health
         </button>
         <button
           on:click={() => activeTab = 'workflow'}
           class="py-2 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 {activeTab === 'workflow' 
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]' 
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
         >
           ⚙️ Workflow Performance
         </button>
         <button
           on:click={() => activeTab = 'drift'}
           class="py-2 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 {activeTab === 'drift' 
-            ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}"
+            ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]' 
+            : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'}"
         >
           🔍 Drift Detection
         </button>
@@ -929,9 +930,9 @@
       <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 md:gap-4">
         <!-- Date Range -->
         <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <label for="date-range" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Time Range:</label>
+          <label for="date-range" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)] whitespace-nowrap">Time Range:</label>
           <select id="date-range" bind:value={dateRange} on:change={loadData}
-                  class="flex-1 sm:flex-none border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs md:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500">
+                  class="flex-1 sm:flex-none border-[var(--sg-border)] rounded-md shadow-sm text-xs md:text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:border-[var(--sg-accent)] focus:ring-[var(--sg-accent)]">
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -940,9 +941,9 @@
 
         <!-- Repository Filter -->
         <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <label for="repo-filter" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Repository:</label>
+          <label for="repo-filter" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)] whitespace-nowrap">Repository:</label>
           <select id="repo-filter" bind:value={selectedRepo}
-                  class="flex-1 sm:flex-none border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs md:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500">
+                  class="flex-1 sm:flex-none border-[var(--sg-border)] rounded-md shadow-sm text-xs md:text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:border-[var(--sg-accent)] focus:ring-[var(--sg-accent)]">
             <option value="">All Repositories</option>
             {#each uniqueRepos as repo}
               <option value={repo}>{repo}</option>
@@ -953,17 +954,17 @@
         <!-- Enhanced Analysis (Workflow tab only) -->
         {#if activeTab === 'workflow'}
           {#if selectedRepo}
-            <div class="flex items-center space-x-2 w-full sm:w-auto sm:border-l sm:border-gray-300 sm:dark:border-gray-600 sm:pl-4">
-              <span class="text-xs md:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Step Details:</span>
+            <div class="flex items-center space-x-2 w-full sm:w-auto sm:border-l sm:border-[var(--sg-border)] sm:pl-4">
+              <span class="text-xs md:text-sm text-[var(--sg-text-dim)] whitespace-nowrap">Step Details:</span>
               <button 
                 on:click={() => loadDetailedDataForRepo(selectedRepo)}
                 disabled={loadingDetailedData || loadedDetailedRepos.has(selectedRepo)}
                 class="px-2 md:px-3 py-0.5 md:py-1 rounded-md text-xs md:text-sm font-medium border transition-all {
                   loadedDetailedRepos.has(selectedRepo) 
-                    ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-600 text-green-700 dark:text-green-300 cursor-default' 
+                    ? 'bg-[var(--sg-success-bg)] border-[var(--sg-success)] text-[var(--sg-success)] cursor-default' 
                     : loadingDetailedData 
-                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-600 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50'
+                      ? 'bg-[var(--sg-bg-0)] border-[var(--sg-border)] text-[var(--sg-text-dim)] cursor-not-allowed'
+                      : 'bg-[var(--sg-accent-bg)] border-[var(--sg-accent)] text-[var(--sg-accent)] hover:bg-[var(--sg-accent-bg)]'
                 }"
                 title={loadedDetailedRepos.has(selectedRepo) 
                   ? 'Detailed step execution data loaded' 
@@ -979,8 +980,8 @@
               </button>
             </div>
           {:else}
-            <div class="flex items-center space-x-2 w-full sm:w-auto sm:border-l sm:border-gray-300 sm:dark:border-gray-600 sm:pl-4">
-              <span class="text-xs text-gray-500 dark:text-gray-400">💡 Select a repository to load detailed step analysis</span>
+            <div class="flex items-center space-x-2 w-full sm:w-auto sm:border-l sm:border-[var(--sg-border)] sm:pl-4">
+              <span class="text-xs text-[var(--sg-text-dim)]">💡 Select a repository to load detailed step analysis</span>
             </div>
           {/if}
         {/if}
@@ -988,7 +989,7 @@
       
       <!-- Success message -->
       {#if activeTab === 'workflow' && selectedRepo && loadedDetailedRepos.has(selectedRepo)}
-        <div class="mt-2 md:mt-3 text-xs text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded border border-green-200 dark:border-green-600">
+        <div class="mt-2 md:mt-3 text-xs text-[var(--sg-success)] bg-[var(--sg-success-bg)] px-2 py-1 rounded border border-[var(--sg-success)]">
           ✅ Now showing detailed step execution data for {selectedRepo}
         </div>
       {/if}
@@ -999,20 +1000,20 @@
   {#if isLoadingRepos || isLoadingDirspaces}
     <div class="flex justify-center items-center py-12">
       <LoadingSpinner size="lg" />
-      <span class="ml-3 text-gray-600 dark:text-gray-400">Loading analytics data...</span>
+      <span class="ml-3 text-[var(--sg-text-dim)]">Loading analytics data...</span>
     </div>
   
   <!-- Error State -->
   {:else if error}
     <div class="text-center py-12">
-      <div class="text-red-600 dark:text-red-400 mb-4">
+      <div class="text-[var(--sg-error)] mb-4">
         <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="text-lg font-medium">Error Loading Data</p>
         <p class="text-sm mt-1">{error}</p>
       </div>
-      <button on:click={loadData} class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+      <button on:click={loadData} class="px-4 py-2 bg-[var(--sg-accent-button)] text-white rounded-md hover:bg-[var(--sg-accent-button-hover)]">
         Retry
       </button>
     </div>
@@ -1022,29 +1023,29 @@
     <!-- Overall Metrics -->
     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{overallMetrics.totalRepos}</div>
-        <div class="text-xs md:text-sm text-blue-700 dark:text-blue-300 mt-1">Total Repositories</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">{overallMetrics.activeRepos} active</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{overallMetrics.totalRepos}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-accent)] mt-1">Total Repositories</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">{overallMetrics.activeRepos} active</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">{overallMetrics.totalRuns}</div>
-        <div class="text-xs md:text-sm text-green-700 dark:text-green-300 mt-1">Total Runs</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Last {dateRange} days (up to 500 runs)</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-success)]">{overallMetrics.totalRuns}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-success)] mt-1">Total Runs</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Last {dateRange} days (up to 500 runs)</div>
       </Card>
       
       <Card padding="md" class="text-center">
         <div class="text-2xl md:text-3xl font-bold {getSuccessRateColor(overallMetrics.avgSuccessRate)}">
           {overallMetrics.avgSuccessRate.toFixed(1)}%
         </div>
-        <div class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1">Avg Success Rate</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Across all repos</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Avg Success Rate</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Across all repos</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400">{overallMetrics.totalUsers}</div>
-        <div class="text-xs md:text-sm text-purple-700 dark:text-purple-300 mt-1">Active Users</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Contributing to runs</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-purple)]">{overallMetrics.totalUsers}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-purple)] mt-1">Active Users</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Contributing to runs</div>
       </Card>
     </div>
 
@@ -1052,31 +1053,31 @@
     <Card padding="md">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 md:mb-6">
         <div>
-          <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100">Repository Performance</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Based on a sample of recent runs from the selected time range</p>
+          <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)]">Repository Performance</h3>
+          <p class="text-xs text-[var(--sg-text-dim)] mt-1">Based on a sample of recent runs from the selected time range</p>
         </div>
         
         <!-- Repository Tab Controls -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <!-- Search -->
           <div class="flex items-center space-x-2">
-            <label for="search-repos" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Search:</label>
+            <label for="search-repos" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)] whitespace-nowrap">Search:</label>
             <input id="search-repos" type="text" bind:value={searchQuery} placeholder="Filter repositories..."
-                   class="flex-1 sm:flex-none border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs md:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500" />
+                   class="flex-1 sm:flex-none border-[var(--sg-border)] rounded-md shadow-sm text-xs md:text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:border-[var(--sg-accent)] focus:ring-[var(--sg-accent)]" />
           </div>
 
           <!-- Sort -->
           <div class="flex items-center space-x-2">
-            <label for="sort-by" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Sort by:</label>
+            <label for="sort-by" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)] whitespace-nowrap">Sort by:</label>
             <select id="sort-by" bind:value={sortBy}
-                    class="flex-1 sm:flex-none border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs md:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500">
+                    class="flex-1 sm:flex-none border-[var(--sg-border)] rounded-md shadow-sm text-xs md:text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:border-[var(--sg-accent)] focus:ring-[var(--sg-accent)]">
               <option value="runs">Runs</option>
               <option value="success">Success Rate</option>
               <option value="activity">Last Activity</option>
               <option value="name">Name</option>
             </select>
             <button on:click={() => sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'}
-                    class="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+                    class="p-1 text-[var(--sg-text-dim)] hover:text-[var(--sg-text-dim)]">
               {#if sortOrder === 'asc'}
                 ↑
               {:else}
@@ -1088,35 +1089,34 @@
       </div>
 
       {#if filteredRepoAnalytics.length === 0}
-        <div class="text-center py-8 text-gray-500">
-          <p class="text-sm">No repositories found</p>
-          {#if searchQuery || selectedRepo}
-            <p class="text-xs mt-1">Try adjusting your search or filters</p>
-          {/if}
-        </div>
+        <EmptyState
+          icon="mdi:source-repository"
+          title="No repositories found"
+          description={searchQuery || selectedRepo ? 'Try adjusting your search or filters' : ''}
+        />
       {:else}
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table class="min-w-full divide-y divide-[var(--sg-border-light)]">
+            <thead class="bg-[var(--sg-bg-1)]">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repository</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Runs</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Success Rate</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Duration</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environments</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">Repository</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">Runs</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">Success Rate</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">Avg Duration</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">Last Activity</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environments</th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="bg-[var(--sg-bg-1)] divide-y divide-[var(--sg-border)]">
               {#each filteredRepoAnalytics as repo}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr class="hover:bg-[var(--sg-bg-2)]">
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-gray-900 dark:text-gray-100">{repo.name}</div>
+                    <div class="font-medium text-[var(--sg-text)]">{repo.name}</div>
                     {#if repo.topUsers.length > 0}
-                      <div class="text-xs text-gray-500 dark:text-gray-400">Top users: {repo.topUsers.join(', ')}</div>
+                      <div class="text-xs text-[var(--sg-text-dim)]">Top users: {repo.topUsers.join(', ')}</div>
                     {/if}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--sg-text)]">
                     {repo.totalRuns}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
@@ -1124,21 +1124,21 @@
                       {repo.successRate.toFixed(1)}%
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--sg-text)]">
                     {formatDuration(repo.avgDuration)}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-[var(--sg-text-dim)]">
                     {formatDate(repo.lastRun)}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex flex-wrap gap-1">
                       {#each repo.environments.slice(0, 3) as env}
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]">
                           {env}
                         </span>
                       {/each}
                       {#if repo.environments.length > 3}
-                        <span class="text-xs text-gray-400 dark:text-gray-500">+{repo.environments.length - 3} more</span>
+                        <span class="text-xs text-[var(--sg-text-dim)]">+{repo.environments.length - 3} more</span>
                       {/if}
                     </div>
                   </td>
@@ -1155,33 +1155,33 @@
     <!-- Performance Overview -->
     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{performanceMetrics.totalSteps}</div>
-        <div class="text-xs md:text-sm text-blue-700 dark:text-blue-300 mt-1">Total Steps</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Executed</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{performanceMetrics.totalSteps}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-accent)] mt-1">Total Steps</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Executed</div>
       </Card>
       
       <Card padding="md" class="text-center">
         <div class="text-2xl md:text-3xl font-bold {getSuccessRateColor(performanceMetrics.successRate)}">
           {performanceMetrics.successRate.toFixed(1)}%
         </div>
-        <div class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1">Success Rate</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Overall performance</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Success Rate</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Overall performance</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400">{formatDuration(performanceMetrics.avgDuration)}</div>
-        <div class="text-xs md:text-sm text-purple-700 dark:text-purple-300 mt-1">Avg Duration</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">Per step</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-purple)]">{formatDuration(performanceMetrics.avgDuration)}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-purple)] mt-1">Avg Duration</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Per step</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-warning)]">
           {selectedStepType || selectedRepo ? filteredStepAnalytics.length : stepAnalytics.length}
         </div>
-        <div class="text-xs md:text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+        <div class="text-xs md:text-sm text-[var(--sg-warning)] mt-1">
           {selectedStepType || selectedRepo ? 'Filtered' : ''} Step Types
         </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">In workflow</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">In workflow</div>
       </Card>
     </div>
 
@@ -1191,9 +1191,9 @@
         <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 md:gap-4">
           <!-- Step Type Filter -->
           <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <label for="step-filter" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Step Type:</label>
+            <label for="step-filter" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)] whitespace-nowrap">Step Type:</label>
             <select id="step-filter" bind:value={selectedStepType}
-                    class="flex-1 sm:flex-none border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs md:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500">
+                    class="flex-1 sm:flex-none border-[var(--sg-border)] rounded-md shadow-sm text-xs md:text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:border-[var(--sg-accent)] focus:ring-[var(--sg-accent)]">
               <option value="">All Steps</option>
               {#each uniqueStepTypes as stepType}
                 <option value={stepType}>{stepType}</option>
@@ -1204,8 +1204,8 @@
           <!-- Failures Only -->
           <div class="flex items-center space-x-2">
             <input id="failures-only" type="checkbox" bind:checked={onlyShowFailures}
-                   class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:bg-gray-800 focus:ring-blue-500" />
-            <label for="failures-only" class="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300">Show failures only</label>
+                   class="rounded border-[var(--sg-border)] text-[var(--sg-accent)] bg-[var(--sg-bg-1)] focus:ring-[var(--sg-accent)]" />
+            <label for="failures-only" class="text-xs md:text-sm font-medium text-[var(--sg-text-muted)]">Show failures only</label>
           </div>
         </div>
       </Card>
@@ -1215,11 +1215,11 @@
     <Card padding="md">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 md:mb-6">
         <div>
-          <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100">Step-by-Step Analysis</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Based on a sample of recent runs from the selected time range</p>
+          <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)]">Step-by-Step Analysis</h3>
+          <p class="text-xs text-[var(--sg-text-dim)] mt-1">Based on a sample of recent runs from the selected time range</p>
         </div>
         {#if selectedStepType || selectedRepo}
-          <div class="text-xs text-gray-600 dark:text-gray-400">
+          <div class="text-xs text-[var(--sg-text-dim)]">
             {#if selectedRepo && !selectedStepType}
               Showing {filteredStepAnalytics.length} step types used by {selectedRepo}
             {:else if selectedStepType && !selectedRepo}
@@ -1234,27 +1234,26 @@
       </div>
       
       {#if filteredStepAnalytics.length === 0}
-        <div class="text-center py-8 text-gray-500">
-          <p class="text-sm">No workflow steps found for the selected criteria</p>
-          {#if selectedStepType || selectedRepo}
-            <p class="text-xs mt-1">Try adjusting your filters or selecting "All Steps" and "All Repositories"</p>
-          {/if}
-        </div>
+        <EmptyState
+          icon="mdi:cog-outline"
+          title="No workflow steps found for the selected criteria"
+          description={selectedStepType || selectedRepo ? 'Try adjusting your filters or selecting "All Steps" and "All Repositories"' : ''}
+        />
       {:else}
         <div class="relative">
           <!-- Loading overlay for detailed data -->
           {#if loadingDetailedData}
-            <div class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center z-10 rounded-md">
+            <div class="absolute inset-0 bg-[var(--sg-bg-1)] bg-opacity-75 bg-opacity-75 flex items-center justify-center z-10 rounded-md">
               <div class="text-center">
                 <LoadingSpinner size="md" />
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading detailed workflow data...</p>
+                <p class="text-sm text-[var(--sg-text-dim)] mt-2">Loading detailed workflow data...</p>
               </div>
             </div>
           {/if}
           
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {#each filteredStepAnalytics as analytics}
-            <Card padding="sm" class="bg-gray-50 dark:bg-gray-700">
+            <Card padding="sm" class="bg-[var(--sg-bg-0)]">
               
               <!-- Step Header -->
               <div class="flex items-center justify-between mb-3">
@@ -1268,7 +1267,7 @@
                   </button>
                   <button 
                     on:click={() => selectedStepType = analytics.stepType}
-                    class="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    class="font-medium text-[var(--sg-text)] hover:text-[var(--sg-accent)] transition-colors"
                     title="Filter to {analytics.stepType} steps only"
                   >
                     {analytics.stepType}
@@ -1278,7 +1277,7 @@
                 <!-- Expand/Collapse Button -->
                 <button
                   on:click={() => expandedStepAnalytic = expandedStepAnalytic === analytics.stepType ? null : analytics.stepType}
-                  class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  class="text-[var(--sg-text-dim)] hover:text-[var(--sg-text-dim)] transition-colors"
                   title={expandedStepAnalytic === analytics.stepType ? 'Collapse details' : 'Show detailed analysis'}
                 >
                   {#if expandedStepAnalytic === analytics.stepType}
@@ -1296,12 +1295,12 @@
               <!-- Metrics -->
               <div class="space-y-2">
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600 dark:text-gray-400">Executions:</span>
+                  <span class="text-[var(--sg-text-dim)]">Executions:</span>
                   <span class="font-medium">{analytics.totalExecutions}</span>
                 </div>
                 
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600 dark:text-gray-400">Success Rate:</span>
+                  <span class="text-[var(--sg-text-dim)]">Success Rate:</span>
                   <button 
                     on:click={() => {
                       selectedStepType = analytics.stepType;
@@ -1316,74 +1315,74 @@
                 </div>
                 
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600 dark:text-gray-400">Avg Duration:</span>
+                  <span class="text-[var(--sg-text-dim)]">Avg Duration:</span>
                   <span class="font-medium">{formatDuration(analytics.avgDuration)}</span>
                 </div>
                 
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600 dark:text-gray-400">Repositories:</span>
+                  <span class="text-[var(--sg-text-dim)]">Repositories:</span>
                   <span class="font-medium">{analytics.repositories.size}</span>
                 </div>
                 
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600 dark:text-gray-400">Last Executed:</span>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{formatDate(analytics.lastExecuted)}</span>
+                  <span class="text-[var(--sg-text-dim)]">Last Executed:</span>
+                  <span class="text-xs text-[var(--sg-text-dim)]">{formatDate(analytics.lastExecuted)}</span>
                 </div>
               </div>
 
               <!-- Expandable Details Section -->
               {#if expandedStepAnalytic === analytics.stepType}
-                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 space-y-3">
+                <div class="mt-4 pt-4 border-t border-[var(--sg-border)] space-y-3">
                   
                   <!-- Performance Details -->
-                  <div class="bg-white dark:bg-gray-800 rounded-md p-3">
-                    <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Performance Details</h5>
+                  <div class="bg-[var(--sg-bg-1)] rounded-md p-3">
+                    <h5 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Performance Details</h5>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                       <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Min Duration:</span>
+                        <span class="text-[var(--sg-text-dim)]">Min Duration:</span>
                         <span class="font-mono">{formatDuration(analytics.minDuration)}</span>
                       </div>
                       <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Max Duration:</span>
+                        <span class="text-[var(--sg-text-dim)]">Max Duration:</span>
                         <span class="font-mono">{formatDuration(analytics.maxDuration)}</span>
                       </div>
                       <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Success Count:</span>
-                        <span class="text-green-600 dark:text-green-400 font-medium">{analytics.successCount}</span>
+                        <span class="text-[var(--sg-text-dim)]">Success Count:</span>
+                        <span class="text-[var(--sg-success)] font-medium">{analytics.successCount}</span>
                       </div>
                       <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Failure Count:</span>
-                        <span class="text-red-600 dark:text-red-400 font-medium">{analytics.failureCount}</span>
+                        <span class="text-[var(--sg-text-dim)]">Failure Count:</span>
+                        <span class="text-[var(--sg-error)] font-medium">{analytics.failureCount}</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Repository Usage -->
-                  <div class="bg-white dark:bg-gray-800 rounded-md p-3">
-                    <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Repository Usage</h5>
+                  <div class="bg-[var(--sg-bg-1)] rounded-md p-3">
+                    <h5 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Repository Usage</h5>
                     <div class="flex flex-wrap gap-1">
                       {#each Array.from(analytics.repositories).slice(0, 5) as repo}
                         <button
                           on:click={() => selectedRepo = repo}
-                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] hover:bg-[var(--sg-accent-bg)] transition-colors"
                           title="Filter to {repo} repository"
                         >
                           {repo}
                         </button>
                       {/each}
                       {#if analytics.repositories.size > 5}
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-2 py-1">+{analytics.repositories.size - 5} more</span>
+                        <span class="text-xs text-[var(--sg-text-dim)] px-2 py-1">+{analytics.repositories.size - 5} more</span>
                       {/if}
                     </div>
                   </div>
 
                   <!-- Recent Executions -->
-                  <div class="bg-white dark:bg-gray-800 rounded-md p-3">
+                  <div class="bg-[var(--sg-bg-1)] rounded-md p-3">
                     <div class="flex items-center justify-between mb-2">
-                      <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300">Recent Executions</h5>
+                      <h5 class="text-xs font-medium text-[var(--sg-text-muted)]">Recent Executions</h5>
                       <button
                         on:click={() => selectedStepType = analytics.stepType}
-                        class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                        class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                         title="View all {analytics.stepType} executions"
                       >
                         View All →
@@ -1393,10 +1392,10 @@
                       {#each filteredSteps.filter(s => s.step === analytics.stepType).slice(0, 3) as execution}
                         <div class="flex items-center justify-between py-1">
                           <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full {execution.success ? 'bg-green-400' : 'bg-red-400'}"></span>
+                            <span class="w-2 h-2 rounded-full {execution.success ? 'bg-[var(--sg-success)]' : 'bg-[var(--sg-error)]'}"></span>
                             <button
                               on:click={() => selectedRepo = execution.repository || ''}
-                              class="text-xs font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                              class="text-xs font-medium text-[var(--sg-text)] hover:text-[var(--sg-accent)] transition-colors"
                               title="Filter to {execution.repository}"
                             >
                               {execution.repository}
@@ -1406,13 +1405,13 @@
                             {#if execution.workManifestId}
                               <button
                                 on:click={() => execution.workManifestId && navigateToRun(execution.workManifestId)}
-                                class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                                class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                                 title="View run details"
                               >
                                 Details →
                               </button>
                             {/if}
-                            <span class="text-xs text-gray-500 dark:text-gray-400">{formatDuration(execution.duration || 0)}</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">{formatDuration(execution.duration || 0)}</span>
                           </div>
                         </div>
                       {/each}
@@ -1431,25 +1430,24 @@
     <div class="mt-8">
       <Card padding="md">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-          <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Workflow Steps</h3>
+          <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)]">Recent Workflow Steps</h3>
           {#if selectedStepType || selectedRepo || onlyShowFailures}
-            <div class="text-xs text-gray-600 dark:text-gray-400">
+            <div class="text-xs text-[var(--sg-text-dim)]">
               Filtered: {filteredSteps.length} / {workflowSteps.length} steps
             </div>
           {/if}
         </div>
         
         {#if filteredSteps.length === 0}
-          <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p class="text-sm">No workflow steps found</p>
-            {#if selectedStepType || selectedRepo || onlyShowFailures}
-              <p class="text-xs mt-1">Try adjusting your filters</p>
-            {/if}
-          </div>
+          <EmptyState
+            icon="mdi:cog-outline"
+            title="No workflow steps found"
+            description={selectedStepType || selectedRepo || onlyShowFailures ? 'Try adjusting your filters' : ''}
+          />
         {:else}
           <div class="space-y-3 max-h-96 overflow-y-auto overflow-x-hidden">
             {#each filteredSteps.slice(0, 50) as step}
-              <div class="bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div class="bg-[var(--sg-bg-0)] rounded-md">
                 <div class="flex items-center justify-between p-3">
                   <div class="flex-1 min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
@@ -1462,7 +1460,7 @@
                       </button>
                       <button 
                         on:click={() => selectedRepo = step.repository || ''}
-                        class="text-xs md:text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate max-w-[150px] md:max-w-none"
+                        class="text-xs md:text-sm font-medium text-[var(--sg-text)] hover:text-[var(--sg-accent)] transition-colors truncate max-w-[150px] md:max-w-none"
                         title="Filter to {step.repository} repository"
                       >
                         {step.repository}
@@ -1476,8 +1474,8 @@
                         }}
                         class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors {
                           step.success 
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 cursor-default' 
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 cursor-pointer'
+                            ? 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] cursor-default' 
+                            : 'bg-[var(--sg-error-bg)] text-[var(--sg-error)] hover:bg-[var(--sg-error-bg)] cursor-pointer'
                         }"
                         title={step.success ? 'Successful execution' : `Filter to failed ${step.step} steps`}
                         disabled={step.success}
@@ -1485,7 +1483,7 @@
                         {step.success ? 'Success' : 'Failed'}
                       </button>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 space-y-1 md:space-y-0">
+                    <div class="text-xs text-[var(--sg-text-dim)] space-y-1 md:space-y-0">
                       <div class="flex flex-wrap items-center gap-x-2">
                         <span>{formatDate(step.created_at)}</span>
                         {#if step.duration}
@@ -1508,7 +1506,7 @@
                   <!-- Expand/Collapse Button for Workflow Steps -->
                   <button
                     on:click={() => expandedWorkflowStep = expandedWorkflowStep === `${step.workManifestId}-${step.step}-${step.idx}` ? null : `${step.workManifestId}-${step.step}-${step.idx}`}
-                    class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ml-2"
+                    class="text-[var(--sg-text-dim)] hover:text-[var(--sg-text-dim)] transition-colors ml-2"
                     title={expandedWorkflowStep === `${step.workManifestId}-${step.step}-${step.idx}` ? 'Collapse details' : 'Show step details'}
                   >
                     {#if expandedWorkflowStep === `${step.workManifestId}-${step.step}-${step.idx}`}
@@ -1525,28 +1523,28 @@
 
                 <!-- Expandable Step Details -->
                 {#if expandedWorkflowStep === `${step.workManifestId}-${step.step}-${step.idx}`}
-                  <div class="px-3 pb-3 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-b-md">
+                  <div class="px-3 pb-3 border-t border-[var(--sg-border)] bg-[var(--sg-bg-1)] rounded-b-md">
                     <div class="pt-3 space-y-3">
                       
                       <!-- Step Execution Details -->
-                      <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
-                        <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Execution Details</h6>
+                      <div class="bg-[var(--sg-bg-0)] rounded-md p-3">
+                        <h6 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Execution Details</h6>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Step Index:</span>
+                            <span class="text-[var(--sg-text-dim)]">Step Index:</span>
                             <span class="font-mono">#{step.idx}</span>
                           </div>
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">State:</span>
-                            <span class="font-medium {step.success ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">{step.state}</span>
+                            <span class="text-[var(--sg-text-dim)]">State:</span>
+                            <span class="font-medium {step.success ? 'text-[var(--sg-success)]' : 'text-[var(--sg-error)]'}">{step.state}</span>
                           </div>
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Ignore Errors:</span>
-                            <span class="font-medium {step.ignore_errors ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-600 dark:text-gray-400'}">{step.ignore_errors ? 'Yes' : 'No'}</span>
+                            <span class="text-[var(--sg-text-dim)]">Ignore Errors:</span>
+                            <span class="font-medium {step.ignore_errors ? 'text-[var(--sg-warning)]' : 'text-[var(--sg-text-dim)]'}">{step.ignore_errors ? 'Yes' : 'No'}</span>
                           </div>
                           {#if step.duration}
                             <div class="flex justify-between">
-                              <span class="text-gray-600 dark:text-gray-400">Duration:</span>
+                              <span class="text-[var(--sg-text-dim)]">Duration:</span>
                               <span class="font-mono">{formatDuration(step.duration)}</span>
                             </div>
                           {/if}
@@ -1555,25 +1553,25 @@
 
                       <!-- Scope Information -->
                       {#if step.scope && (step.scope.dir || step.scope.workspace || step.scope.type)}
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
-                          <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Scope Information</h6>
+                        <div class="bg-[var(--sg-bg-0)] rounded-md p-3">
+                          <h6 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Scope Information</h6>
                           <div class="space-y-1 text-xs">
                             {#if step.scope.dir}
                               <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Directory:</span>
-                                <span class="font-mono text-gray-900 dark:text-gray-100">{step.scope.dir}</span>
+                                <span class="text-[var(--sg-text-dim)]">Directory:</span>
+                                <span class="font-mono text-[var(--sg-text)]">{step.scope.dir}</span>
                               </div>
                             {/if}
                             {#if step.scope.workspace}
                               <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Workspace:</span>
-                                <span class="font-mono text-gray-900 dark:text-gray-100">{step.scope.workspace}</span>
+                                <span class="text-[var(--sg-text-dim)]">Workspace:</span>
+                                <span class="font-mono text-[var(--sg-text)]">{step.scope.workspace}</span>
                               </div>
                             {/if}
                             {#if step.scope.type}
                               <div class="flex justify-between">
-                                <span class="text-gray-600 dark:text-gray-400">Type:</span>
-                                <span class="font-mono text-gray-900 dark:text-gray-100">{step.scope.type}</span>
+                                <span class="text-[var(--sg-text-dim)]">Type:</span>
+                                <span class="font-mono text-[var(--sg-text)]">{step.scope.type}</span>
                               </div>
                             {/if}
                           </div>
@@ -1588,7 +1586,7 @@
                               selectedStepType = step.step;
                               selectedRepo = step.repository || '';
                             }}
-                            class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                            class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                             title="Filter to this step type and repository"
                           >
                             🔍 Filter Similar
@@ -1599,7 +1597,7 @@
                                 selectedStepType = step.step;
                                 onlyShowFailures = true;
                               }}
-                              class="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                              class="text-xs text-[var(--sg-error)] hover:text-[var(--sg-error)] transition-colors"
                               title="Show all failed {step.step} steps"
                             >
                               ❌ View Failures
@@ -1609,7 +1607,7 @@
                         {#if step.workManifestId}
                           <button
                             on:click={() => step.workManifestId && navigateToRun(step.workManifestId)}
-                            class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                            class="text-xs font-medium text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                             title="View full run details"
                           >
                             📋 View Run →
@@ -1622,7 +1620,7 @@
               </div>
             {/each}
             {#if filteredSteps.length > 50}
-              <div class="text-center py-2 text-xs text-gray-500">
+              <div class="text-center py-2 text-xs text-[var(--sg-text-dim)]">
                 Showing first 50 of {filteredSteps.length} steps
               </div>
             {/if}
@@ -1636,33 +1634,33 @@
     <!-- Drift Overview Metrics -->
     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-blue-600">{driftMetrics.totalDrifts}</div>
-        <div class="text-xs md:text-sm text-blue-700 mt-1">Drift Detections</div>
-        <div class="text-xs text-gray-500 mt-0.5 md:mt-1">Last 30 days</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{driftMetrics.totalDrifts}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-accent)] mt-1">Drift Detections</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Last 30 days</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold {driftMetrics.openDrifts > 0 ? 'text-red-600' : 'text-green-600'}">
+        <div class="text-2xl md:text-3xl font-bold {driftMetrics.openDrifts > 0 ? 'text-[var(--sg-error)]' : 'text-[var(--sg-success)]'}">
           {driftMetrics.openDrifts}
         </div>
-        <div class="text-xs md:text-sm text-gray-700 mt-1">Open Drifts</div>
-        <div class="text-xs text-gray-500 mt-0.5 md:mt-1">Requiring attention</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Open Drifts</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Requiring attention</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-2xl md:text-3xl font-bold text-purple-600">
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-purple)]">
           {formatDuration(driftMetrics.avgDriftResolutionTime)}
         </div>
-        <div class="text-xs md:text-sm text-purple-700 mt-1">Avg Resolution</div>
-        <div class="text-xs text-gray-500 mt-0.5 md:mt-1">Time to complete</div>
+        <div class="text-xs md:text-sm text-[var(--sg-purple)] mt-1">Avg Resolution</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Time to complete</div>
       </Card>
       
       <Card padding="md" class="text-center">
-        <div class="text-base md:text-lg font-bold text-yellow-600">
+        <div class="text-base md:text-lg font-bold text-[var(--sg-warning)]">
           {driftMetrics.mostDriftProneRepo || 'None'}
         </div>
-        <div class="text-xs md:text-sm text-yellow-700 mt-1">Most Drift-Prone</div>
-        <div class="text-xs text-gray-500 mt-0.5 md:mt-1">Repository</div>
+        <div class="text-xs md:text-sm text-[var(--sg-warning)] mt-1">Most Drift-Prone</div>
+        <div class="text-xs text-[var(--sg-text-dim)] mt-0.5 md:mt-1">Repository</div>
       </Card>
     </div>
 
@@ -1670,12 +1668,12 @@
     {#if isLoadingDrift}
       <div class="flex justify-center items-center py-12">
         <LoadingSpinner size="lg" />
-        <span class="ml-3 text-gray-600">Loading drift detection data...</span>
+        <span class="ml-3 text-[var(--sg-text-muted)]">Loading drift detection data...</span>
       </div>
     {:else if driftError}
-      <Card padding="lg" class="border-red-200 bg-red-50">
+      <Card padding="lg" class="border-[var(--sg-error)] bg-[var(--sg-error-bg)]">
         <div class="text-center">
-          <div class="text-red-800 mb-4">
+          <div class="text-[var(--sg-error)] mb-4">
             <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
@@ -1684,23 +1682,23 @@
           </div>
           <button
             on:click={() => loadDriftOperations()}
-            class="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            class="mt-4 px-4 py-2 bg-[var(--sg-error)] text-white rounded-md hover:bg-[var(--sg-error)]"
           >
             Retry Loading
           </button>
         </div>
       </Card>
     {:else if driftOperations.length === 0}
-      <Card padding="lg" class="border-gray-200 bg-gray-50">
+      <Card padding="lg" class="border-[var(--sg-border-light)] bg-[var(--sg-bg-1)]">
         <div class="text-center py-8">
-          <div class="text-gray-600 mb-4">
+          <div class="text-[var(--sg-text-muted)] mb-4">
             <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p class="text-lg font-medium">No Infrastructure Drift Detected</p>
             <p class="text-sm mt-1">Either no drift has been detected, or drift detection is not enabled</p>
           </div>
-          <div class="text-gray-600 text-sm">
+          <div class="text-[var(--sg-text-muted)] text-sm">
             <p>Infrastructure drift monitoring helps detect unauthorized changes to your Terraform-managed infrastructure.</p>
             <p class="mt-2">Consider enabling drift detection in your repositories to monitor infrastructure compliance.</p>
           </div>
@@ -1712,48 +1710,48 @@
       <Card padding="md" class="mb-6 md:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 md:mb-6">
           <div>
-            <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Drift Detections</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Based on recent drift operations</p>
+            <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)]">Recent Drift Detections</h3>
+            <p class="text-xs text-[var(--sg-text-dim)] mt-1">Based on recent drift operations</p>
           </div>
-          <div class="text-xs text-gray-600 dark:text-gray-400 text-left sm:text-right">
+          <div class="text-xs text-[var(--sg-text-dim)] text-left sm:text-right">
             Showing {driftOperations.length} drift operation{driftOperations.length !== 1 ? 's' : ''}
           </div>
         </div>
 
         <div class="space-y-3 md:space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto">
           {#each driftOperations as drift}
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-md">
+            <div class="bg-[var(--sg-bg-0)] rounded-md">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 gap-3">
                 <div class="flex-1 min-w-0">
                   <div class="flex flex-wrap items-center gap-2 mb-2">
                     <span class="w-3 h-3 rounded-full {
-                      drift.state === 'success' ? 'bg-green-400' :
-                      drift.state === 'failure' ? 'bg-red-400' :
-                      drift.state === 'running' ? 'bg-blue-400' :
-                      drift.state === 'queued' ? 'bg-yellow-400' :
-                      'bg-gray-400'
+                      drift.state === 'success' ? 'bg-[var(--sg-success)]' :
+                      drift.state === 'failure' ? 'bg-[var(--sg-error)]' :
+                      drift.state === 'running' ? 'bg-[var(--sg-accent)]' :
+                      drift.state === 'queued' ? 'bg-[var(--sg-warning)]' :
+                      'bg-[var(--sg-bg-2)]'
                     }"></span>
-                    <span class="font-medium text-sm md:text-base text-gray-900 dark:text-gray-100">{drift.repo}</span>
-                    <span class="text-xs md:text-sm text-gray-700 dark:text-gray-300">/{drift.dir}</span>
+                    <span class="font-medium text-sm md:text-base text-[var(--sg-text)]">{drift.repo}</span>
+                    <span class="text-xs md:text-sm text-[var(--sg-text-muted)]">/{drift.dir}</span>
                     {#if drift.workspace && drift.workspace !== 'default'}
-                      <span class="text-xs md:text-sm text-gray-700 dark:text-gray-300">:{drift.workspace}</span>
+                      <span class="text-xs md:text-sm text-[var(--sg-text-muted)]">:{drift.workspace}</span>
                     {/if}
                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {
-                      drift.state === 'success' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' :
-                      drift.state === 'failure' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200' :
-                      drift.state === 'running' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200' :
-                      drift.state === 'queued' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200' :
-                      'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
+                      drift.state === 'success' ? 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]' :
+                      drift.state === 'failure' ? 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]' :
+                      drift.state === 'running' ? 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]' :
+                      drift.state === 'queued' ? 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)]' :
+                      'bg-[var(--sg-bg-1)] bg-[var(--sg-bg-1)] text-[var(--sg-text)]'
                     }">
                       {drift.state}
                     </span>
                     {#if drift.environment}
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200">
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]">
                         {drift.environment}
                       </span>
                     {/if}
                   </div>
-                  <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <div class="text-xs md:text-sm text-[var(--sg-text-dim)]">
                     <span>Owner: {drift.owner || 'Unknown'}</span>
                     <span class="mx-2">•</span>
                     <span>Created: {formatDate(drift.created_at)}</span>
@@ -1769,7 +1767,7 @@
                 <!-- Expand/Collapse Button for Drift Items -->
                 <button
                   on:click={() => expandedDriftItem = expandedDriftItem === drift.id ? null : drift.id}
-                  class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors sm:ml-4"
+                  class="text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] transition-colors sm:ml-4"
                   title={expandedDriftItem === drift.id ? 'Collapse details' : 'Show drift details'}
                 >
                   {#if expandedDriftItem === drift.id}
@@ -1786,89 +1784,89 @@
 
               <!-- Expandable Drift Details -->
               {#if expandedDriftItem === drift.id}
-                <div class="px-3 md:px-4 pb-3 md:pb-4 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-b-md">
+                <div class="px-3 md:px-4 pb-3 md:pb-4 border-t border-[var(--sg-border)] bg-[var(--sg-bg-1)] rounded-b-md">
                   <div class="pt-4 space-y-3">
                     
                     <!-- Drift Analysis Details -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
-                      <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Drift Detection Details</h6>
+                    <div class="bg-[var(--sg-bg-0)] rounded-md p-3">
+                      <h6 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Drift Detection Details</h6>
                       <div class="grid grid-cols-2 gap-2 text-xs">
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Detection ID:</span>
+                          <span class="text-[var(--sg-text-dim)]">Detection ID:</span>
                           <span class="font-mono">{drift.id}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">State:</span>
+                          <span class="text-[var(--sg-text-dim)]">State:</span>
                           <span class="font-medium {
-                            drift.state === 'success' ? 'text-green-600 dark:text-green-400' :
-                            drift.state === 'failure' ? 'text-red-600 dark:text-red-400' :
-                            drift.state === 'running' ? 'text-blue-600 dark:text-blue-400' :
-                            'text-yellow-600 dark:text-yellow-400'
+                            drift.state === 'success' ? 'text-[var(--sg-success)]' :
+                            drift.state === 'failure' ? 'text-[var(--sg-error)]' :
+                            drift.state === 'running' ? 'text-[var(--sg-accent)]' :
+                            'text-[var(--sg-warning)]'
                           }">{drift.state}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Run Type:</span>
-                          <span class="font-medium text-gray-900 dark:text-gray-100">{drift.run_type || 'drift'}</span>
+                          <span class="text-[var(--sg-text-dim)]">Run Type:</span>
+                          <span class="font-medium text-[var(--sg-text)]">{drift.run_type || 'drift'}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Run ID:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{drift.run_id || 'N/A'}</span>
+                          <span class="text-[var(--sg-text-dim)]">Run ID:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{drift.run_id || 'N/A'}</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Infrastructure Context -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
-                      <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Infrastructure Context</h6>
+                    <div class="bg-[var(--sg-bg-0)] rounded-md p-3">
+                      <h6 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Infrastructure Context</h6>
                       <div class="space-y-1 text-xs">
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Repository:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{drift.repo}</span>
+                          <span class="text-[var(--sg-text-dim)]">Repository:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{drift.repo}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Directory:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{drift.dir}</span>
+                          <span class="text-[var(--sg-text-dim)]">Directory:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{drift.dir}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Workspace:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{drift.workspace || 'default'}</span>
+                          <span class="text-[var(--sg-text-dim)]">Workspace:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{drift.workspace || 'default'}</span>
                         </div>
                         {#if drift.environment}
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment:</span>
-                            <span class="font-mono text-gray-900 dark:text-gray-100">{drift.environment}</span>
+                            <span class="text-[var(--sg-text-dim)]">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment:</span>
+                            <span class="font-mono text-[var(--sg-text)]">{drift.environment}</span>
                           </div>
                         {/if}
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Branch:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{drift.branch || 'unknown'}</span>
+                          <span class="text-[var(--sg-text-dim)]">Branch:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{drift.branch || 'unknown'}</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Timing Information -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-3">
-                      <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Timing Information</h6>
+                    <div class="bg-[var(--sg-bg-0)] rounded-md p-3">
+                      <h6 class="text-xs font-medium text-[var(--sg-text-muted)] mb-2">Timing Information</h6>
                       <div class="space-y-1 text-xs">
                         <div class="flex justify-between">
-                          <span class="text-gray-600 dark:text-gray-400">Started:</span>
-                          <span class="font-mono text-gray-900 dark:text-gray-100">{formatDate(drift.created_at)}</span>
+                          <span class="text-[var(--sg-text-dim)]">Started:</span>
+                          <span class="font-mono text-[var(--sg-text)]">{formatDate(drift.created_at)}</span>
                         </div>
                         {#if drift.completed_at}
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Completed:</span>
-                            <span class="font-mono text-gray-900 dark:text-gray-100">{formatDate(drift.completed_at)}</span>
+                            <span class="text-[var(--sg-text-dim)]">Completed:</span>
+                            <span class="font-mono text-[var(--sg-text)]">{formatDate(drift.completed_at)}</span>
                           </div>
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Duration:</span>
-                            <span class="font-mono text-gray-900 dark:text-gray-100">
+                            <span class="text-[var(--sg-text-dim)]">Duration:</span>
+                            <span class="font-mono text-[var(--sg-text)]">
                               {formatDuration(new Date(drift.completed_at).getTime() - new Date(drift.created_at).getTime())}
                             </span>
                           </div>
                         {:else}
                           <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Status:</span>
-                            <span class="font-medium text-blue-600 dark:text-blue-400">In Progress</span>
+                            <span class="text-[var(--sg-text-dim)]">Status:</span>
+                            <span class="font-medium text-[var(--sg-accent)]">In Progress</span>
                           </div>
                         {/if}
                       </div>
@@ -1882,7 +1880,7 @@
                             selectedRepo = drift.repo;
                             activeTab = 'repository';
                           }}
-                          class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                           title="View repository analytics for {drift.repo}"
                         >
                           📊 Repository Analytics
@@ -1892,13 +1890,13 @@
                             selectedRepo = drift.repo;
                             activeTab = 'workflow';
                           }}
-                          class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                           title="View workflow analytics for {drift.repo}"
                         >
                           ⚙️ Workflow Analytics
                         </button>
                         {#if drift.state === 'failure'}
-                          <span class="text-xs text-red-600 dark:text-red-400">
+                          <span class="text-xs text-[var(--sg-error)]">
                             ❌ Investigation Required
                           </span>
                         {/if}
@@ -1908,7 +1906,7 @@
                           on:click={() => {
                             navigateToRuns(`repo:${encodeURIComponent(drift.repo)} and kind:drift`);
                           }}
-                          class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          class="text-xs font-medium text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                           title="View all drift runs for this repository"
                         >
                           🔍 View All Drifts →
@@ -1917,7 +1915,7 @@
                           on:click={() => {
                             navigateToRun(drift.id);
                           }}
-                          class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          class="text-xs font-medium text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
                           title="View this drift detection details"
                         >
                           📋 Drift Details →
@@ -1937,10 +1935,10 @@
             <button
               on:click={loadMoreDrift}
               disabled={isLoadingMoreDrift}
-              class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center px-4 py-2 border border-[var(--sg-border)] rounded-md shadow-sm text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--sg-accent)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {#if isLoadingMoreDrift}
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-[var(--sg-text-dim)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>

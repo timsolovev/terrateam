@@ -19,7 +19,7 @@
   });
 </script>
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+<div class="min-h-screen bg-[var(--sg-bg-0)] flex items-center justify-center px-4">
   <div class="max-w-md w-full space-y-8 text-center">
     <!-- Terrateam Logo -->
     <div class="flex justify-center">
@@ -36,10 +36,10 @@
     <!-- Maintenance Message -->
     <div class="space-y-6">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-bold text-[var(--sg-text)]">
           Under Maintenance
         </h1>
-        <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        <p class="mt-4 text-lg text-[var(--sg-text-muted)]">
           {message}
         </p>
       </div>
@@ -47,26 +47,26 @@
       <!-- Status Indicators -->
       <div class="space-y-4">
         <div class="flex items-center justify-center space-x-2">
-          <div class="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" aria-hidden="true"></div>
-          <span class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="w-3 h-3 bg-[var(--sg-warning)] rounded-full animate-pulse" aria-hidden="true"></div>
+          <span class="text-sm text-[var(--sg-text-dim)]">
             System Status: Maintenance Mode
           </span>
         </div>
         
-        <div class="text-xs text-gray-400 dark:text-gray-500">
+        <div class="text-xs text-[var(--sg-text-dim)]">
           Last updated: {currentTime}
         </div>
       </div>
       
       <!-- Contact Information -->
-      <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+      <div class="pt-6 border-t border-[var(--sg-border)]">
+        <p class="text-sm text-[var(--sg-text-dim)]">
           For urgent issues, please contact our support team:
         </p>
         <div class="mt-2 space-y-1">
           <a 
             href="mailto:support@terrateam.io" 
-            class="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded"
+            class="text-sm text-[var(--sg-accent)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-offset-2 rounded"
             aria-label="Contact support via email"
           >
             support@terrateam.io
@@ -76,7 +76,7 @@
             href="https://terrateamio.slack.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            class="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded"
+            class="text-sm text-[var(--sg-accent)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-offset-2 rounded"
             aria-label="Join our Slack community (opens in new tab)"
           >
             Slack Community

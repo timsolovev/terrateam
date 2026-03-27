@@ -31,7 +31,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-[var(--sg-bg-0)]">
   <!-- Desktop Sidebar (hidden on mobile) -->
   <div class="hidden md:block">
     <Sidebar {activeItem} />
@@ -60,12 +60,12 @@
   <div class="md:ml-64 flex flex-col min-h-screen">
     {#if showHeader}
       <!-- Header -->
-      <header class="shadow bg-blue-600 dark:bg-gray-800">
+      <header class="bg-[var(--sg-bg-0)] border-b border-[var(--sg-border)] sticky top-0 z-10">
         <div class="px-4 md:px-6 py-4">
           <div class="flex items-center">
             <!-- Mobile menu button -->
             <button
-              class="md:hidden mr-4 p-2 rounded-md text-white bg-white bg-opacity-10 hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-white transition-colors"
+              class="md:hidden mr-4 p-2 rounded-md text-[var(--sg-text-dim)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] transition-colors"
               on:click={toggleMobileMenu}
               aria-label="Open navigation menu"
             >
@@ -73,11 +73,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            
+
             <div class="flex-1">
-              <h1 class="text-lg md:text-2xl font-semibold text-white">{title}</h1>
+              <h1 class="text-lg md:text-2xl font-semibold text-[var(--sg-text)]">{title}</h1>
               {#if subtitle}
-                <p class="text-xs md:text-sm text-blue-100 mt-1">{subtitle}</p>
+                <p class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">{subtitle}</p>
               {/if}
             </div>
           </div>
@@ -87,26 +87,26 @@
 
     <!-- Getting Started Banner (shown when no installations are connected) -->
     {#if !$installationsLoading && $installations.length === 0 && activeItem !== 'getting-started' && activeItem !== 'login'}
-      <div class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-b border-green-200 dark:border-green-800">
+      <div class="bg-[var(--sg-success-bg)] border-b border-[var(--sg-success)]">
         <div class="px-4 md:px-6 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-[var(--sg-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                <p class="text-sm font-medium text-[var(--sg-success)]">
                   Ready to get started with Terrateam?
                 </p>
-                <p class="text-xs text-green-700 dark:text-green-300">
+                <p class="text-xs text-[var(--sg-success)]">
                   Connect your {VCS_PROVIDERS[currentProvider].displayName} {terminology.organization.toLowerCase()} to start automating your Terraform workflows
                 </p>
               </div>
             </div>
             <button
-              class="flex items-center space-x-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              class="flex items-center space-x-2 bg-[var(--sg-success)] hover:bg-[var(--sg-success)] hover:opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sg-success)] focus:ring-offset-2"
               on:click={() => window.location.hash = '#/getting-started'}
               aria-label="Go to getting started page"
             >

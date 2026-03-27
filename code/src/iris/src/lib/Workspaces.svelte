@@ -8,6 +8,7 @@
   import { navigateToWorkspace } from './utils/navigation';
   import LoadingSpinner from './components/ui/LoadingSpinner.svelte';
   import ErrorMessage from './components/ui/ErrorMessage.svelte';
+  import EmptyState from './components/ui/EmptyState.svelte';
   import Card from './components/ui/Card.svelte';
   import ClickableCard from './components/ui/ClickableCard.svelte';
   import { VCS_PROVIDERS } from './vcs/providers';
@@ -208,17 +209,17 @@
   function getStateColor(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failure':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'running':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'queued':
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
+        return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)]';
       case 'aborted':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
     }
   }
   
@@ -282,20 +283,20 @@
   <!-- Summary Cards -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
     <Card padding="md" class="text-center">
-      <div class="text-2xl md:text-3xl font-bold text-brand-primary">{totalWorkspaceCount}</div>
-      <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Workspaces Loaded</div>
+      <div class="text-2xl md:text-3xl font-bold text-[var(--sg-text)]">{totalWorkspaceCount}</div>
+      <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Workspaces Loaded</div>
     </Card>
     <Card padding="md" class="text-center">
-      <div class="text-2xl md:text-3xl font-bold text-brand-primary">{totalRepositories}</div>
-      <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Repositories</div>
+      <div class="text-2xl md:text-3xl font-bold text-[var(--sg-text)]">{totalRepositories}</div>
+      <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Repositories</div>
     </Card>
     <Card padding="md" class="text-center">
-      <div class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">{successfulWorkspaces}</div>
-      <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Successful</div>
+      <div class="text-2xl md:text-3xl font-bold text-[var(--sg-success)]">{successfulWorkspaces}</div>
+      <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Successful</div>
     </Card>
     <Card padding="md" class="text-center">
-      <div class="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400">{failedWorkspaces}</div>
-      <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Failed</div>
+      <div class="text-2xl md:text-3xl font-bold text-[var(--sg-error)]">{failedWorkspaces}</div>
+      <div class="text-xs md:text-sm text-[var(--sg-text-muted)] mt-1">Failed</div>
     </Card>
   </div>
 
@@ -308,18 +309,18 @@
           type="text"
           bind:value={searchQuery}
           placeholder="Search repositories..."
-          class="w-full px-4 py-2 pl-10 pr-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-colors"
+          class="w-full px-4 py-2 pl-10 pr-4 text-[var(--sg-text)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent transition-colors"
           aria-label="Search repositories"
         />
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-[var(--sg-text-dim)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
         {#if searchQuery}
           <button
             on:click={() => searchQuery = ''}
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)]"
             aria-label="Clear search"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +331,7 @@
       </div>
       
       <!-- Results Info and Pagination Info -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm text-[var(--sg-text-muted)]">
         <div>
           {#if searchQuery}
             <p>Found {filteredRepositories.length} repositor{filteredRepositories.length === 1 ? 'y' : 'ies'} matching "{searchQuery}"</p>
@@ -349,7 +350,7 @@
   
   <!-- Lazy loading info -->
   {#if paginatedRepositories.length > 0 && totalWorkspaceCount === 0 && !isLoadingRepositories}
-    <div class="mb-6 text-sm text-gray-600 dark:text-gray-400 text-center">
+    <div class="mb-6 text-sm text-[var(--sg-text-muted)] text-center">
       <p>Click on a repository below to load its workspaces</p>
     </div>
   {/if}
@@ -360,25 +361,25 @@
     <div class="flex flex-col items-center py-12">
       <LoadingSpinner size="lg" />
       <div class="mt-4 text-center">
-        <p class="text-gray-600 dark:text-gray-400">Loading installations...</p>
+        <p class="text-[var(--sg-text-muted)]">Loading installations...</p>
       </div>
     </div>
   {:else if !$selectedInstallation}
     <!-- Demo Mode Message -->
-    <Card padding="lg" class="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+    <Card padding="lg" class="border-[var(--sg-accent)] bg-[var(--sg-accent-bg)]">
       <div class="text-center">
         <div class="flex justify-center mb-4">
-          <svg class="w-16 h-16 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-[var(--sg-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Demo Mode - Workspaces</h3>
-        <p class="text-blue-700 dark:text-blue-300 mb-6">
+        <h3 class="text-xl font-semibold text-[var(--sg-accent)] mb-2">Demo Mode - Workspaces</h3>
+        <p class="text-[var(--sg-accent)] mb-6">
           You're viewing the workspaces page in demo mode. Once you connect a {VCS_PROVIDERS[currentProvider].displayName} {terminology.organization.toLowerCase()}, you'll see your actual Terraform workspaces and their status.
         </p>
         
         <div class="grid gap-4 mb-6">
-          <div class="text-sm text-blue-600 dark:text-blue-400 bg-white dark:bg-blue-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+          <div class="text-sm text-[var(--sg-accent)] bg-[var(--sg-bg-1)] rounded-lg p-4 border border-[var(--sg-accent)]">
             <div class="font-semibold mb-2">What you'll see here:</div>
             <ul class="text-left space-y-1">
               <li>• All your Terraform workspaces across repositories</li>
@@ -395,9 +396,9 @@
           hover={true}
           on:click={() => window.location.hash = '#/getting-started'}
           aria-label="Go to getting started to connect a repository"
-          class="inline-block bg-white dark:bg-blue-800/30 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500"
+          class="inline-block bg-[var(--sg-bg-1)] border-[var(--sg-accent)] hover:border-[var(--sg-accent)]"
         >
-          <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+          <div class="flex items-center space-x-2 text-[var(--sg-accent)]">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
@@ -410,35 +411,29 @@
     <div class="flex flex-col items-center py-12">
       <LoadingSpinner size="lg" />
       <div class="mt-4 text-center">
-        <p class="text-gray-600 dark:text-gray-400">Loading repositories...</p>
+        <p class="text-[var(--sg-text-muted)]">Loading repositories...</p>
       </div>
     </div>
   {:else if error}
     <ErrorMessage type="error" message={error} />
   {:else if repositories.length === 0 && !searchQuery}
-    <Card padding="lg" class="text-center">
-      <div class="text-6xl mb-4">📦</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Repositories Found</h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">
-        No repositories are connected to this installation yet.
-      </p>
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Join our Slack community</a>
-      </p>
+    <Card padding="lg">
+      <EmptyState icon="mdi:package-variant" title="No Repositories Found" description="No repositories are connected to this installation yet.">
+        <p class="mt-2 text-sm text-[var(--sg-text-dim)]">
+          Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-[var(--sg-accent)] hover:underline">Join our Slack community</a>
+        </p>
+      </EmptyState>
     </Card>
   {:else if filteredRepositories.length === 0 && searchQuery}
-    <Card padding="lg" class="text-center">
-      <div class="text-6xl mb-4">🔍</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Repositories Found</h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">
-        No repositories match your search "{searchQuery}".
-      </p>
-      <button
-        on:click={() => searchQuery = ''}
-        class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Clear Search
-      </button>
+    <Card padding="lg">
+      <EmptyState icon="mdi:magnify" title="No Repositories Found" description={`No repositories match your search "${searchQuery}".`}>
+        <button
+          on:click={() => searchQuery = ''}
+          class="mt-4 px-4 py-2 bg-[var(--sg-accent-button)] text-white rounded-lg hover:bg-[var(--sg-accent-button-hover)] transition-colors"
+        >
+          Clear Search
+        </button>
+      </EmptyState>
     </Card>
   {:else}
     <!-- Repository Listings -->
@@ -453,15 +448,15 @@
           <!-- Repository Header -->
           <button
             on:click={() => toggleRepoCollapse(repoName)}
-            class="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            class="w-full px-4 md:px-6 py-3 md:py-4 bg-[var(--sg-bg-2)] border-b border-[var(--sg-border)] flex items-center justify-between hover:bg-[var(--sg-bg-2)] transition-colors"
           >
             <div class="flex items-center space-x-2 md:space-x-3">
-              <div class="text-base md:text-lg">
-                {collapsedRepos.has(repoName) ? '▶️' : '🔽'}
-              </div>
+              <svg class="w-5 h-5 transition-transform {collapsedRepos.has(repoName) ? '' : 'rotate-90'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
               <div class="text-left min-w-0 flex-1">
-                <h3 class="text-base md:text-lg font-semibold text-brand-primary truncate">{repoName}</h3>
-                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)] truncate">{repoName}</h3>
+                <p class="text-xs md:text-sm text-[var(--sg-text-muted)]">
                   {#if loadedRepos.has(repoName)}
                     {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''}
                   {:else if isLoading}
@@ -477,10 +472,10 @@
                 <LoadingSpinner size="sm" />
               {:else if loadedRepos.has(repoName) && workspaces.length > 0}
                 <!-- Status summary for this repo -->
-                <span class="text-xs px-1.5 md:px-2 py-0.5 md:py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full">
+                <span class="text-xs px-1.5 md:px-2 py-0.5 md:py-1 bg-[var(--sg-success-bg)] text-[var(--sg-success)] rounded-full">
                   {workspaces.filter(ws => ws.state === 'success').length} ✅
                 </span>
-                <span class="text-xs px-1.5 md:px-2 py-0.5 md:py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 rounded-full">
+                <span class="text-xs px-1.5 md:px-2 py-0.5 md:py-1 bg-[var(--sg-error-bg)] text-[var(--sg-error)] rounded-full">
                   {workspaces.filter(ws => ws.state === 'failure').length} ❌
                 </span>
               {/if}
@@ -490,37 +485,37 @@
           <!-- Workspace List -->
           {#if !collapsedRepos.has(repoName)}
             {#if hasError}
-              <div class="p-4 bg-red-50 dark:bg-red-900/20">
+              <div class="p-4 bg-[var(--sg-error-bg)]">
                 <ErrorMessage type="error" message={`Failed to load workspaces: ${hasError}`} />
               </div>
             {:else if isLoading}
               <div class="p-8 text-center">
                 <LoadingSpinner size="md" />
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading workspaces...</p>
+                <p class="text-sm text-[var(--sg-text-muted)] mt-2">Loading workspaces...</p>
               </div>
             {:else if !loadedRepos.has(repoName)}
-              <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+              <div class="p-8 text-center text-[var(--sg-text-dim)]">
                 <p class="text-sm">Click the repository header to load workspaces</p>
               </div>
             {:else if workspaces.length === 0}
-              <div class="p-8 text-center text-gray-500 dark:text-gray-400">
-                <p>No workspaces found for this repository</p>
+              <div class="p-8">
+                <EmptyState title="No workspaces found" description="No workspaces found for this repository" />
               </div>
             {:else}
-              <div class="divide-y divide-gray-200 dark:divide-gray-600">
+              <div class="divide-y divide-[var(--sg-divider)]">
                 {#each workspaces as workspace}
                 <button
                   on:click={() => navigateToWorkspace(workspace.repo, workspace.dir, workspace.workspace)}
-                  class="w-full p-4 md:p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  class="w-full p-4 md:p-6 text-left hover:bg-[var(--sg-bg-2)] transition-colors cursor-pointer"
                 >
                   <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-2">
-                        <h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate" title={workspace.dir}>
+                        <h4 class="text-base md:text-lg font-medium text-[var(--sg-text)] hover:text-[var(--sg-accent)] transition-colors truncate" title={workspace.dir}>
                           📁 {workspace.dir}
                         </h4>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                          <span class="text-xs md:text-sm px-2 py-0.5 md:py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full font-mono whitespace-nowrap" title="Workspace: {workspace.workspace}">
+                          <span class="text-xs md:text-sm px-2 py-0.5 md:py-1 bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] rounded-full font-mono whitespace-nowrap" title="Workspace: {workspace.workspace}">
                             {workspace.workspace}
                           </span>
                           <span class={`text-xs px-2 py-0.5 md:py-1 rounded-full font-medium whitespace-nowrap ${getStateColor(workspace.state)}`} title="Status: {workspace.state}">
@@ -529,7 +524,7 @@
                         </div>
                       </div>
                       
-                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 text-xs md:text-sm text-[var(--sg-text-muted)]">
                         <div class="truncate">
                           <span class="font-medium">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment:</span>
                           <span class="ml-1">{workspace.environment || 'default'}</span>
@@ -545,14 +540,14 @@
                       </div>
                       
                       {#if workspace.user}
-                        <div class="mt-2 text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        <div class="mt-2 text-xs md:text-sm text-[var(--sg-text-muted)] truncate">
                           <span class="font-medium">Last User:</span>
                           <span class="ml-1">{workspace.user}</span>
                         </div>
                       {/if}
                       
                       {#if workspace.branch && workspace.branch !== workspace.base_branch}
-                        <div class="mt-2 text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        <div class="mt-2 text-xs md:text-sm text-[var(--sg-text-muted)] truncate">
                           <span class="font-medium">Branch:</span>
                           <span class="ml-1 font-mono">{workspace.branch}</span>
                           <span class="mx-1 md:mx-2">→</span>
@@ -562,8 +557,8 @@
                     </div>
                     
                     <div class="flex items-center space-x-2 flex-shrink-0">
-                      <span class="hidden md:inline text-sm text-gray-500 dark:text-gray-400">Click for details →</span>
-                      <svg class="w-4 h-4 text-gray-400 md:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <span class="hidden md:inline text-sm text-[var(--sg-text-dim)]">Click for details →</span>
+                      <svg class="w-4 h-4 text-[var(--sg-text-dim)] md:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -586,7 +581,7 @@
           <button
             on:click={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-3 py-2 text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             aria-label="Previous page"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -601,8 +596,8 @@
                 on:click={() => goToPage(i + 1)}
                 class="px-3 py-2 text-sm font-medium rounded-lg transition-colors {
                   currentPage === i + 1
-                    ? 'bg-brand-primary text-white'
-                    : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-[var(--sg-accent-button)] text-white'
+                    : 'text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)]'
                 }"
                 aria-label="Go to page {i + 1}"
                 aria-current={currentPage === i + 1 ? 'page' : undefined}
@@ -615,13 +610,13 @@
             {#if currentPage > 3}
               <button
                 on:click={() => goToPage(1)}
-                class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                class="px-3 py-2 text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg hover:bg-[var(--sg-bg-2)] transition-colors"
                 aria-label="Go to page 1"
               >
                 1
               </button>
               {#if currentPage > 4}
-                <span class="px-2 text-gray-500">...</span>
+                <span class="px-2 text-[var(--sg-text-dim)]">...</span>
               {/if}
             {/if}
             
@@ -632,8 +627,8 @@
                   on:click={() => goToPage(pageNum)}
                   class="px-3 py-2 text-sm font-medium rounded-lg transition-colors {
                     currentPage === pageNum
-                      ? 'bg-brand-primary text-white'
-                      : 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-[var(--sg-accent-button)] text-white'
+                      : 'text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)]'
                   }"
                   aria-label="Go to page {pageNum}"
                   aria-current={currentPage === pageNum ? 'page' : undefined}
@@ -645,11 +640,11 @@
             
             {#if currentPage < totalPages - 2}
               {#if currentPage < totalPages - 3}
-                <span class="px-2 text-gray-500">...</span>
+                <span class="px-2 text-[var(--sg-text-dim)]">...</span>
               {/if}
               <button
                 on:click={() => goToPage(totalPages)}
-                class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                class="px-3 py-2 text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg hover:bg-[var(--sg-bg-2)] transition-colors"
                 aria-label="Go to page {totalPages}"
               >
                 {totalPages}
@@ -661,7 +656,7 @@
           <button
             on:click={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-3 py-2 text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             aria-label="Next page"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -672,19 +667,19 @@
         
         <!-- Items per page selector -->
         <div class="flex items-center gap-2 text-sm">
-          <label for="items-per-page" class="text-gray-700 dark:text-gray-300">Show:</label>
+          <label for="items-per-page" class="text-[var(--sg-text-muted)]">Show:</label>
           <select
             id="items-per-page"
             bind:value={itemsPerPage}
             on:change={() => currentPage = 1}
-            class="px-3 py-1 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+            class="px-3 py-1 text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent"
           >
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
           </select>
-          <span class="text-gray-700 dark:text-gray-300">per page</span>
+          <span class="text-[var(--sg-text-muted)]">per page</span>
         </div>
       </div>
     {/if}

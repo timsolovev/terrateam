@@ -8,9 +8,11 @@
   import Card from './components/ui/Card.svelte';
   import ClickableCard from './components/ui/ClickableCard.svelte';
   import LinkCard from './components/ui/LinkCard.svelte';
+  import EmptyState from './components/ui/EmptyState.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { navigateToRun as navigateToRunUtil, navigateToRuns } from './utils/navigation';
   import { VCS_PROVIDERS } from './vcs/providers';
+  import { LoadingSpinner } from './components';
   import { EXTERNAL_URLS } from './constants';
 
   // Note: Terraform summary functionality removed due to memory safety concerns
@@ -777,12 +779,12 @@
 
   function getStateColor(state: string): string {
     switch (state) {
-      case 'success': return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700';
-      case 'failure': return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700';
-      case 'running': return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700';
+      case 'success': return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] border-[var(--sg-success)]';
+      case 'failure': return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)] border-[var(--sg-error)]';
+      case 'running': return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border-[var(--sg-accent)]';
       case 'pending': 
-      case 'queued': return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700';
-      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
+      case 'queued': return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border-[var(--sg-warning)]';
+      default: return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)] border-[var(--sg-border)]';
     }
   }
 
@@ -936,7 +938,7 @@
           updateURLWithQuery('');
           loadRuns();
         }}
-        class="inline-flex items-center px-3 md:px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm"
+        class="inline-flex items-center px-3 md:px-4 py-2 text-sm font-medium text-[var(--sg-text-dim)] bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-md hover:bg-[var(--sg-bg-2)] hover:text-[var(--sg-text-muted)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--sg-accent)] transition-colors shadow-sm"
       >
         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -949,7 +951,7 @@
   <!-- View Mode Selector (only show when not viewing a specific repository) -->
   {#if !basicFilters.repo}
     <div class="mb-6">
-      <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full sm:w-fit">
+      <div class="flex items-center space-x-1 bg-[var(--sg-bg-2)] rounded-lg p-1 w-full sm:w-fit">
         <button
           on:click={() => {
             viewMode = 'overview';
@@ -959,7 +961,7 @@
             loadRecentFailures();
             loadRecentSuccesses();
           }}
-          class="flex-1 sm:flex-initial px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors {viewMode === 'overview' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+          class="flex-1 sm:flex-initial px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors {viewMode === 'overview' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
         >
           🏠 Overview
         </button>
@@ -973,7 +975,7 @@
               loadRuns();
             }
           }}
-          class="flex-1 sm:flex-initial px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors {viewMode === 'search' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+          class="flex-1 sm:flex-initial px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors {viewMode === 'search' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
         >
           🔍 Search
         </button>
@@ -983,25 +985,25 @@
 
   {#if $installationsLoading}
     <div class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="ml-3 text-gray-600 dark:text-gray-400">Loading organizations...</span>
+      <LoadingSpinner size="lg" centered={false} />
+      <span class="ml-3 text-[var(--sg-text-dim)]">Loading organizations...</span>
     </div>
   {:else if !$selectedInstallation}
     <!-- Demo Mode Message -->
-    <Card padding="lg" class="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+    <Card padding="lg" class="border-[var(--sg-accent)] bg-[var(--sg-accent-bg)]">
       <div class="text-center">
         <div class="flex justify-center mb-4">
-          <svg class="w-16 h-16 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-[var(--sg-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Demo Mode - Runs</h3>
-        <p class="text-blue-700 dark:text-blue-300 mb-6">
+        <h3 class="text-xl font-semibold text-[var(--sg-accent)] mb-2">Demo Mode - Runs</h3>
+        <p class="text-[var(--sg-accent)] mb-6">
           You're viewing the runs page in demo mode. Once you connect a {VCS_PROVIDERS[currentProvider].displayName} {terminology.organization.toLowerCase()}, you'll see your real run history and can track Terraform operations.
         </p>
         
         <div class="grid gap-4 mb-6">
-          <div class="text-sm text-blue-600 dark:text-blue-400 bg-white dark:bg-blue-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+          <div class="text-sm text-[var(--sg-accent)] bg-[var(--sg-bg-1)] rounded-lg p-4 border border-[var(--sg-accent)]">
             <div class="font-semibold mb-2">What you'll see here:</div>
             <ul class="text-left space-y-1">
               <li>• Real-time run status (running, success, failure)</li>
@@ -1018,9 +1020,9 @@
           hover={true}
           on:click={() => window.location.hash = '#/getting-started'}
           aria-label="Go to getting started to connect a repository"
-          class="inline-block bg-white dark:bg-blue-800/30 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500"
+          class="inline-block bg-[var(--sg-bg-1)] border-[var(--sg-accent)] hover:border-[var(--sg-accent)]"
         >
-          <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+          <div class="flex items-center space-x-2 text-[var(--sg-accent)]">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
@@ -1030,16 +1032,16 @@
       </div>
     </Card>
   {:else if error}
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+        <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-md p-4 mb-6">
           <div class="flex">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg class="h-5 w-5 text-[var(--sg-error)]" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Error</h3>
-              <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+              <h3 class="text-sm font-medium text-[var(--sg-error)]">Error</h3>
+              <div class="mt-2 text-sm text-[var(--sg-error)]">
                 <p>{error}</p>
               </div>
             </div>
@@ -1051,20 +1053,20 @@
       <!-- OVERVIEW MODE -->
       <div class="space-y-6">
         <!-- Recent Activity Tabbed Section -->
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow overflow-hidden">
+        <div class="bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg shadow overflow-hidden">
           <!-- Tab Headers -->
-          <div class="border-b border-gray-200 dark:border-gray-700">
+          <div class="border-b border-[var(--sg-border)]">
             <nav class="flex flex-col sm:flex-row sm:space-x-0" aria-label="Recent Activity">
               <button
                 on:click={() => activeTab = 'active'}
-                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'active' ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'active' ? 'border-[var(--sg-accent)] text-[var(--sg-accent)] bg-[var(--sg-accent-bg)]' : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)]'}"
               >
                 <div class="flex items-center justify-center flex-wrap gap-1">
                   <span class="hidden sm:inline mr-1">🔄</span>
                   <span>Active</span>
                   <span class="hidden lg:inline">Operations</span>
                   {#if activeOperations.length > 0}
-                    <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
+                    <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]">
                       {activeOperations.length}
                     </span>
                   {/if}
@@ -1072,7 +1074,7 @@
               </button>
               <button
                 on:click={() => activeTab = 'failures'}
-                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'failures' ? 'border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'failures' ? 'border-[var(--sg-error)] text-[var(--sg-error)] bg-[var(--sg-error-bg)]' : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)]'}"
               >
                 <div class="flex items-center justify-center flex-wrap gap-1">
                   <span class="hidden sm:inline mr-1">🚨</span>
@@ -1082,7 +1084,7 @@
               </button>
               <button
                 on:click={() => activeTab = 'successes'}
-                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'successes' ? 'border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                class="flex-1 py-3 px-2 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-center sm:border-b-2 border-l-4 sm:border-l-0 transition-colors {activeTab === 'successes' ? 'border-[var(--sg-success)] text-[var(--sg-success)] bg-[var(--sg-success-bg)]' : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)]'}"
               >
                 <div class="flex items-center justify-center flex-wrap gap-1">
                   <span class="hidden sm:inline mr-1">✅</span>
@@ -1100,11 +1102,11 @@
               <div class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
-                    <h2 class="text-base md:text-lg font-semibold text-blue-800 dark:text-blue-400">Active Operations</h2>
-                    <p class="text-xs md:text-sm text-blue-600 dark:text-blue-400">Running and pending Terraform operations</p>
+                    <h2 class="text-base md:text-lg font-semibold text-[var(--sg-accent)]">Active Operations</h2>
+                    <p class="text-xs md:text-sm text-[var(--sg-accent)]">Running and pending Terraform operations</p>
                   </div>
-                  <div class="flex items-center space-x-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                    <div class="w-2 h-2 bg-green-400 dark:bg-green-500 rounded-full animate-pulse"></div>
+                  <div class="flex items-center space-x-2 text-xs md:text-sm text-[var(--sg-text-dim)]">
+                    <div class="w-2 h-2 bg-[var(--sg-success)] rounded-full animate-pulse"></div>
                     <span>Auto-refreshing</span>
                   </div>
                 </div>
@@ -1112,8 +1114,8 @@
 
               {#if isLoadingActive && !hasLoadedActive}
                 <div class="flex justify-center items-center py-8">
-                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                  <span class="ml-3 text-gray-600 dark:text-gray-400">Loading active operations...</span>
+                  <LoadingSpinner size="md" centered={false} />
+                  <span class="ml-3 text-[var(--sg-text-dim)]">Loading active operations...</span>
                 </div>
               {:else if activeOperations.length > 0}
 
@@ -1136,7 +1138,7 @@
                         navigateToRunUtil(operation.id);
                       }}
                       aria-label="View operation {operation.run_type} in {operation.repo}/{operation.dir}"
-                      class="bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
+                      class="bg-[var(--sg-bg-0)] hover:bg-[var(--sg-accent-bg)] border border-[var(--sg-border)] hover:border-[var(--sg-accent)]"
                     >
                       <div class="flex items-center justify-between">
                         <div class="flex-1 min-w-0">
@@ -1146,17 +1148,17 @@
                                 {getStateIcon(operation.state)} {operation.state.toUpperCase()}
                               </span>
                               <div class="flex-1 min-w-0">
-                                <div class="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">
+                                <div class="text-xs sm:text-sm font-medium text-[var(--sg-text)]">
                                   {operation.run_type}
                                 </div>
-                                <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">
+                                <div class="text-xs sm:text-sm text-[var(--sg-text-dim)] break-words">
                                   {operation.repo}/{operation.dir}
                                 </div>
                               </div>
                             </div>
                           </div>
                           
-                          <div class="text-xs text-gray-500 dark:text-gray-400 space-y-0.5">
+                          <div class="text-xs text-[var(--sg-text-dim)] space-y-0.5">
                             <div>Started {formatDateTime(operation.created_at)}</div>
                             <div>Duration: {formatDuration(duration)}</div>
                             {#if operation.workspace && operation.workspace !== 'default'}
@@ -1170,7 +1172,7 @@
                         </div>
                         
                         <div class="flex items-center ml-2 sm:ml-4">
-                          <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg class="w-4 h-4 text-[var(--sg-text-dim)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
@@ -1180,7 +1182,7 @@
                 </div>
               {:else}
                 <div class="text-center py-8">
-                  <p class="text-gray-600 dark:text-gray-400 text-sm">
+                  <p class="text-[var(--sg-text-dim)] text-sm">
                     No active Terraform operations running right now. When operations start, they'll appear here.
                   </p>
                 </div>
@@ -1190,13 +1192,13 @@
               <!-- Failures Content -->
               <div class="flex items-center justify-between mb-4">
                 <div>
-                  <h2 class="text-lg font-semibold text-red-800 dark:text-red-400">Recent Failures</h2>
-                  <p class="text-sm text-red-600 dark:text-red-400">Latest failed runs that need attention</p>
+                  <h2 class="text-lg font-semibold text-[var(--sg-error)]">Recent Failures</h2>
+                  <p class="text-sm text-[var(--sg-error)]">Latest failed runs that need attention</p>
                 </div>
                 {#if recentFailures.length > 0}
                   <a 
                     href={getRunHref('state:failure')}
-                    class="text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 font-medium"
+                    class="text-sm text-[var(--sg-error)] hover:text-[var(--sg-error)] font-medium"
                   >
                     View all failures →
                   </a>
@@ -1205,13 +1207,13 @@
 
               {#if isLoadingFailures}
                 <div class="flex justify-center py-8">
-                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+                  <LoadingSpinner size="sm" color="error" centered={false} />
                 </div>
               {:else if recentFailures.length === 0 && hasLoadedFailures}
                 <div class="text-center py-8">
                   <div class="text-4xl mb-2">✅</div>
-                  <p class="text-red-700 dark:text-red-400 font-medium">No recent failures</p>
-                  <p class="text-sm text-red-600 dark:text-red-400 mt-1">All runs are running smoothly</p>
+                  <p class="text-[var(--sg-error)] font-medium">No recent failures</p>
+                  <p class="text-sm text-[var(--sg-error)] mt-1">All runs are running smoothly</p>
                 </div>
               {:else}
                 <div class="space-y-3">
@@ -1226,53 +1228,53 @@
                         e.preventDefault();
                         navigateToRun(failure.id);
                       }}
-                      class="block w-full text-left p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-300 dark:hover:border-red-700 transition-colors cursor-pointer"
+                      class="block w-full text-left p-4 bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg hover:bg-[var(--sg-error-bg)] hover:border-[var(--sg-error)] transition-colors cursor-pointer"
                     >
                       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div class="flex-1">
                           <!-- Repository and Type -->
                           <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
-                            <span class="font-medium text-red-800 dark:text-red-400">{failure.repo}</span>
+                            <span class="font-medium text-[var(--sg-error)]">{failure.repo}</span>
                             <!-- Plan/Apply Badge for failures -->
                             {#if failure.run_type === 'plan'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700" title="Click to view run details">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-error-bg)] text-[var(--sg-error)] border border-[var(--sg-error)]" title="Click to view run details">
                                 📋 Plan
                               </span>
                             {:else if failure.run_type === 'apply'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-error-bg)] text-[var(--sg-error)] border border-[var(--sg-error)]">
                                 🚀 Apply
                               </span>
                             {:else}
-                              <span class="text-sm text-red-700 dark:text-red-300">{failure.run_type}</span>
+                              <span class="text-sm text-[var(--sg-error)]">{failure.run_type}</span>
                             {/if}
                             
                             <!-- Drift Detection Indicator for failures -->
                             {#if failure.kind === 'drift'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-700">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border border-[var(--sg-warning)]">
                                 🔍 Drift
                               </span>
                             {/if}
                           </div>
                           
                           <!-- Branch and Directory -->
-                          <div class="text-sm text-red-700 dark:text-red-300 mb-1">
+                          <div class="text-sm text-[var(--sg-error)] mb-1">
                             {failure.branch}
                             {#if failure.dir}
-                              <span class="text-xs text-red-600 dark:text-red-400"> • </span>
-                              <span class="text-xs text-red-600 dark:text-red-400 font-mono">{failure.dir}</span>
+                              <span class="text-xs text-[var(--sg-error)]"> • </span>
+                              <span class="text-xs text-[var(--sg-error)] font-mono">{failure.dir}</span>
                             {/if}
                             {#if failure.workspace && failure.workspace !== 'default'}
-                              <span class="text-xs text-red-600 dark:text-red-400"> • </span>
-                              <span class="text-xs text-red-600 dark:text-red-400">workspace: {failure.workspace}</span>
+                              <span class="text-xs text-[var(--sg-error)]"> • </span>
+                              <span class="text-xs text-[var(--sg-error)]">workspace: {failure.workspace}</span>
                             {/if}
                             {#if failure.environment}
-                              <span class="text-xs text-red-600 dark:text-red-400"> • </span>
-                              <span class="text-xs text-red-600 dark:text-red-400">env: {failure.environment}</span>
+                              <span class="text-xs text-[var(--sg-error)]"> • </span>
+                              <span class="text-xs text-[var(--sg-error)]">env: {failure.environment}</span>
                             {/if}
                           </div>
                           
                           <!-- Timestamp and User -->
-                          <div class="text-xs text-red-600 dark:text-red-400">
+                          <div class="text-xs text-[var(--sg-error)]">
                             Failed {formatDateTime(failure.created_at)}
                             {#if failure.user}
                               • by {failure.user}
@@ -1282,10 +1284,10 @@
                         
                         <!-- Status Badge and Arrow -->
                         <div class="flex items-center space-x-2 self-start sm:self-center">
-                          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--sg-error-bg)] text-[var(--sg-error)]">
                             Failed
                           </span>
-                          <svg class="w-4 h-4 text-red-400 dark:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg class="w-4 h-4 text-[var(--sg-error)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
@@ -1298,13 +1300,13 @@
               <!-- Successes Content -->
               <div class="flex items-center justify-between mb-4">
                 <div>
-                  <h2 class="text-lg font-semibold text-green-800 dark:text-green-400">Recent Successes</h2>
-                  <p class="text-sm text-green-600 dark:text-green-400">Latest successful runs</p>
+                  <h2 class="text-lg font-semibold text-[var(--sg-success)]">Recent Successes</h2>
+                  <p class="text-sm text-[var(--sg-success)]">Latest successful runs</p>
                 </div>
                 {#if recentSuccesses.length > 0}
                   <a 
                     href={getRunHref('state:success')}
-                    class="text-sm text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 font-medium"
+                    class="text-sm text-[var(--sg-success)] hover:text-[var(--sg-success)] font-medium"
                   >
                     View all successes →
                   </a>
@@ -1313,14 +1315,10 @@
 
               {#if isLoadingSuccesses}
                 <div class="flex justify-center py-8">
-                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
+                  <LoadingSpinner size="sm" color="success" centered={false} />
                 </div>
               {:else if recentSuccesses.length === 0 && hasLoadedSuccesses}
-                <div class="text-center py-8">
-                  <div class="text-4xl mb-2">💤</div>
-                  <p class="text-green-700 dark:text-green-400 font-medium">No recent successes</p>
-                  <p class="text-sm text-green-600 dark:text-green-400 mt-1">No successful runs found recently</p>
-                </div>
+                <EmptyState title="No recent successes" description="No successful runs found recently" />
               {:else}
                 <div class="space-y-3">
                   {#each recentSuccesses.slice(0, 5) as success}
@@ -1334,53 +1332,53 @@
                         e.preventDefault();
                         navigateToRun(success.id);
                       }}
-                      class="block w-full text-left p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 hover:border-green-300 dark:hover:border-green-700 transition-colors cursor-pointer"
+                      class="block w-full text-left p-4 bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg hover:bg-[var(--sg-success-bg)] hover:border-[var(--sg-success)] transition-colors cursor-pointer"
                     >
                       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div class="flex-1">
                           <!-- Repository and Type -->
                           <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
-                            <span class="font-medium text-green-800 dark:text-green-400">{success.repo}</span>
+                            <span class="font-medium text-[var(--sg-success)]">{success.repo}</span>
                             <!-- Plan/Apply Badge for successes -->
                             {#if success.run_type === 'plan'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700" title="Click to view run details">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] border border-[var(--sg-success)]" title="Click to view run details">
                                 📋 Plan
                               </span>
                             {:else if success.run_type === 'apply'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] border border-[var(--sg-success)]">
                                 🚀 Apply
                               </span>
                             {:else}
-                              <span class="text-sm text-green-700 dark:text-green-300">{success.run_type}</span>
+                              <span class="text-sm text-[var(--sg-success)]">{success.run_type}</span>
                             {/if}
                             
                             <!-- Drift Detection Indicator for successes -->
                             {#if success.kind === 'drift'}
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-700">
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border border-[var(--sg-warning)]">
                                 🔍 Drift
                               </span>
                             {/if}
                           </div>
                           
                           <!-- Branch and Directory -->
-                          <div class="text-sm text-green-700 dark:text-green-300 mb-1">
+                          <div class="text-sm text-[var(--sg-success)] mb-1">
                             {success.branch}
                             {#if success.dir}
-                              <span class="text-xs text-green-600 dark:text-green-400"> • </span>
-                              <span class="text-xs text-green-600 dark:text-green-400 font-mono">{success.dir}</span>
+                              <span class="text-xs text-[var(--sg-success)]"> • </span>
+                              <span class="text-xs text-[var(--sg-success)] font-mono">{success.dir}</span>
                             {/if}
                             {#if success.workspace && success.workspace !== 'default'}
-                              <span class="text-xs text-green-600 dark:text-green-400"> • </span>
-                              <span class="text-xs text-green-600 dark:text-green-400">workspace: {success.workspace}</span>
+                              <span class="text-xs text-[var(--sg-success)]"> • </span>
+                              <span class="text-xs text-[var(--sg-success)]">workspace: {success.workspace}</span>
                             {/if}
                             {#if success.environment}
-                              <span class="text-xs text-green-600 dark:text-green-400"> • </span>
-                              <span class="text-xs text-green-600 dark:text-green-400">env: {success.environment}</span>
+                              <span class="text-xs text-[var(--sg-success)]"> • </span>
+                              <span class="text-xs text-[var(--sg-success)]">env: {success.environment}</span>
                             {/if}
                           </div>
                           
                           <!-- Timestamp and User -->
-                          <div class="text-xs text-green-600 dark:text-green-400">
+                          <div class="text-xs text-[var(--sg-success)]">
                             Completed {formatDateTime(success.created_at)}
                             {#if success.user}
                               • by {success.user}
@@ -1390,10 +1388,10 @@
                         
                         <!-- Status Badge and Arrow -->
                         <div class="flex items-center space-x-2 self-start sm:self-center">
-                          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)]">
                             Success
                           </span>
-                          <svg class="w-4 h-4 text-green-400 dark:text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg class="w-4 h-4 text-[var(--sg-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
@@ -1409,41 +1407,35 @@
         <!-- Repository Filter -->
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Repositories</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Based on the most recent 100 runs from the last 30 days</p>
+            <h2 class="text-lg font-semibold text-[var(--sg-text)]">Repositories</h2>
+            <p class="text-sm text-[var(--sg-text-dim)]">Based on the most recent 100 runs from the last 30 days</p>
           </div>
           <div class="w-64">
             <input
               type="text"
               bind:value={repoFilter}
               placeholder="Filter repositories..."
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-[var(--sg-border)] rounded-md text-sm bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-[var(--sg-accent)]"
             />
           </div>
         </div>
 
         <!-- Repository List -->
         {#if isLoadingMetrics}
-          <div class="flex justify-center py-12">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
-          </div>
+          <LoadingSpinner size="md" />
         {:else if paginatedRepoMetrics.length === 0 && filteredRepoMetrics.length === 0 && hasLoadedMetrics}
-          <div class="text-center py-12 card-bg rounded-lg shadow">
-            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-brand-primary dark:text-blue-400">
-              {repoFilter ? 'No repositories match your filter' : 'No repositories found'}
-            </h3>
-            <p class="mt-1 text-sm text-brand-secondary dark:text-gray-400">
-              {repoFilter ? 'Try adjusting your search terms' : 'No runs found in the last 30 days'}
-            </p>
+          <div class="card-bg rounded-lg shadow">
+            <EmptyState
+              icon="mdi:inbox-outline"
+              title={repoFilter ? 'No repositories match your filter' : 'No repositories found'}
+              description={repoFilter ? 'Try adjusting your search terms' : 'No runs found in the last 30 days'}
+            />
           </div>
         {:else}
           <div class="card-bg rounded-lg shadow overflow-hidden">
             <!-- Table Header -->
-            <div class="bg-gray-50 dark:bg-gray-700 px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-600">
-              <div class="hidden md:grid grid-cols-12 gap-4 text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+            <div class="bg-[var(--sg-bg-0)] px-4 md:px-6 py-3 border-b border-[var(--sg-border)]">
+              <div class="hidden md:grid grid-cols-12 gap-4 text-xs font-medium text-[var(--sg-text-muted)] uppercase tracking-wider">
                 <div class="col-span-4">Repository</div>
                 <div class="col-span-2 text-center">Success</div>
                 <div class="col-span-2 text-center">Failed</div>
@@ -1453,10 +1445,10 @@
             </div>
 
             <!-- Repository Rows -->
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="divide-y divide-[var(--sg-border)]">
               {#each paginatedRepoMetrics as repo}
                 <div 
-                  class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                  class="px-6 py-4 hover:bg-[var(--sg-bg-2)] cursor-pointer transition-colors"
                   on:click={() => viewRepoRuns(repo.name)}
                   on:keydown={(e) => e.key === 'Enter' && viewRepoRuns(repo.name)}
                   tabindex="0"
@@ -1467,12 +1459,12 @@
                     <!-- Repository Name -->
                     <div class="md:col-span-4">
                       <div class="flex items-center">
-                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-4 h-4 text-[var(--sg-text-dim)] mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                         <div>
-                          <div class="font-medium text-gray-900 dark:text-gray-100">{repo.name}</div>
-                          <div class="text-sm text-gray-500 dark:text-gray-400">
+                          <div class="font-medium text-[var(--sg-text)]">{repo.name}</div>
+                          <div class="text-sm text-[var(--sg-text-dim)]">
                             {repo.successCount + repo.failedCount + repo.runningCount} total runs
                           </div>
                         </div>
@@ -1483,47 +1475,47 @@
                     <div class="flex justify-around md:hidden">
                       <!-- Success Count -->
                       <div class="text-center">
-                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Success</div>
-                        <div class="text-lg font-semibold text-green-600 dark:text-green-400">{repo.successCount}</div>
+                        <div class="text-xs text-[var(--sg-text-dim)] mb-1">Success</div>
+                        <div class="text-lg font-semibold text-[var(--sg-success)]">{repo.successCount}</div>
                       </div>
                       <!-- Failed Count -->
                       <div class="text-center">
-                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Failed</div>
-                        <div class="text-lg font-semibold {repo.failedCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'}">{repo.failedCount}</div>
+                        <div class="text-xs text-[var(--sg-text-dim)] mb-1">Failed</div>
+                        <div class="text-lg font-semibold {repo.failedCount > 0 ? 'text-[var(--sg-error)]' : 'text-[var(--sg-text-dim)]'}">{repo.failedCount}</div>
                       </div>
                       <!-- Running Count -->
                       <div class="text-center">
-                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Running</div>
-                        <div class="text-lg font-semibold {repo.runningCount > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}">{repo.runningCount}</div>
+                        <div class="text-xs text-[var(--sg-text-dim)] mb-1">Running</div>
+                        <div class="text-lg font-semibold {repo.runningCount > 0 ? 'text-[var(--sg-accent)]' : 'text-[var(--sg-text-dim)]'}">{repo.runningCount}</div>
                       </div>
                     </div>
 
                     <!-- Desktop: Status counts without labels (headers provide context) -->
                     <!-- Success Count -->
                     <div class="hidden md:block col-span-2 text-center">
-                      <div class="text-lg font-semibold text-green-600 dark:text-green-400">{repo.successCount}</div>
+                      <div class="text-lg font-semibold text-[var(--sg-success)]">{repo.successCount}</div>
                     </div>
 
                     <!-- Failed Count -->
                     <div class="hidden md:block col-span-2 text-center">
-                      <div class="text-lg font-semibold {repo.failedCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'}">{repo.failedCount}</div>
+                      <div class="text-lg font-semibold {repo.failedCount > 0 ? 'text-[var(--sg-error)]' : 'text-[var(--sg-text-dim)]'}">{repo.failedCount}</div>
                     </div>
 
                     <!-- Running Count -->
                     <div class="hidden md:block col-span-2 text-center">
-                      <div class="text-lg font-semibold {repo.runningCount > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}">{repo.runningCount}</div>
+                      <div class="text-lg font-semibold {repo.runningCount > 0 ? 'text-[var(--sg-accent)]' : 'text-[var(--sg-text-dim)]'}">{repo.runningCount}</div>
                     </div>
 
                     <!-- Last Run -->
                     <div class="col-span-2 text-center">
-                      <div class="text-xs text-gray-600 dark:text-gray-400 mb-1 md:hidden">Last Deploy</div>
+                      <div class="text-xs text-[var(--sg-text-dim)] mb-1 md:hidden">Last Deploy</div>
                       {#if repo.lastApplied}
                         <div class="text-sm">
-                          <div class="font-medium text-gray-900 dark:text-gray-100">{formatDateTime(repo.lastApplied.date)}</div>
-                          <div class="text-xs text-gray-500 dark:text-gray-400">by {repo.lastApplied.user}</div>
+                          <div class="font-medium text-[var(--sg-text)]">{formatDateTime(repo.lastApplied.date)}</div>
+                          <div class="text-xs text-[var(--sg-text-dim)]">by {repo.lastApplied.user}</div>
                         </div>
                       {:else}
-                        <div class="text-sm text-gray-400 dark:text-gray-500">No recent applies</div>
+                        <div class="text-sm text-[var(--sg-text-dim)]">No recent applies</div>
                       {/if}
                     </div>
                   </div>
@@ -1533,9 +1525,9 @@
             
             <!-- Pagination Controls -->
             {#if totalRepoPages > 1}
-              <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 border-t border-gray-200 dark:border-gray-600">
+              <div class="bg-[var(--sg-bg-0)] px-6 py-3 border-t border-[var(--sg-border)]">
                 <div class="flex items-center justify-between">
-                  <div class="text-sm text-gray-700 dark:text-gray-300">
+                  <div class="text-sm text-[var(--sg-text-muted)]">
                     Showing {(repoCurrentPage - 1) * repoPageSize + 1} to {Math.min(repoCurrentPage * repoPageSize, filteredRepoMetrics.length)} of {filteredRepoMetrics.length} repositories
                   </div>
                   <div class="flex items-center space-x-1">
@@ -1543,7 +1535,7 @@
                     <button
                       on:click={() => changeRepoPage(repoCurrentPage - 1)}
                       disabled={repoCurrentPage === 1}
-                      class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="p-2 rounded hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       aria-label="Previous page"
                     >
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1555,19 +1547,19 @@
                     {#if repoCurrentPage > 3}
                       <button
                         on:click={() => changeRepoPage(1)}
-                        class="px-3 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        class="px-3 py-1 text-sm rounded hover:bg-[var(--sg-bg-2)] transition-colors"
                       >
                         1
                       </button>
                       {#if repoCurrentPage > 4}
-                        <span class="px-2 text-gray-500 dark:text-gray-400">...</span>
+                        <span class="px-2 text-[var(--sg-text-dim)]">...</span>
                       {/if}
                     {/if}
                     
                     {#each getRepoPageNumbers() as page}
                       <button
                         on:click={() => changeRepoPage(page)}
-                        class="px-3 py-1 text-sm rounded transition-colors {page === repoCurrentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}"
+                        class="px-3 py-1 text-sm rounded transition-colors {page === repoCurrentPage ? 'bg-[var(--sg-accent-button)] text-white' : 'hover:bg-[var(--sg-bg-2)]'}"
                       >
                         {page}
                       </button>
@@ -1575,11 +1567,11 @@
                     
                     {#if repoCurrentPage < totalRepoPages - 2}
                       {#if repoCurrentPage < totalRepoPages - 3}
-                        <span class="px-2 text-gray-500 dark:text-gray-400">...</span>
+                        <span class="px-2 text-[var(--sg-text-dim)]">...</span>
                       {/if}
                       <button
                         on:click={() => changeRepoPage(totalRepoPages)}
-                        class="px-3 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        class="px-3 py-1 text-sm rounded hover:bg-[var(--sg-bg-2)] transition-colors"
                       >
                         {totalRepoPages}
                       </button>
@@ -1589,7 +1581,7 @@
                     <button
                       on:click={() => changeRepoPage(repoCurrentPage + 1)}
                       disabled={repoCurrentPage === totalRepoPages}
-                      class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="p-2 rounded hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       aria-label="Next page"
                     >
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1612,10 +1604,10 @@
             <div class="flex flex-col gap-3">
               <!-- Title and Back Button Row -->
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-400">🔍 Search Runs</h3>
+                <h3 class="text-sm font-semibold text-[var(--sg-accent)]">🔍 Search Runs</h3>
                 <button
                   on:click={() => navigateToRuns()}
-                  class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                  class="text-xs sm:text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)]"
                 >
                   ← Back to Overview
                 </button>
@@ -1623,17 +1615,17 @@
               
               <!-- Mode Toggle Row -->
               <div class="flex items-center justify-center sm:justify-start gap-2">
-                <span class="text-xs text-gray-600 dark:text-gray-400">Mode:</span>
+                <span class="text-xs text-[var(--sg-text-dim)]">Mode:</span>
                 <div class="flex rounded-md shadow-sm" role="group">
                   <button
                     on:click={switchToBasicMode}
-                    class="px-3 py-1.5 text-xs font-medium rounded-l-md transition-colors {isBasicMode ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'}"
+                    class="px-3 py-1.5 text-xs font-medium rounded-l-md transition-colors {isBasicMode ? 'bg-[var(--sg-accent-button)] text-white' : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] border border-[var(--sg-border)]'}"
                   >
                     Basic
                   </button>
                   <button
                     on:click={switchToAdvancedMode}
-                    class="px-3 py-1.5 text-xs font-medium rounded-r-md transition-colors {!isBasicMode ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'} {isBasicMode ? 'border-l border-gray-300 dark:border-gray-600' : ''}"
+                    class="px-3 py-1.5 text-xs font-medium rounded-r-md transition-colors {!isBasicMode ? 'bg-[var(--sg-accent-button)] text-white' : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] border border-[var(--sg-border)]'} {isBasicMode ? 'border-l border-[var(--sg-border)]' : ''}"
                   >
                     Advanced
                   </button>
@@ -1646,8 +1638,8 @@
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <!-- Repository Filter -->
                 <div>
-                  <label for="repo-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Repository</label>
-                  <select id="repo-filter" bind:value={basicFilters.repo} class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  <label for="repo-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Repository</label>
+                  <select id="repo-filter" bind:value={basicFilters.repo} class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]">
                     <option value="">All repositories</option>
                     {#if isLoadingRepos}
                       <option value="" disabled>Loading repositories...</option>
@@ -1661,8 +1653,8 @@
 
                 <!-- Status Filter -->
                 <div>
-                  <label for="status-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                  <select id="status-filter" bind:value={basicFilters.state} class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  <label for="status-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Status</label>
+                  <select id="status-filter" bind:value={basicFilters.state} class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]">
                     <option value="">Any status</option>
                     <option value="success">✅ Success</option>
                     <option value="failure">❌ Failed</option>
@@ -1674,8 +1666,8 @@
 
                 <!-- Type Filter -->
                 <div>
-                  <label for="type-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Operation Type</label>
-                  <select id="type-filter" bind:value={basicFilters.type} class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  <label for="type-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Operation Type</label>
+                  <select id="type-filter" bind:value={basicFilters.type} class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]">
                     <option value="">Any type</option>
                     <option value="plan">📋 Plan</option>
                     <option value="apply">🚀 Apply</option>
@@ -1684,28 +1676,28 @@
 
                 <!-- Enhanced Date Range Filter -->
                 <div class="relative">
-                  <div class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Time Period</div>
+                  <div class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Time Period</div>
                   
                   <!-- Date Range Mode Selector with Inline Preset Dropdown -->
                   <div class="flex items-center space-x-1 mb-2">
                     <button
                       type="button"
                       on:click={() => dateRangeMode = 'preset'}
-                      class="px-2 py-1 text-xs border rounded {dateRangeMode === 'preset' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300' : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                      class="px-2 py-1 text-xs border rounded {dateRangeMode === 'preset' ? 'bg-[var(--sg-accent-bg)] border-[var(--sg-accent)] text-[var(--sg-accent)]' : 'bg-[var(--sg-bg-1)] border-[var(--sg-border)] text-[var(--sg-text-dim)] hover:bg-[var(--sg-bg-2)]'}"
                     >
                       Presets
                     </button>
                     <button
                       type="button"
                       on:click={() => dateRangeMode = 'custom'}
-                      class="px-2 py-1 text-xs border rounded {dateRangeMode === 'custom' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300' : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+                      class="px-2 py-1 text-xs border rounded {dateRangeMode === 'custom' ? 'bg-[var(--sg-accent-bg)] border-[var(--sg-accent)] text-[var(--sg-accent)]' : 'bg-[var(--sg-bg-1)] border-[var(--sg-border)] text-[var(--sg-text-dim)] hover:bg-[var(--sg-bg-2)]'}"
                     >
                       Custom
                     </button>
                     
                     <!-- Preset Dropdown (inline with buttons) -->
                     {#if dateRangeMode === 'preset'}
-                      <select bind:value={basicFilters.dateRange} class="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                      <select bind:value={basicFilters.dateRange} class="flex-1 px-2 py-1 text-xs border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]">
                         <option value="">All time</option>
                         <option value="today">Last 24 hours</option>
                         <option value="yesterday">Last 48 hours</option>
@@ -1721,24 +1713,24 @@
                   {#if dateRangeMode === 'custom'}
                     <div class="space-y-2">
                       <div>
-                        <label for="custom-start-date" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">From date & time (optional)</label>
+                        <label for="custom-start-date" class="block text-xs text-[var(--sg-text-dim)] mb-1">From date & time (optional)</label>
                         <input
                           id="custom-start-date"
                           type="datetime-local"
                           bind:value={customStartDate}
-                          class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                         />
                       </div>
                       <div>
-                        <label for="custom-end-date" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">To date & time (optional)</label>
+                        <label for="custom-end-date" class="block text-xs text-[var(--sg-text-dim)] mb-1">To date & time (optional)</label>
                         <input
                           id="custom-end-date"
                           type="datetime-local"
                           bind:value={customEndDate}
-                          class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                         />
                       </div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                      <div class="text-xs text-[var(--sg-text-dim)]">
                         <p>Leave blank for open-ended ranges</p>
                         <p class="mt-1">Examples: 2024-01-15 14:30 or just 2024-01-15</p>
                       </div>
@@ -1748,49 +1740,49 @@
 
                 <!-- User Filter -->
                 <div>
-                  <label for="user-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">User</label>
+                  <label for="user-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">User</label>
                   <input
                     id="user-filter"
                     type="text"
                     bind:value={basicFilters.user}
                     placeholder="e.g., josh"
-                    class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder:text-[var(--sg-text-dim)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                   />
                 </div>
 
                 <!-- Branch Filter -->
                 <div>
-                  <label for="branch-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Branch</label>
+                  <label for="branch-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Branch</label>
                   <input
                     id="branch-filter"
                     type="text"
                     bind:value={basicFilters.branch}
                     placeholder="e.g., main"
-                    class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder:text-[var(--sg-text-dim)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                   />
                 </div>
 
                 <!-- Environment Filter -->
                 <div>
-                  <label for="environment-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment</label>
+                  <label for="environment-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment</label>
                   <input
                     id="environment-filter"
                     type="text"
                     bind:value={basicFilters.environment}
                     placeholder="e.g., production"
-                    class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder:text-[var(--sg-text-dim)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                   />
                 </div>
 
                 <!-- Workspace Filter -->
                 <div>
-                  <label for="workspace-filter" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Workspace</label>
+                  <label for="workspace-filter" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-1">Workspace</label>
                   <input
                     id="workspace-filter"
                     type="text"
                     bind:value={basicFilters.workspace}
                     placeholder="e.g., default"
-                    class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-2 py-1 text-sm border border-[var(--sg-border)] rounded bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder:text-[var(--sg-text-dim)] focus:outline-none focus:ring-1 focus:ring-[var(--sg-accent)]"
                   />
                 </div>
               </div>
@@ -1800,17 +1792,17 @@
                 <button
                   on:click={performBasicSearch}
                   disabled={isLoadingWorkManifests}
-                  class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  class="px-4 py-2 bg-[var(--sg-accent-button)] text-white text-sm rounded-md hover:bg-[var(--sg-accent-button-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {#if isLoadingWorkManifests}
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <LoadingSpinner size="sm" color="white" centered={false} />
                   {:else}
                     Search
                   {/if}
                 </button>
                 <button
                   on:click={clearBasicFilters}
-                  class="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 text-sm rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  class="px-3 py-2 border border-[var(--sg-border)] text-[var(--sg-text-dim)] text-sm rounded-md bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] transition-colors"
                 >
                   Clear All
                 </button>
@@ -1819,33 +1811,33 @@
               <!-- Advanced Mode: Direct Query Input -->
               <div class="space-y-4">
                 <div>
-                  <label for="search-query" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label for="search-query" class="block text-xs font-medium text-[var(--sg-text-muted)] mb-2">
                     Search Query
-                    <span class="text-gray-500 dark:text-gray-400 font-normal">(Use Terrateam query syntax: repo:name, state:success, user:josh, etc.)</span>
+                    <span class="text-[var(--sg-text-dim)] font-normal">(Use Terrateam query syntax: repo:name, state:success, user:josh, etc.)</span>
                   </label>
                   <input
                     id="search-query"
                     type="text"
                     bind:value={searchQuery}
                     placeholder="e.g., repo:myapp state:failure"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 border border-[var(--sg-border)] rounded-md bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder:text-[var(--sg-text-dim)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-[var(--sg-accent)]"
                     on:keydown={(e) => e.key === 'Enter' && performSearch()}
                   />
                 </div>
                 
                 <!-- Quick Filter Buttons -->
                 <div class="flex flex-wrap gap-2 mb-3 md:mb-0">
-                  <span class="text-xs font-medium text-gray-700 dark:text-gray-300 self-center">Quick filters:</span>
-                  <button on:click={() => addQuickFilter('state:failure')} class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                  <span class="text-xs font-medium text-[var(--sg-text-muted)] self-center">Quick filters:</span>
+                  <button on:click={() => addQuickFilter('state:failure')} class="px-2 py-1 bg-[var(--sg-error-bg)] text-[var(--sg-error)] text-xs rounded hover:bg-[var(--sg-error-bg)] transition-colors">
                     ❌ Failures
                   </button>
-                  <button on:click={() => addQuickFilter('state:running')} class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors">
+                  <button on:click={() => addQuickFilter('state:running')} class="px-2 py-1 bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] text-xs rounded hover:bg-[var(--sg-accent-bg)] transition-colors">
                     🔄 Running
                   </button>
-                  <button on:click={() => addQuickFilter('type:apply')} class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                  <button on:click={() => addQuickFilter('type:apply')} class="px-2 py-1 bg-[var(--sg-success-bg)] text-[var(--sg-success)] text-xs rounded hover:bg-[var(--sg-success-bg)] transition-colors">
                     🚀 Applies
                   </button>
-                  <button on:click={() => addQuickFilter('type:plan')} class="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors">
+                  <button on:click={() => addQuickFilter('type:plan')} class="px-2 py-1 bg-[var(--sg-purple-bg)] text-[var(--sg-purple)] text-xs rounded hover:bg-[var(--sg-purple-bg)] transition-colors">
                     📋 Plans
                   </button>
                 </div>
@@ -1856,24 +1848,24 @@
                     <button
                       on:click={performSearch}
                       disabled={isLoadingWorkManifests}
-                      class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="px-4 py-2 bg-[var(--sg-accent-button)] text-white text-sm rounded-md hover:bg-[var(--sg-accent-button-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {#if isLoadingWorkManifests}
-                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <LoadingSpinner size="sm" color="white" centered={false} />
                       {:else}
                         Search
                       {/if}
                     </button>
                     <button
                       on:click={clearSearch}
-                      class="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 text-sm rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      class="px-3 py-2 border border-[var(--sg-border)] text-[var(--sg-text-dim)] text-sm rounded-md bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] transition-colors"
                     >
                       Clear All
                     </button>
                   </div>
                   <button
                     on:click={() => showQueryExamples = !showQueryExamples}
-                    class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+                    class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] underline"
                   >
                     {showQueryExamples ? 'Hide Examples' : 'Show Query Examples'}
                   </button>
@@ -1881,55 +1873,55 @@
 
                 <!-- Query Examples -->
                 {#if showQueryExamples}
-                  <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Tag Query Language (TQL) Examples</h4>
+                  <div class="mt-4 p-4 bg-[var(--sg-bg-0)] rounded-lg border border-[var(--sg-border)]">
+                    <h4 class="text-sm font-semibold text-[var(--sg-text)] mb-3">Tag Query Language (TQL) Examples</h4>
                     <div class="space-y-4 text-xs">
                       <!-- Basic Queries -->
                       <div>
-                        <div class="font-medium text-gray-700 dark:text-gray-300 mb-2">Basic Queries:</div>
-                        <div class="space-y-1 text-gray-600 dark:text-gray-400">
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">pr:123</code> - Match pull request #123</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">state:failure</code> - Failed runs (options: running, success, failure, aborted, queued)</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">repo:infrastructure</code> - Operations in infrastructure repository</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">user:josh</code> - Operations by user josh</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">type:apply</code> - Apply operations (options: plan, apply)</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">kind:pr</code> - Pull request operations (options: pr, drift)</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">branch:main</code> - Operations on main branch</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">workspace:production</code> - Operations in production workspace</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">dir:infra/s3</code> - Operations that processed the infra/s3 directory</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">environment:production</code> - Operations in production {$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} environment</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">environment:</code> - Operations with no {$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} environment specified</div>
+                        <div class="font-medium text-[var(--sg-text-muted)] mb-2">Basic Queries:</div>
+                        <div class="space-y-1 text-[var(--sg-text-dim)]">
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">pr:123</code> - Match pull request #123</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">state:failure</code> - Failed runs (options: running, success, failure, aborted, queued)</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">repo:infrastructure</code> - Operations in infrastructure repository</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">user:josh</code> - Operations by user josh</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">type:apply</code> - Apply operations (options: plan, apply)</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">kind:pr</code> - Pull request operations (options: pr, drift)</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">branch:main</code> - Operations on main branch</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">workspace:production</code> - Operations in production workspace</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">dir:infra/s3</code> - Operations that processed the infra/s3 directory</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">environment:production</code> - Operations in production {$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} environment</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">environment:</code> - Operations with no {$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} environment specified</div>
                         </div>
                       </div>
                       
                       <!-- Date Queries -->
                       <div>
-                        <div class="font-medium text-gray-700 dark:text-gray-300 mb-2">Date & Time Queries:</div>
-                        <div class="space-y-1 text-gray-600 dark:text-gray-400">
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">created_at:2024-01-15</code> - Operations on January 15, 2024</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">created_at:2024-01-01..</code> - Operations since January 1, 2024</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">created_at:2024-01-01..2024-01-31</code> - Operations in January 2024</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">"created_at:2024-01-15 14:30"</code> - Operations at specific time (quotes required)</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">"created_at:2024-01-15 09:00..2024-01-15 17:00"</code> - Operations between specific times</div>
+                        <div class="font-medium text-[var(--sg-text-muted)] mb-2">Date & Time Queries:</div>
+                        <div class="space-y-1 text-[var(--sg-text-dim)]">
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">created_at:2024-01-15</code> - Operations on January 15, 2024</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">created_at:2024-01-01..</code> - Operations since January 1, 2024</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">created_at:2024-01-01..2024-01-31</code> - Operations in January 2024</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">"created_at:2024-01-15 14:30"</code> - Operations at specific time (quotes required)</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">"created_at:2024-01-15 09:00..2024-01-15 17:00"</code> - Operations between specific times</div>
                         </div>
                       </div>
 
                       <!-- Sorting & Complex Queries -->
                       <div>
-                        <div class="font-medium text-gray-700 dark:text-gray-300 mb-2">Sorting & Complex Examples:</div>
-                        <div class="space-y-1 text-gray-600 dark:text-gray-400">
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">sort:asc</code> - Sort by created_at ascending (options: asc, desc)</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">state:failure and repo:infrastructure</code> - Failed operations in infrastructure repo</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">user:josh and created_at:2024-01-01..</code> - Josh's operations since Jan 1</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">state:success and (user:josh or user:alex)</code> - Successful ops by josh or alex</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">branch:main and environment:production and type:apply</code> - Production applies from main</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">created_at:2024-01-01.. and kind:drift and sort:desc</code> - Recent drift operations</div>
-                          <div><code class="bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">dir:infra/s3 and dir:infra/iam and kind:pr</code> - PR operations affecting S3 and IAM</div>
+                        <div class="font-medium text-[var(--sg-text-muted)] mb-2">Sorting & Complex Examples:</div>
+                        <div class="space-y-1 text-[var(--sg-text-dim)]">
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">sort:asc</code> - Sort by created_at ascending (options: asc, desc)</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">state:failure and repo:infrastructure</code> - Failed operations in infrastructure repo</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">user:josh and created_at:2024-01-01..</code> - Josh's operations since Jan 1</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">state:success and (user:josh or user:alex)</code> - Successful ops by josh or alex</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">branch:main and environment:production and type:apply</code> - Production applies from main</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">created_at:2024-01-01.. and kind:drift and sort:desc</code> - Recent drift operations</div>
+                          <div><code class="bg-[var(--sg-bg-1)] px-2 py-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">dir:infra/s3 and dir:infra/iam and kind:pr</code> - PR operations affecting S3 and IAM</div>
                         </div>
                       </div>
                     </div>
-                    <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                      <strong>Note:</strong> Use <code class="bg-white dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">and</code>, <code class="bg-white dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100">or</code>, and parentheses to combine queries. Date/time queries with spaces require quotes.
+                    <div class="mt-3 text-xs text-[var(--sg-text-dim)]">
+                      <strong>Note:</strong> Use <code class="bg-[var(--sg-bg-1)] px-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">and</code>, <code class="bg-[var(--sg-bg-1)] px-1 rounded border border-[var(--sg-border)] text-[var(--sg-text)]">or</code>, and parentheses to combine queries. Date/time queries with spaces require quotes.
                     </div>
                   </div>
                 {/if}
@@ -1940,32 +1932,27 @@
 
         <!-- Search Results -->
         {#if isLoadingWorkManifests}
-          <div class="flex justify-center py-12">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
-          </div>
+          <LoadingSpinner size="md" />
         {:else if workManifests.length === 0}
-          <div class="text-center py-12 card-bg rounded-lg shadow">
-            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-brand-primary dark:text-blue-400">No runs found</h3>
-            <p class="mt-1 text-sm text-brand-secondary dark:text-gray-400">
-              {#if searchQuery}
-                No runs match your search: <code class="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-900 dark:text-gray-100">{searchQuery}</code>
-              {:else}
-                Try adjusting your search criteria or time range.
-              {/if}
+          <div class="card-bg rounded-lg shadow">
+            <EmptyState
+              icon="mdi:inbox-outline"
+              title="No runs found"
+              description={searchQuery
+                ? `No runs match your search: ${searchQuery}`
+                : 'Try adjusting your search criteria or time range.'}
+            >
+            <p class="mt-3 text-sm text-[var(--sg-text-dim)]">
+              Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-[var(--sg-accent)] hover:underline">Join our Slack community</a>
             </p>
-            <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
-              Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Join our Slack community</a>
-            </p>
+            </EmptyState>
           </div>
         {:else}
           <!-- Results Summary -->
-          <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <div class="text-sm text-[var(--sg-text-dim)] mb-4">
             Showing {workManifests.length} run{workManifests.length !== 1 ? 's' : ''} 
             {#if searchQuery}
-              matching: <code class="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-900 dark:text-gray-100">{searchQuery}</code>
+              matching: <code class="px-1 py-0.5 bg-[var(--sg-bg-2)] rounded text-xs text-[var(--sg-text)]">{searchQuery}</code>
             {/if}
             • Grouped by repository
           </div>
@@ -1973,23 +1960,23 @@
           <!-- Grouped Results by Repository -->
           <div class="space-y-4">
             {#each Object.keys(groupedRuns).sort() as repoName}
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div class="bg-[var(--sg-bg-1)] rounded-lg shadow border border-[var(--sg-border)] overflow-hidden">
                 <!-- Repository Header -->
                 <button
                   on:click={() => toggleRepoCollapse(repoName)}
-                  class="w-full px-4 md:px-6 py-3 md:py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800 flex items-center justify-between hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                  class="w-full px-4 md:px-6 py-3 md:py-4 bg-[var(--sg-accent-bg)] border-b border-[var(--sg-accent)] flex items-center justify-between hover:bg-[var(--sg-accent-bg)] transition-colors"
                 >
                   <div class="flex items-center flex-wrap gap-2">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 text-[var(--sg-accent)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    <h3 class="text-base sm:text-lg font-medium text-blue-900 dark:text-blue-100">{repoName}</h3>
-                    <span class="px-2.5 py-1 bg-blue-200 dark:bg-blue-800/50 text-blue-800 dark:text-blue-200 text-xs rounded-full whitespace-nowrap">
+                    <h3 class="text-base sm:text-lg font-medium text-[var(--sg-accent)]">{repoName}</h3>
+                    <span class="px-2.5 py-1 bg-[var(--sg-accent-bg)]/50 text-[var(--sg-accent)] text-xs rounded-full whitespace-nowrap">
                       {groupedRuns[repoName].length} run{groupedRuns[repoName].length !== 1 ? 's' : ''}
                     </span>
                   </div>
                   <svg 
-                    class="w-5 h-5 text-blue-600 dark:text-blue-400 transition-transform {collapsedRepos.has(repoName) ? 'rotate-0' : 'rotate-90'}" 
+                    class="w-5 h-5 text-[var(--sg-accent)] transition-transform {collapsedRepos.has(repoName) ? 'rotate-0' : 'rotate-90'}" 
                     fill="none" 
                     viewBox="0 0 24 24" 
                     stroke="currentColor"
@@ -2000,7 +1987,7 @@
 
                 <!-- Repository Runs -->
                 {#if !collapsedRepos.has(repoName)}
-                  <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <div class="divide-y divide-[var(--sg-border)]">
                     {#each groupedRuns[repoName] as run}
                       <a 
                         href={getRunDetailHref(run.id)}
@@ -2012,7 +1999,7 @@
                           e.preventDefault();
                           navigateToRun(run.id);
                         }}
-                        class="block w-full text-left p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        class="block w-full text-left p-4 md:p-6 hover:bg-[var(--sg-bg-2)] transition-colors cursor-pointer"
                       >
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div class="flex-1">
@@ -2020,46 +2007,46 @@
                               <div class="flex items-start gap-2 flex-wrap">
                                 <!-- Plan/Apply Visual Indicator -->
                                 {#if run.run_type === 'plan'}
-                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 flex-shrink-0">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border border-[var(--sg-accent)] flex-shrink-0">
                                     📋 Plan
                                   </span>
                                 {:else if run.run_type === 'apply'}
-                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700 flex-shrink-0">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] border border-[var(--sg-success)] flex-shrink-0">
                                     🚀 Apply
                                   </span>
                                 {:else}
-                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 flex-shrink-0">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] border border-[var(--sg-border)] flex-shrink-0">
                                     {run.run_type}
                                   </span>
                                 {/if}
                                 
                                 <!-- Drift Detection Indicator -->
                                 {#if run.kind === 'drift'}
-                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-700 flex-shrink-0">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border border-[var(--sg-warning)] flex-shrink-0">
                                     🔍 Drift
                                   </span>
                                 {/if}
                                 
                                 <!-- Path and details on separate line if needed -->
                                 <div class="flex items-center gap-1 flex-wrap">
-                                  <span class="text-sm text-gray-700 dark:text-gray-300">{run.branch}</span>
+                                  <span class="text-sm text-[var(--sg-text-muted)]">{run.branch}</span>
                                   {#if run.dir}
-                                    <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                                    <span class="text-xs text-gray-600 dark:text-gray-400 font-mono break-all">{run.dir}</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)] font-mono break-all">{run.dir}</span>
                                   {/if}
                                   {#if run.workspace && run.workspace !== 'default'}
-                                    <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">workspace: {run.workspace}</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)]">workspace: {run.workspace}</span>
                                   {/if}
                                   {#if run.environment}
-                                    <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">env: {run.environment}</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                                    <span class="text-xs text-[var(--sg-text-dim)]">env: {run.environment}</span>
                                   {/if}
                                 </div>
                               </div>
                             </div>
                             <!-- Terraform summary removed for memory safety -->
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                            <div class="text-xs text-[var(--sg-text-dim)]">
                               {formatDateTime(run.created_at)}
                               {#if run.user}
                                 • by {run.user}
@@ -2070,7 +2057,7 @@
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {getStateColor(run.state)}">
                               {run.state}
                             </span>
-                            <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-[var(--sg-text-dim)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
                           </div>
@@ -2085,8 +2072,8 @@
 
           <!-- Results Summary -->
           {#if workManifests.length > 0}
-            <div class="mt-6 py-4 border-t border-gray-200 dark:border-gray-700">
-              <div class="text-sm text-gray-600 dark:text-gray-400 text-center">
+            <div class="mt-6 py-4 border-t border-[var(--sg-border)]">
+              <div class="text-sm text-[var(--sg-text-dim)] text-center">
                 Showing {workManifests.length} run{workManifests.length !== 1 ? 's' : ''}
               </div>
               
@@ -2096,10 +2083,10 @@
                   <button
                     on:click={loadMoreRuns}
                     disabled={isLoadingMore}
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="inline-flex items-center px-4 py-2 border border-[var(--sg-border)] rounded-md shadow-sm text-sm font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--sg-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {#if isLoadingMore}
-                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-[var(--sg-text-dim)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>

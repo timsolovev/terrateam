@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Stacks, StackOuter, StackInner, StackState } from '../../types';
   import StackNode from './StackNode.svelte';
+  import { EmptyState, LoadingSpinner } from '../index';
   import { aggregateStacks } from '../../utils/stackAggregation';
 
   export let stacks: Stacks | null = null;
@@ -123,24 +124,16 @@
 
 {#if loading || !stacksLoaded}
   <!-- Show loading spinner while loading OR if stacks haven't been loaded yet (null) -->
-  <div class="flex items-center justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-      role="status"
-      aria-label="Loading stacks"
-    >
-      <span class="sr-only">Loading stacks...</span>
-    </div>
-  </div>
+  <LoadingSpinner size="xl" />
 {:else if error}
   <div
-    class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800"
+    class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
         <svg
-          class="h-5 w-5 text-red-400"
+          class="h-5 w-5 text-[var(--sg-error)]"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -152,10 +145,10 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        <h3 class="text-sm font-medium text-[var(--sg-error)]">
           Error loading stacks
         </h3>
-        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+        <div class="mt-2 text-sm text-[var(--sg-error)]">
           {error}
         </div>
       </div>
@@ -163,48 +156,48 @@
   </div>
 {:else if hasStacks}
   <!-- Status Dashboard -->
-  <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Stack Status Summary</h3>
+  <div class="mb-4 bg-[var(--sg-bg-0)] rounded-lg p-4 border border-[var(--sg-border)]">
+    <h3 class="text-sm font-medium text-[var(--sg-text-muted)] mb-3">Stack Status Summary</h3>
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-gray-400"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-text-dim)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.no_changes}</span> No changes
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-pink-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-pink)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.plan_pending}</span> Plan pending
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-orange-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-orange)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.plan_failed}</span> Plan failed
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-accent)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.apply_ready}</span> Apply ready
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-purple-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-purple)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.apply_pending}</span> Apply pending
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-green-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-success)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.apply_success}</span> Apply success
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-        <span class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="w-3 h-3 rounded-full bg-[var(--sg-error)]"></div>
+        <span class="text-sm text-[var(--sg-text)]">
           <span class="font-semibold">{stateCounts.apply_failed}</span> Apply failed
         </span>
       </div>
@@ -218,10 +211,10 @@
         type="text"
         bind:value={searchQuery}
         placeholder="Search stacks by name..."
-        class="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+        class="w-full px-4 py-2 pl-10 border border-[var(--sg-border)] rounded-md bg-[var(--sg-bg-1)] text-[var(--sg-text)] placeholder-[var(--sg-text-dim)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent"
       />
       <svg
-        class="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+        class="absolute left-3 top-2.5 h-5 w-5 text-[var(--sg-text-dim)]"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -237,10 +230,10 @@
   </div>
 
   <!-- Controls bar -->
-  <div class="mb-4 flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+  <div class="mb-4 flex items-center gap-4 pb-4 border-b border-[var(--sg-border)]">
     <button
       on:click={toggleExpandAll}
-      class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors"
+      class="inline-flex items-center px-3 py-2 border border-[var(--sg-border)] shadow-sm text-sm font-medium rounded-md text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--sg-accent)] transition-colors"
       aria-label="{allExpanded ? 'Collapse' : 'Expand'} all stacks"
     >
       <svg
@@ -263,9 +256,9 @@
       <input
         type="checkbox"
         bind:checked={showWorkspaces}
-        class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-brand-primary focus:ring-brand-primary focus:ring-offset-0 cursor-pointer"
+        class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-accent)] focus:ring-[var(--sg-accent)] focus:ring-offset-0 cursor-pointer"
       />
-      <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <span class="ml-2 text-sm font-medium text-[var(--sg-text-muted)]">
         Show Workspaces
       </span>
     </label>
@@ -279,51 +272,24 @@
       {/each}
     </div>
   {:else if searchQuery}
-    <div class="text-center py-12">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No matching stacks</h3>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        No stacks found matching "{searchQuery}".
-      </p>
+    <EmptyState
+      icon="mdi:magnify"
+      title="No matching stacks"
+      description={`No stacks found matching "${searchQuery}".`}
+    >
       <button
         on:click={() => searchQuery = ''}
-        class="mt-4 px-4 py-2 text-sm font-medium text-brand-primary hover:text-brand-primary/80 transition-colors"
+        class="mt-4 px-4 py-2 text-sm font-medium text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] transition-colors"
       >
         Clear search
       </button>
-    </div>
+    </EmptyState>
   {/if}
 {:else}
   <!-- Empty state: no stacks configured -->
-  <div class="text-center py-12">
-    <svg
-      class="mx-auto h-12 w-12 text-gray-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-      />
-    </svg>
-    <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No stacks found</h3>
-    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-      This pull request doesn't have any stacks configured yet.
-    </p>
-  </div>
+  <EmptyState
+    icon="mdi:file-document-outline"
+    title="No stacks found"
+    description="This pull request doesn't have any stacks configured yet."
+  />
 {/if}

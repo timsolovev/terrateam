@@ -31,20 +31,20 @@
   }
 </script>
 
-<div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6">
+<div class="flex items-center justify-between border-t border-[var(--sg-border)] bg-[var(--sg-bg-1)] px-4 py-3 sm:px-6">
   <div class="flex flex-1 justify-between sm:hidden">
     <!-- Mobile pagination -->
     <button
       on:click={handlePrevious}
       disabled={!hasPrevious || isLoading}
-      class="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="relative inline-flex items-center rounded-md border border-[var(--sg-border)] bg-[var(--sg-bg-1)] px-4 py-2 text-sm font-medium text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed"
     >
       Previous
     </button>
     <button
       on:click={handleNext}
       disabled={!hasNext || isLoading}
-      class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      class="relative ml-3 inline-flex items-center rounded-md border border-[var(--sg-border)] bg-[var(--sg-bg-1)] px-4 py-2 text-sm font-medium text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] disabled:opacity-50 disabled:cursor-not-allowed"
     >
       Next
     </button>
@@ -52,7 +52,7 @@
 
   <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
     <div>
-      <p class="text-sm text-gray-700 dark:text-gray-300">
+      <p class="text-sm text-[var(--sg-text-muted)]">
         Page <span class="font-medium">{currentPage}</span>
         {#if hasNext}
           of many
@@ -68,7 +68,7 @@
         <button
           on:click={handlePrevious}
           disabled={!hasPrevious || isLoading}
-          class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-800"
+          class="relative inline-flex items-center rounded-l-md px-2 py-2 text-[var(--sg-text-dim)] ring-1 ring-inset ring-[var(--sg-border)] hover:bg-[var(--sg-bg-2)] focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--sg-bg-1)]"
         >
           <span class="sr-only">Previous</span>
           {#if isLoading}
@@ -84,7 +84,7 @@
         </button>
 
         <!-- Current page indicator -->
-        <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800">
+        <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-[var(--sg-text)] ring-1 ring-inset ring-[var(--sg-border)] bg-[var(--sg-bg-1)]">
           {currentPage}
         </span>
 
@@ -92,7 +92,7 @@
         <button
           on:click={handleNext}
           disabled={!hasNext || isLoading}
-          class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-800"
+          class="relative inline-flex items-center rounded-r-md px-2 py-2 text-[var(--sg-text-dim)] ring-1 ring-inset ring-[var(--sg-border)] hover:bg-[var(--sg-bg-2)] focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--sg-bg-1)]"
         >
           <span class="sr-only">Next</span>
           {#if isLoading}

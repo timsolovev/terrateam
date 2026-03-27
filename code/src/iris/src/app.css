@@ -2,32 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* DejaVu Sans - UI Font */
 @font-face {
-  font-family: 'Apertura';
-  src: url('/assets/fonts/Apertura_Regular.otf') format('opentype');
+  font-family: 'DejaVu Sans';
+  src: url('/assets/fonts/DejaVuSans-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Apertura';
-  src: url('/assets/fonts/Apertura_Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
+  font-family: 'DejaVu Sans';
+  src: url('/assets/fonts/DejaVuSans-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Apertura';
-  src: url('/assets/fonts/Apertura_Bold.otf') format('opentype');
+  font-family: 'DejaVu Sans';
+  src: url('/assets/fonts/DejaVuSans-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Apertura';
-  src: url('/assets/fonts/Apertura_Black.otf') format('opentype');
-  font-weight: 900;
+  font-family: 'DejaVu Sans';
+  src: url('/assets/fonts/DejaVuSans-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* JetBrains Mono - Monospace Font */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/assets/fonts/JetBrainsMono-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/assets/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/assets/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/assets/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* Hide scrollbars for horizontal tab navigation */
@@ -40,91 +86,189 @@
 }
 
 :root {
-  /* Brand Colors */
-  --color-primary: #009bff;
-  --color-secondary: #12223f;
-  --color-accent: #e7f67e;
-  --color-alert: #f44e27;
-  
-  /* Light Theme Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f3f4f6;
-  --bg-tertiary: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --border-primary: #d1d5db;
-  --border-secondary: #e5e7eb;
+  /* Stategraph Design Tokens - Light Mode (Default) */
+
+  /* Backgrounds */
+  --sg-bg-0: #f5f5f4;
+  --sg-bg-1: #ffffff;
+  --sg-bg-2: #f0f0ef;
+
+  /* Borders */
+  --sg-border: #e0e0df;
+  --sg-border-light: #ebebea;
+
+  /* Text */
+  --sg-text: #1a1a1a;
+  --sg-text-muted: #333333;
+  --sg-text-dim: #555555;
+
+  /* Accent */
+  --sg-accent: #2563eb;
+  --sg-accent-bg: #2563eb15;
+  --sg-accent-bg-active: #2563eb20;
+  --sg-accent-hover: #1d4ed8;
+  --sg-accent-button: #2563eb;
+  --sg-accent-button-hover: #1d4ed8;
+  --sg-accent-dim: #2563eb22;
+
+  /* Semantic */
+  --sg-error: #dc2626;
+  --sg-error-bg: #dc262615;
+  --sg-warning: #d97706;
+  --sg-warning-bg: #d9770615;
+  --sg-success: #16a34a;
+  --sg-success-bg: #16a34a15;
+
+  /* Extended Semantic / Category Colors */
+  --sg-purple: #9333ea;
+  --sg-purple-bg: #9333ea15;
+  --sg-pink: #ec4899;
+  --sg-pink-bg: #ec489915;
+  --sg-orange: #ea580c;
+  --sg-orange-bg: #ea580c15;
+  --sg-amber: #d97706;
+  --sg-amber-bg: #d9770615;
+  --sg-indigo: #4f46e5;
+  --sg-indigo-bg: #4f46e515;
+
+  /* Code blocks */
+  --sg-bg-code: #1e1e1e;
+  --sg-text-code: #e4e4e4;
+
+  /* Typography */
+  --sg-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sg-line-height-relaxed: 1.6;
+  --sg-line-height-normal: 1.5;
+  --sg-line-height-tight: 1.4;
+
+  /* Component Tokens */
+  --sg-button-radius: 2px;
+  --sg-card-radius: 12px;
+  --sg-input-radius: 4px;
+  --sg-input-height: 40px;
+
+  /* Shadows */
+  --sg-shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.02);
+  --sg-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --sg-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --sg-shadow-accent-sm: 0 0 20px var(--sg-accent-dim);
+  --sg-shadow-accent-md: 0 0 30px var(--sg-accent-dim);
+  --sg-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  /* Animation Tokens */
+  --sg-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sg-transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sg-transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
 }
 
 .dark {
-  /* Dark Theme Colors */
-  --bg-primary: #12223f;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --border-primary: #4b5563;
-  --border-secondary: #374151;
+  /* Stategraph Design Tokens - Dark Mode */
+
+  /* Backgrounds */
+  --sg-bg-0: #0a0a0a;
+  --sg-bg-1: #111111;
+  --sg-bg-2: #1a1a1a;
+
+  /* Borders */
+  --sg-border: #2a2a2a;
+  --sg-border-light: #333333;
+
+  /* Text */
+  --sg-text: #e4e4e4;
+  --sg-text-muted: #a0a0a0;
+  --sg-text-dim: #a0a0a0;
+
+  /* Accent */
+  --sg-accent: #60a5fa;
+  --sg-accent-bg: #60a5fa15;
+  --sg-accent-bg-active: #60a5fa15;
+  --sg-accent-hover: #3b82f6;
+  --sg-accent-button: #2563eb;
+  --sg-accent-button-hover: #1d4ed8;
+  --sg-accent-dim: #60a5fa22;
+
+  /* Semantic */
+  --sg-error: #ff3366;
+  --sg-error-bg: #ff336615;
+  --sg-warning: #d97706;
+  --sg-warning-bg: #d9770615;
+  --sg-success: #22c55e;
+  --sg-success-bg: #22c55e15;
+
+  /* Extended Semantic / Category Colors */
+  --sg-purple: #c084fc;
+  --sg-purple-bg: #c084fc20;
+  --sg-pink: #f472b6;
+  --sg-pink-bg: #f472b620;
+  --sg-orange: #ea580c;
+  --sg-orange-bg: #ea580c20;
+  --sg-amber: #fbbf24;
+  --sg-amber-bg: #fbbf2420;
+  --sg-indigo: #818cf8;
+  --sg-indigo-bg: #818cf820;
+
+  /* Code blocks */
+  --sg-bg-code: #0d0d0d;
+  --sg-text-code: #e4e4e4;
 }
 
 body {
-  font-family: 'Apertura', sans-serif;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  font-family: 'DejaVu Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--sg-bg-0);
+  color: var(--sg-text);
 }
 
 /* Brand-specific utility classes */
-.bg-brand-primary { background-color: var(--bg-primary); }
-.bg-brand-secondary { background-color: var(--bg-secondary); }
-.bg-brand-tertiary { background-color: var(--bg-tertiary); }
+.bg-brand-primary { background-color: var(--sg-bg-1); }
+.bg-brand-secondary { background-color: var(--sg-bg-0); }
+.bg-brand-tertiary { background-color: var(--sg-bg-2); }
 
-.text-brand-primary { color: var(--text-primary); }
-.text-brand-secondary { color: var(--text-secondary); }
-.text-brand-tertiary { color: var(--text-tertiary); }
+.text-brand-primary { color: var(--sg-text); }
+.text-brand-secondary { color: var(--sg-text-muted); }
+.text-brand-tertiary { color: var(--sg-text-dim); }
 
-.border-brand-primary { border-color: var(--border-primary); }
-.border-brand-secondary { border-color: var(--border-secondary); }
+.border-brand-primary { border-color: var(--sg-border); }
+.border-brand-secondary { border-color: var(--sg-border-light); }
 
-.accent-bg { 
-  background-color: var(--color-accent); 
-  color: var(--color-secondary);
+.accent-bg {
+  background-color: var(--sg-accent-button);
+  color: white;
 }
 
-.primary-bg { 
-  background-color: var(--color-primary); 
+.primary-bg {
+  background-color: var(--sg-accent-button);
   color: white;
 }
 
 .sidebar-bg {
-  background-color: var(--bg-secondary);
-  border-color: var(--border-secondary);
+  background-color: var(--sg-bg-0);
+  border-color: var(--sg-border-light);
 }
 
 .card-bg {
-  background-color: var(--bg-primary);
-  border-color: var(--border-secondary);
+  background-color: var(--sg-bg-1);
+  border-color: var(--sg-border-light);
 }
 
-/* Hover state utilities to replace onmouseover/onmouseout */
+/* Hover state utilities */
 .accent-bg:hover {
-  background-color: #d4e668 !important;
+  background-color: var(--sg-accent-button-hover) !important;
 }
 
 .accent-link {
-  color: #009bff;
-  transition: color 0.2s ease;
+  color: var(--sg-accent);
+  transition: color var(--sg-transition-base);
 }
 
 .accent-link:hover {
-  color: #0086d9 !important;
+  color: var(--sg-accent-hover) !important;
 }
 
 .slack-button {
   background-color: #4A154B;
   color: white;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--sg-transition-base);
 }
 
 .slack-button:hover {
@@ -135,22 +279,46 @@ body {
   background-color: #4A154B;
 }
 
-/* Component-specific styles extracted from individual components */
-
-/* Button Component Styles */
-.accent-bg {
-  background-color: var(--color-accent);
-  color: var(--color-secondary);
+/* Button variants */
+.btn-primary {
+  background-color: var(--sg-accent-button);
+  color: white;
+  transition: all var(--sg-transition-base);
 }
 
-.accent-bg:hover,
-.bg-accent-hover {
-  background-color: #d4e668;
+.btn-primary:hover {
+  background-color: var(--sg-accent-button-hover);
+}
+
+.btn-primary:focus {
+  outline: 2px solid var(--sg-accent);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  background-color: var(--sg-bg-0);
+  color: var(--sg-text);
+  border: 1px solid var(--sg-border);
+  transition: all var(--sg-transition-base);
+}
+
+.btn-secondary:hover {
+  background-color: var(--sg-bg-2);
+}
+
+.btn-accent {
+  background-color: var(--sg-accent-button);
+  color: white;
+  transition: all var(--sg-transition-base);
+}
+
+.btn-accent:hover {
+  background-color: var(--sg-accent-button-hover);
 }
 
 /* Code/Monospace Styles */
 .code-font {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--sg-font-mono);
 }
 
 /* Animation Utilities */
@@ -203,107 +371,68 @@ body {
   animation: slide-down 0.3s ease-out;
 }
 
-/* Standard Component Patterns */
-
 /* Card variants */
 .card-hover {
-  transition: all 0.2s ease;
+  transition: all var(--sg-transition-base);
 }
 
 .card-hover:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sg-shadow-md);
 }
 
 .card-interactive {
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--sg-transition-base);
 }
 
 .card-interactive:hover {
-  background-color: rgba(59, 130, 246, 0.05);
-  border-color: rgba(59, 130, 246, 0.3);
+  background-color: var(--sg-accent-bg);
+  border-color: var(--sg-accent);
 }
 
 .card-interactive:focus {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--sg-accent);
   outline-offset: 2px;
-}
-
-/* Button variants */
-.btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: #0086d9;
-}
-
-.btn-primary:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.btn-secondary {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-primary);
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--bg-tertiary);
-}
-
-.btn-accent {
-  background-color: var(--color-accent);
-  color: var(--color-secondary);
-  transition: all 0.2s ease;
-}
-
-.btn-accent:hover {
-  background-color: #d4e668;
 }
 
 /* Form element styles */
 .form-input {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  transition: border-color 0.2s ease;
+  background-color: var(--sg-bg-1);
+  border: 1px solid var(--sg-border);
+  color: var(--sg-text);
+  transition: border-color var(--sg-transition-base);
 }
 
 .form-input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--sg-accent);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 155, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--sg-accent-bg);
 }
 
 .form-label {
-  color: var(--text-secondary);
+  color: var(--sg-text-muted);
   font-weight: 500;
 }
 
 /* Status indicator styles */
 .status-success {
-  background-color: #10b981;
+  background-color: var(--sg-success);
   color: white;
 }
 
 .status-error {
-  background-color: #ef4444;
+  background-color: var(--sg-error);
   color: white;
 }
 
 .status-warning {
-  background-color: #f59e0b;
+  background-color: var(--sg-warning);
   color: white;
 }
 
 .status-info {
-  background-color: var(--color-primary);
+  background-color: var(--sg-accent);
   color: white;
 }
 
@@ -318,23 +447,23 @@ body {
 
 /* Accessibility improvements */
 .focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--sg-accent);
   outline-offset: 2px;
 }
 
 /* Sidebar active menu item styles */
 .sidebar-active-item {
-  color: #009bff;
-  background-color: rgba(0, 155, 255, 0.1);
+  color: var(--sg-accent);
+  background-color: var(--sg-accent-bg);
 }
 
 /* Brand-colored icon backgrounds */
 .brand-icon-bg {
-  background-color: rgba(0, 155, 255, 0.1);
+  background-color: var(--sg-accent-bg);
 }
 
 .brand-icon-color {
-  color: #009bff;
+  color: var(--sg-accent);
 }
 
 /* Screen reader only content */
@@ -350,14 +479,10 @@ body {
   border: 0;
 }
 
-/* Component-specific styles extracted from GitLabSetup.svelte */
-
 /* GitLabSetup code elements */
 .gitlab-code {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--sg-font-mono);
 }
-
-/* Component-specific styles extracted from Configuration.svelte */
 
 /* Configuration toast notification animation */
 @keyframes config-slide-up {

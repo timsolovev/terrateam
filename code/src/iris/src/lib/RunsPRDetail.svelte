@@ -162,25 +162,25 @@
   function getPRStateBadgeClass(state: string): string {
     switch (state) {
       case 'open':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'closed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'merged':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
   function getStateColor(state: string): string {
     switch (state) {
-      case 'success': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
-      case 'failure': return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
-      case 'running': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
-      case 'pending': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
-      case 'queued': return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
-      case 'aborted': return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+      case 'success': return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
+      case 'failure': return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
+      case 'running': return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
+      case 'pending': return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)]';
+      case 'queued': return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
+      case 'aborted': return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
+      default: return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -278,7 +278,7 @@
       <div class="flex items-start justify-between mb-4">
         <div class="flex-1">
           <div class="flex items-center gap-3 mb-3">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 class="text-2xl font-semibold text-[var(--sg-text)]">
               #{pullRequest.pull_number} {pullRequest.title || 'Untitled'}
             </h2>
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {getPRStateBadgeClass(pullRequest.state)}">
@@ -288,23 +288,23 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <span class="font-medium text-gray-700 dark:text-gray-300">Repository:</span>
-              <span class="text-gray-600 dark:text-gray-400 ml-2">
+              <span class="font-medium text-[var(--sg-text-muted)]">Repository:</span>
+              <span class="text-[var(--sg-text-dim)] ml-2">
                 {pullRequest.owner}/{pullRequest.name}
               </span>
             </div>
 
             <div>
-              <span class="font-medium text-gray-700 dark:text-gray-300">Branches:</span>
-              <span class="text-gray-600 dark:text-gray-400 ml-2">
+              <span class="font-medium text-[var(--sg-text-muted)]">Branches:</span>
+              <span class="text-[var(--sg-text-dim)] ml-2">
                 {pullRequest.branch} → {pullRequest.base_branch}
               </span>
             </div>
 
             {#if pullRequest.user}
               <div>
-                <span class="font-medium text-gray-700 dark:text-gray-300">Author:</span>
-                <span class="text-gray-600 dark:text-gray-400 ml-2">
+                <span class="font-medium text-[var(--sg-text-muted)]">Author:</span>
+                <span class="text-[var(--sg-text-dim)] ml-2">
                   {pullRequest.user}
                 </span>
               </div>
@@ -312,8 +312,8 @@
 
             {#if pullRequest.merged_at}
               <div>
-                <span class="font-medium text-gray-700 dark:text-gray-300">Merged:</span>
-                <span class="text-gray-600 dark:text-gray-400 ml-2">
+                <span class="font-medium text-[var(--sg-text-muted)]">Merged:</span>
+                <span class="text-[var(--sg-text-dim)] ml-2">
                   {new Date(pullRequest.merged_at).toLocaleString()}
                 </span>
               </div>
@@ -323,7 +323,7 @@
       </div>
 
       <!-- Quick Actions -->
-      <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex flex-wrap gap-3 pt-4 border-t border-[var(--sg-border)]">
         {#if getPRUrl()}
           <Button
             variant="outline"
@@ -361,7 +361,7 @@
     <!-- Stacks Section -->
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 class="text-xl font-semibold text-[var(--sg-text)]">
           Infrastructure Stacks
         </h2>
       </div>
@@ -376,32 +376,30 @@
     <!-- Runs Section -->
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 class="text-xl font-semibold text-[var(--sg-text)]">
           Terraform Runs
         </h2>
       </div>
 
       {#if isRunsLoading}
-        <div class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+        <LoadingSpinner size="xl" />
       {:else if runsError}
         <ErrorMessage type="error" message={runsError} />
       {:else if runs.length === 0}
         <Card padding="md">
           <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="mx-auto h-12 w-12 text-[var(--sg-text-dim)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No runs found</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <h3 class="mt-2 text-sm font-semibold text-[var(--sg-text)]">No runs found</h3>
+            <p class="mt-1 text-sm text-[var(--sg-text-dim)]">
               This pull request doesn't have any Terraform runs yet.
             </p>
           </div>
         </Card>
       {:else}
         <Card padding="none">
-          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div class="divide-y divide-[var(--sg-border)]">
             {#each runs as run}
               <a
                 href={getRunDetailHref(run.id)}
@@ -413,7 +411,7 @@
                   e.preventDefault();
                   navigateToRun(run.id);
                 }}
-                class="block w-full text-left p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                class="block w-full text-left p-4 md:p-6 hover:bg-[var(--sg-bg-2)] transition-colors cursor-pointer"
               >
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div class="flex-1">
@@ -421,38 +419,38 @@
                       <div class="flex items-start gap-2 flex-wrap">
                         <!-- Plan/Apply Visual Indicator -->
                         {#if run.run_type === 'plan'}
-                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 flex-shrink-0">
+                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border border-[var(--sg-accent)] flex-shrink-0">
                             📋 Plan
                           </span>
                         {:else if run.run_type === 'apply'}
-                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700 flex-shrink-0">
+                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] border border-[var(--sg-success)] flex-shrink-0">
                             🚀 Apply
                           </span>
                         {:else}
-                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 flex-shrink-0">
+                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] border border-[var(--sg-border)] flex-shrink-0">
                             {run.run_type}
                           </span>
                         {/if}
 
                         <!-- Path and details on separate line if needed -->
                         <div class="flex items-center gap-1 flex-wrap">
-                          <span class="text-sm text-gray-700 dark:text-gray-300">{run.branch}</span>
+                          <span class="text-sm text-[var(--sg-text-muted)]">{run.branch}</span>
                           {#if run.dir}
-                            <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                            <span class="text-xs text-gray-600 dark:text-gray-400 font-mono break-all">{run.dir}</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                            <span class="text-xs text-[var(--sg-text-dim)] font-mono break-all">{run.dir}</span>
                           {/if}
                           {#if run.workspace && run.workspace !== 'default'}
-                            <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                            <span class="text-xs text-gray-600 dark:text-gray-400">workspace: {run.workspace}</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">workspace: {run.workspace}</span>
                           {/if}
                           {#if run.environment}
-                            <span class="text-xs text-gray-400 dark:text-gray-500">•</span>
-                            <span class="text-xs text-gray-600 dark:text-gray-400">env: {run.environment}</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">•</span>
+                            <span class="text-xs text-[var(--sg-text-dim)]">env: {run.environment}</span>
                           {/if}
                         </div>
                       </div>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                    <div class="text-xs text-[var(--sg-text-dim)]">
                       {formatDateTime(run.created_at)}
                       {#if run.user}
                         • by {run.user}
@@ -463,7 +461,7 @@
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {getStateColor(run.state)}">
                       {run.state}
                     </span>
-                    <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-[var(--sg-text-dim)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
