@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RepositoryWithStacks } from '../../types';
+  import { EmptyState, LoadingSpinner } from '../index';
 
   // Props
   export let repositoriesWithStacks: RepositoryWithStacks[];
@@ -122,22 +123,22 @@
     switch (state) {
       case 'success':
       case 'apply_success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failed':
       case 'apply_failed':
       case 'plan_failed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'pending':
       case 'apply_pending':
       case 'plan_pending':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'ready':
       case 'apply_ready':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'no_changes':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -156,25 +157,17 @@
 
 <!-- Loading state -->
 {#if isLoading}
-  <div class="flex items-center justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-      role="status"
-      aria-label="Loading repositories"
-    >
-      <span class="sr-only">Loading repositories...</span>
-    </div>
-  </div>
+  <LoadingSpinner size="xl" />
 
 <!-- Error state -->
 {:else if error}
   <div
-    class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800"
+    class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="h-5 w-5 text-[var(--sg-error)]" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -183,15 +176,15 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        <h3 class="text-sm font-medium text-[var(--sg-error)]">
           Error loading repositories
         </h3>
-        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+        <div class="mt-2 text-sm text-[var(--sg-error)]">
           {error}
         </div>
         <button
           on:click={onRefresh}
-          class="mt-3 text-sm font-medium text-red-800 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 underline"
+          class="mt-3 text-sm font-medium text-[var(--sg-error)] hover:text-[var(--sg-error)] underline"
         >
           Try again
         </button>
@@ -202,12 +195,12 @@
 <!-- Partial errors warning -->
 {:else if loadErrors.length > 0}
   <div
-    class="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4 border border-yellow-200 dark:border-yellow-800"
+    class="rounded-md bg-[var(--sg-warning-bg)] p-4 border border-[var(--sg-warning)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="h-5 w-5 text-[var(--sg-warning)]" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
             d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -216,10 +209,10 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+        <h3 class="text-sm font-medium text-[var(--sg-warning)]">
           Some stacks could not be loaded
         </h3>
-        <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+        <div class="mt-2 text-sm text-[var(--sg-warning)]">
           Failed to load stacks for {loadErrors.length} PR{loadErrors.length > 1 ? 's' : ''}.
           Showing {filteredRepos.length} {filteredRepos.length === 1 ? 'repository' : 'repositories'} that loaded successfully.
         </div>
@@ -233,26 +226,26 @@
   {#if filteredRepos.length > 0}
     <div class="space-y-4">
       {#each filteredRepos as repo}
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] shadow-sm">
           <!-- Repository header (clickable to expand/collapse) -->
           <button
             on:click={() => toggleRepo(repo.repo)}
-            class="w-full px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors rounded-t-lg"
+            class="w-full px-6 py-4 text-left hover:bg-[var(--sg-bg-2)] transition-colors rounded-t-lg"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-3 mb-2">
-                  <span class="text-lg">
-                    {expandedRepos.has(repo.repo) ? '▼' : '▶'}
-                  </span>
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <svg class="w-5 h-5 transition-transform {expandedRepos.has(repo.repo) ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  <h3 class="text-lg font-semibold text-[var(--sg-text)]">
                     {repo.repo}
                   </h3>
                   <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {getStateBadgeClasses(repo.aggregateState)}">
                     {formatStateName(repo.aggregateState)}
                   </span>
                 </div>
-                <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 ml-8">
+                <div class="flex items-center gap-4 text-sm text-[var(--sg-text-dim)] ml-8">
                   <span>{repo.totalStacks} {repo.totalStacks === 1 ? 'stack' : 'stacks'}</span>
                   <span>•</span>
                   <span>{repo.totalPRs} {repo.totalPRs === 1 ? 'PR' : 'PRs'}</span>
@@ -263,23 +256,23 @@
 
           <!-- Stacks list (expanded) -->
           {#if expandedRepos.has(repo.repo)}
-            <div class="border-t border-gray-200 dark:border-gray-700 p-4 space-y-2 bg-gray-50 dark:bg-gray-900/20">
+            <div class="border-t border-[var(--sg-border)] p-4 space-y-2 bg-[var(--sg-bg-0)]">
               {#each repo.stacks as stack}
-                <div class="p-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div class="p-3 rounded-md bg-[var(--sg-bg-1)] border border-[var(--sg-border)]">
                   <div class="flex items-center justify-between">
                     <div class="flex-1 min-w-0">
-                      <div class="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      <div class="font-medium text-[var(--sg-text)] mb-1">
                         {stack.stackName}
                       </div>
                       <div class="flex flex-wrap gap-1.5 text-xs">
                         {#each stack.dirspaces as ds}
-                          <span class="font-mono bg-gray-100 dark:bg-gray-900/50 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400">
+                          <span class="font-mono bg-[var(--sg-bg-2)] px-1.5 py-0.5 rounded text-[var(--sg-text-dim)]">
                             {ds.dir}:{ds.workspace}
                           </span>
                         {/each}
                       </div>
                       {#if stack.prs.length > 0}
-                        <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        <div class="text-xs text-[var(--sg-text-dim)] mt-1">
                           PRs: {stack.prs.map(pr => `#${pr.prNumber}`).join(', ')}
                         </div>
                       {/if}
@@ -297,28 +290,12 @@
     </div>
   {:else}
     <!-- Empty state -->
-    <div class="text-center py-12">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-        />
-      </svg>
-      <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No repositories found</h3>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        {#if searchQuery}
-          No repositories match your search. Try adjusting your search query.
-        {:else}
-          No repositories with stacks in the last {timeRange} days.
-        {/if}
-      </p>
-    </div>
+    <EmptyState
+      icon="mdi:folder-outline"
+      title="No repositories found"
+      description={searchQuery
+        ? 'No repositories match your search. Try adjusting your search query.'
+        : `No repositories with stacks in the last ${timeRange} days.`}
+    />
   {/if}
 {/if}

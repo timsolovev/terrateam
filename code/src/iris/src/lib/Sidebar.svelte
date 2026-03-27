@@ -131,16 +131,17 @@
   })();
 </script>
 
-<div class="{mobile ? 'bg-white dark:bg-gray-900 shadow-xl' : 'bg-white dark:bg-gray-800'} fixed left-0 top-0 w-64 h-screen border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto">
+<div class="{mobile ? 'bg-[var(--sg-bg-1)] shadow-xl' : 'bg-[var(--sg-bg-1)]'} fixed left-0 top-0 w-64 h-screen border-r border-[var(--sg-border)] flex flex-col overflow-y-auto">
   <!-- Logo and Mobile Close Button -->
-  <div class="flex items-center justify-between px-6 py-6 border-b border-gray-200 dark:border-gray-700">
+  <div class="flex items-center justify-between px-6 py-6 border-b border-[var(--sg-border)]">
     <a href="/" class="block">
       <img src={logoPath} alt="Terrateam" class="h-12" />
+      <span class="text-xs text-[var(--sg-text-dim)] block text-right pr-[18%]">by Stategraph</span>
     </a>
     {#if mobile}
       <button
         on:click={() => dispatch('navigate')}
-        class="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        class="md:hidden p-2 rounded-md text-[var(--sg-text-dim)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)] transition-colors"
         aria-label="Close navigation menu"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +152,7 @@
   </div>
 
   <!-- Slack CTA -->
-  <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+  <div class="px-4 py-3 border-b border-[var(--sg-border)]">
     <button
       on:click={() => window.open(EXTERNAL_URLS.SLACK, '_blank')}
       class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-[#4A154B] hover:bg-[#611f64] rounded-lg transition-colors"
@@ -165,9 +166,9 @@
 
   <!-- Organization Selector -->
   {#if !$installationsLoading && $installations.length > 0}
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="px-6 py-4 border-b border-[var(--sg-border)]">
       <!-- Label -->
-      <label for="organization-select" class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+      <label for="organization-select" class="block text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider mb-2">
         {terminology.organization}
       </label>
       
@@ -175,7 +176,7 @@
       <div class="relative">
         <select
           id="organization-select"
-          class="appearance-none relative block w-full px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg shadow-sm hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm font-medium"
+          class="appearance-none relative block w-full px-3 py-2.5 bg-[var(--sg-bg-1)] border border-[var(--sg-border)] text-[var(--sg-text)] rounded-lg shadow-sm hover:border-[var(--sg-border)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-transparent transition-colors text-sm font-medium"
           on:change={handleInstallationChange}
           value={$selectedInstallation?.id || ''}
         >
@@ -187,7 +188,7 @@
           {/each}
         </select>
         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+          <svg class="h-4 w-4 text-[var(--sg-text-dim)]" fill="none" viewBox="0 0 20 20" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7l3-3 3 3m0 6l-3 3-3-3" />
           </svg>
         </div>
@@ -201,20 +202,20 @@
             <!-- Tier Badge -->
             {#if $selectedInstallation.tier && $selectedInstallation.tier.name.toLowerCase() !== 'unknown'}
               <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium
-                {$selectedInstallation.tier.name.toLowerCase() === 'enterprise' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-                 $selectedInstallation.tier.name.toLowerCase() === 'pro' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">
+                {$selectedInstallation.tier.name.toLowerCase() === 'enterprise' ? 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]' :
+                 $selectedInstallation.tier.name.toLowerCase() === 'pro' ? 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]' :
+                 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]'}">
                 {$selectedInstallation.tier.name}
               </span>
             {:else if currentProvider === 'gitlab'}
               <!-- For GitLab, show a default plan badge when tier is unknown -->
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]">
                 Free
               </span>
             {/if}
             
             <!-- Organization/Group Count -->
-            <span class="text-gray-500 dark:text-gray-400 text-xs">
+            <span class="text-[var(--sg-text-dim)] text-xs">
               {$installations.length} {$installations.length === 1 ? 
                 (currentProvider === 'github' ? 'org' : 'group') : 
                 (currentProvider === 'github' ? 'orgs' : 'groups')}
@@ -226,7 +227,7 @@
             {@const daysLeft = Math.ceil((new Date($selectedInstallation.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}
             {#if daysLeft > 0}
               <div>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 text-xs">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] text-xs">
                   Trial: {daysLeft} days left
                 </span>
               </div>
@@ -236,23 +237,23 @@
       {/if}
     </div>
   {:else if $installationsLoading}
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="px-6 py-4 border-b border-[var(--sg-border)]">
       <div class="animate-pulse">
-        <div class="h-2 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-        <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div class="h-2 w-20 bg-[var(--sg-bg-2)] rounded mb-2"></div>
+        <div class="h-10 bg-[var(--sg-bg-2)] rounded"></div>
       </div>
     </div>
   {:else if $installationsError}
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-      <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+    <div class="px-6 py-4 border-b border-[var(--sg-border)]">
+      <div class="text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider mb-2">
         {terminology.organization}
       </div>
-      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+      <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-3">
         <div class="flex items-center">
-          <svg class="w-4 h-4 text-red-500 dark:text-red-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-[var(--sg-error)] mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.882 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
-          <span class="text-xs text-red-600 dark:text-red-400">
+          <span class="text-xs text-[var(--sg-error)]">
             Failed to load {terminology.organizations}
           </span>
         </div>
@@ -260,16 +261,16 @@
     </div>
   {:else}
     <!-- No installations - demo mode -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-      <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+    <div class="px-6 py-4 border-b border-[var(--sg-border)]">
+      <div class="text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider mb-2">
         {terminology.organization}
       </div>
-      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+      <div class="bg-[var(--sg-accent-bg)] border border-[var(--sg-accent)] rounded-lg p-3">
         <div class="flex items-center">
-          <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-[var(--sg-accent)] mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span class="text-xs text-blue-600 dark:text-blue-400">
+          <span class="text-xs text-[var(--sg-accent)]">
             Demo mode - No {terminology.organizations} connected
           </span>
         </div>
@@ -281,11 +282,11 @@
   <nav class="flex-1 px-4 py-6 space-y-2">
     <!-- Setup Section -->
     <div class="px-3 mb-2">
-      <h3 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Setup</h3>
+      <h3 class="text-xs font-semibold text-[var(--sg-text-dim)] uppercase tracking-wider">Setup</h3>
     </div>
     <button 
       on:click={() => clearURLParamsAndNavigate('#/getting-started')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'getting-started' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'getting-started' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -294,7 +295,7 @@
     </button>
     <button 
       on:click={() => clearURLParamsAndNavigate('#/configuration')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'configuration' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'configuration' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -303,7 +304,7 @@
     </button>
     <button 
       on:click={() => clearURLParamsAndNavigate('#/repositories')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'repositories' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'repositories' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -313,11 +314,11 @@
     
     <!-- Operations Section -->
     <div class="px-3 mt-6 mb-2">
-      <h3 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Operations</h3>
+      <h3 class="text-xs font-semibold text-[var(--sg-text-dim)] uppercase tracking-wider">Operations</h3>
     </div>
     <button 
       on:click={() => clearURLParamsAndNavigate('#/dashboard')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'dashboard' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'dashboard' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
@@ -327,7 +328,7 @@
     </button>
     <button 
       on:click={() => clearURLParamsAndNavigate('#/workspaces')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'workspaces' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'workspaces' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
@@ -336,7 +337,7 @@
     </button>
     <button
       on:click={() => clearURLParamsAndNavigate('#/runs')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'runs' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'runs' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -346,7 +347,7 @@
     </button>
     <button
       on:click={() => clearURLParamsAndNavigate('#/stacks')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'stacks' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'stacks' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -355,7 +356,7 @@
     </button>
     <button
       on:click={() => clearURLParamsAndNavigate('#/analytics')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'analytics' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'analytics' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -364,7 +365,7 @@
     </button>
     <button
       on:click={() => clearURLParamsAndNavigate('#/audit-trail')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'audit-trail' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'audit-trail' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -374,13 +375,13 @@
     
     <!-- Administration Section -->
     <div class="px-3 mt-6 mb-2">
-      <h3 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Administration</h3>
+      <h3 class="text-xs font-semibold text-[var(--sg-text-dim)] uppercase tracking-wider">Administration</h3>
     </div>
     <!-- Subscription - Hide if subscription UI is disabled -->
     {#if shouldShowSubscriptionMenu()}
       <button 
         on:click={() => clearURLParamsAndNavigate('#/subscription')}
-        class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'subscription' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+        class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'subscription' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
       >
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -390,7 +391,7 @@
     {/if}
     <button
       on:click={() => clearURLParamsAndNavigate('#/support')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'support' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'support' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -399,7 +400,7 @@
     </button>
     <button
       on:click={() => clearURLParamsAndNavigate('#/settings')}
-      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'settings' ? 'sidebar-active-item' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'}"
+      class="flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left {activeItem === 'settings' ? 'sidebar-active-item' : 'text-[var(--sg-text-muted)] hover:text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)]'}"
     >
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -410,26 +411,26 @@
   </nav>
 
   <!-- User section -->
-  <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+  <div class="border-t border-[var(--sg-border)] p-4">
     {#if $user}
       <div class="flex items-center justify-between">
         <div class="flex items-center flex-1">
           {#if $githubUser?.avatar_url}
             <img class="h-8 w-8 rounded-full" src={$githubUser.avatar_url} alt={$githubUser.username} />
           {:else}
-            <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <div class="flex-shrink-0 w-8 h-8 bg-[var(--sg-accent-button)] rounded-full flex items-center justify-center">
               <span class="text-white text-sm font-medium">
                 {$githubUser?.username?.charAt(0)?.toUpperCase() || $user.id.charAt(0).toUpperCase()}
               </span>
             </div>
           {/if}
           <div class="ml-3 flex-1">
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <p class="text-sm font-medium text-[var(--sg-text)]">
               {$githubUser?.username || `${$user.id.substring(0, 8)}...`}
             </p>
             <button
               on:click={handleLogout}
-              class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              class="text-xs text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)]"
             >
               Sign out
             </button>
@@ -443,7 +444,7 @@
               const newTheme = $theme === 'dark' ? 'light' : 'dark';
               theme.setTheme(newTheme);
             }}
-            class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-2 rounded-md text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] transition-colors"
             aria-label="Toggle theme"
             title={$theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >

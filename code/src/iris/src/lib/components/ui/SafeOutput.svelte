@@ -177,13 +177,13 @@
 
 {#if !showContent}
   <!-- Size warning with options -->
-  <div class="border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+  <div class="border border-[var(--sg-warning)] bg-[var(--sg-warning-bg)] rounded-lg p-4">
     <div class="flex items-start gap-3">
-      <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="w-5 h-5 text-[var(--sg-warning)] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <div class="flex-1">
-        <h4 class="font-medium text-yellow-800 dark:text-yellow-200 mb-2 text-sm sm:text-base">
+        <h4 class="font-medium text-[var(--sg-warning)] mb-2 text-sm sm:text-base">
           {#if isMedium}
             Large Output Detected
           {:else if isLarge}
@@ -192,7 +192,7 @@
             Extremely Large Output Detected
           {/if}
         </h4>
-        <p class="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300 mb-3">
+        <p class="text-xs sm:text-sm text-[var(--sg-warning)] mb-3">
           This {title.toLowerCase()} output is {formatSize(contentSize)}.
           {#if isMedium}
             This is large but should render fine on modern browsers.
@@ -206,7 +206,7 @@
         <div class="flex flex-col sm:flex-row gap-2">
           {#if !isHuge}
             <button
-              class="px-3 py-1.5 bg-yellow-600 dark:bg-yellow-700 text-white text-xs sm:text-sm rounded hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-colors inline-flex items-center justify-center"
+              class="px-3 py-1.5 bg-[var(--sg-warning)] text-white text-xs sm:text-sm rounded hover:bg-[var(--sg-warning)] hover:opacity-90 transition-colors inline-flex items-center justify-center"
               on:click={handleShowContent}
             >
               <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,7 +217,7 @@
           {/if}
           
           <button
-            class="px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs sm:text-sm rounded hover:bg-green-700 dark:hover:bg-green-800 transition-colors inline-flex items-center justify-center"
+            class="px-3 py-1.5 bg-[var(--sg-success)] text-white text-xs sm:text-sm rounded hover:bg-[var(--sg-success)] hover:opacity-90 transition-colors inline-flex items-center justify-center"
             on:click={handleDownload}
           >
             <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,7 +228,7 @@
           
           {#if githubUrl}
             <button
-              class="px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white text-xs sm:text-sm rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors inline-flex items-center justify-center"
+              class="px-3 py-1.5 bg-[var(--sg-accent-button)] text-white text-xs sm:text-sm rounded hover:bg-[var(--sg-accent-button-hover)] transition-colors inline-flex items-center justify-center"
               on:click={openGitHubLog}
             >
               <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -240,7 +240,7 @@
           
           {#if !isHuge}
             <button
-              class="px-3 py-1.5 border border-yellow-300 dark:border-yellow-600 text-yellow-700 dark:text-yellow-300 text-xs sm:text-sm rounded hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors inline-flex items-center justify-center"
+              class="px-3 py-1.5 border border-[var(--sg-warning)] text-[var(--sg-warning)] text-xs sm:text-sm rounded hover:bg-[var(--sg-warning-bg)] transition-colors inline-flex items-center justify-center"
               on:click={handleShowFullContent}
             >
               <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,7 +257,7 @@
   <!-- Content display -->
   <div class="space-y-3">
     <!-- Header with expand button and size info -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-[var(--sg-text-dim)] bg-[var(--sg-bg-0)] px-3 py-2 rounded">
       <span class="font-medium">
         {#if isMedium || isLarge || isHuge}
           Size: {formatSize(contentSize)}
@@ -267,7 +267,7 @@
       </span>
       <div class="flex items-center gap-2 flex-wrap">
         <button
-          class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-3 py-1 border border-blue-200 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors inline-flex items-center justify-center"
+          class="text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] px-3 py-1 border border-[var(--sg-accent)] rounded hover:bg-[var(--sg-accent-bg)] transition-colors inline-flex items-center justify-center"
           on:click={handleExpand}
         >
           <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -276,7 +276,7 @@
           <span>Expand</span>
         </button>
         <button
-          class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 px-3 py-1 border border-green-200 dark:border-green-600 rounded hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors inline-flex items-center justify-center"
+          class="text-[var(--sg-success)] hover:text-[var(--sg-success)] px-3 py-1 border border-[var(--sg-success)] rounded hover:bg-[var(--sg-success-bg)] transition-colors inline-flex items-center justify-center"
           on:click={handleDownload}
         >
           <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -286,7 +286,7 @@
         </button>
         {#if githubUrl && (isMedium || isLarge || isHuge)}
           <button
-            class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+            class="text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] underline"
             on:click={openGitHubLog}
           >
             View in GitHub
@@ -297,12 +297,12 @@
     
     {#if isPlan && highlightedContent}
       <!-- Syntax-highlighted plan output -->
-      <pre class="plan-hljs text-xs bg-gray-900 dark:bg-gray-950 p-3 rounded overflow-x-auto whitespace-pre-wrap font-mono {showFullContent ? '' : 'max-h-96'}">
+      <pre class="plan-hljs text-xs bg-[var(--sg-bg-code)] p-3 rounded overflow-x-auto whitespace-pre-wrap font-mono {showFullContent ? '' : 'max-h-96'}">
         <code>{@html showFullContent ? highlightedContent : highlightedPreview}</code>
       </pre>
     {:else}
       <!-- Plain text output (non-plan or highlighting failed) -->
-      <pre class="text-xs bg-gray-900 dark:bg-gray-950 text-gray-100 dark:text-gray-200 p-3 rounded overflow-x-auto whitespace-pre-wrap font-mono {showFullContent ? '' : 'max-h-96'}">
+      <pre class="text-xs bg-[var(--sg-bg-code)] text-[var(--sg-text-code)] p-3 rounded overflow-x-auto whitespace-pre-wrap font-mono {showFullContent ? '' : 'max-h-96'}">
         {showFullContent ? content : previewContent}
       </pre>
     {/if}
@@ -310,7 +310,7 @@
     {#if !showFullContent && (isMedium || isLarge)}
       <div class="text-center">
         <button
-          class="px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+          class="px-4 py-2 bg-[var(--sg-bg-2)] text-[var(--sg-text)] text-sm rounded hover:bg-[var(--sg-bg-2)] hover:opacity-90 transition-colors"
           on:click={handleShowFullContent}
         >
           ⚡ Load Full Output ({formatSize(contentSize)})

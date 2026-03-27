@@ -9,50 +9,50 @@
     switch (state) {
       case 'no_changes':
         return {
-          bgClass: 'bg-gray-100 dark:bg-gray-700',
-          textClass: 'text-gray-800 dark:text-gray-300',
+          bgClass: 'bg-[var(--sg-bg-2)]',
+          textClass: 'text-[var(--sg-text)]',
           label: 'No changes'
         };
       case 'plan_failed':
         return {
-          bgClass: 'bg-orange-100 dark:bg-orange-900/30',
-          textClass: 'text-orange-800 dark:text-orange-400',
+          bgClass: 'bg-[var(--sg-orange-bg)]',
+          textClass: 'text-[var(--sg-orange)]',
           label: 'Plan failed'
         };
       case 'plan_pending':
         return {
-          bgClass: 'bg-pink-100 dark:bg-pink-900/30',
-          textClass: 'text-pink-800 dark:text-pink-400',
+          bgClass: 'bg-[var(--sg-pink-bg)]',
+          textClass: 'text-[var(--sg-pink)]',
           label: 'Plan pending'
         };
       case 'apply_failed':
         return {
-          bgClass: 'bg-red-100 dark:bg-red-900/30',
-          textClass: 'text-red-800 dark:text-red-400',
+          bgClass: 'bg-[var(--sg-error-bg)]',
+          textClass: 'text-[var(--sg-error)]',
           label: 'Apply failed'
         };
       case 'apply_pending':
         return {
-          bgClass: 'bg-purple-100 dark:bg-purple-900/30',
-          textClass: 'text-purple-800 dark:text-purple-400',
+          bgClass: 'bg-[var(--sg-purple-bg)]',
+          textClass: 'text-[var(--sg-purple)]',
           label: 'Apply pending'
         };
       case 'apply_ready':
         return {
-          bgClass: 'bg-blue-100 dark:bg-blue-900/30',
-          textClass: 'text-blue-800 dark:text-blue-400',
+          bgClass: 'bg-[var(--sg-accent-bg)]',
+          textClass: 'text-[var(--sg-accent)]',
           label: 'Apply ready'
         };
       case 'apply_success':
         return {
-          bgClass: 'bg-green-100 dark:bg-green-900/30',
-          textClass: 'text-green-800 dark:text-green-400',
+          bgClass: 'bg-[var(--sg-success-bg)]',
+          textClass: 'text-[var(--sg-success)]',
           label: 'Applied successfully'
         };
       default:
         return {
-          bgClass: 'bg-gray-100 dark:bg-gray-700',
-          textClass: 'text-gray-800 dark:text-gray-300',
+          bgClass: 'bg-[var(--sg-bg-2)]',
+          textClass: 'text-[var(--sg-text)]',
           label: 'Unknown'
         };
     }

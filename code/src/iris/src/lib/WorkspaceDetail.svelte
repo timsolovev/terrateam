@@ -302,17 +302,17 @@
   function getStateColor(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failure':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'running':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'queued':
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
+        return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)]';
       case 'aborted':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
     }
   }
   
@@ -380,18 +380,18 @@
     <div class="mt-4">
       <a 
         href={getBackUrl()} 
-        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+        class="text-[var(--sg-accent)] hover:text-[var(--sg-accent)] font-medium"
       >
         ← Back to Workspaces
       </a>
     </div>
   {:else if !isLoading && !workspace}
     <div class="text-center py-12">
-      <p class="text-gray-600 dark:text-gray-400">Workspace not found.</p>
+      <p class="text-[var(--sg-text-muted)]">Workspace not found.</p>
       <div class="mt-4">
         <a 
           href={getBackUrl()} 
-          class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+          class="text-[var(--sg-accent)] hover:text-[var(--sg-accent)] font-medium"
         >
           ← Back to Workspaces
         </a>
@@ -402,7 +402,7 @@
     <div class="mb-6">
       <a 
         href={getBackUrl()} 
-        class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+        class="inline-flex items-center text-[var(--sg-accent)] hover:text-[var(--sg-accent)] font-medium"
       >
         <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -417,11 +417,11 @@
       <Card padding="md" class="lg:col-span-2">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 md:mb-6">
           <div class="min-w-0 flex-1">
-            <h2 class="text-xl md:text-2xl font-bold text-brand-primary mb-2 truncate">
+            <h2 class="text-xl md:text-2xl font-bold text-[var(--sg-text)] mb-2 truncate">
               📁 {workspace.dir}
             </h2>
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm md:text-lg px-2 md:px-3 py-0.5 md:py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full font-mono">
+              <span class="text-sm md:text-lg px-2 md:px-3 py-0.5 md:py-1 bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] rounded-full font-mono">
                 {workspace.workspace}
               </span>
               <span class={`px-2 md:px-3 py-0.5 md:py-1 rounded-full font-medium text-sm ${getStateColor(workspace.state)}`}>
@@ -430,28 +430,28 @@
             </div>
           </div>
           <div class="text-left sm:text-right">
-            <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">Last Run</div>
+            <div class="text-xs md:text-sm text-[var(--sg-text-muted)]">Last Run</div>
             <div class="font-medium text-sm md:text-base">{getRunTypeLabel(workspace.run_type)}</div>
-            <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400">{getRelativeTime(workspace.created_at)}</div>
+            <div class="text-xs md:text-sm text-[var(--sg-text-dim)]">{getRelativeTime(workspace.created_at)}</div>
           </div>
         </div>
         
         <!-- Repository & Environment Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-xs md:text-sm">
           <div>
-            <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">Repository</h4>
+            <h4 class="font-medium text-[var(--sg-text)] mb-2">Repository</h4>
             <div class="space-y-1">
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">Owner:</span> <span class="font-mono">{workspace.owner}</span></div>
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">Repo:</span> <span class="font-mono">{workspace.repo}</span></div>
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment:</span> <span class="font-mono">{workspace.environment || 'default'}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">Owner:</span> <span class="font-mono">{workspace.owner}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">Repo:</span> <span class="font-mono">{workspace.repo}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment:</span> <span class="font-mono">{workspace.environment || 'default'}</span></div>
             </div>
           </div>
           <div>
-            <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">Last Run Context</h4>
+            <h4 class="font-medium text-[var(--sg-text)] mb-2">Last Run Context</h4>
             <div class="space-y-1">
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">Branch:</span> <span class="font-mono text-xs">{workspace.branch}</span></div>
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">Base Branch:</span> <span class="font-mono text-xs">{workspace.base_branch}</span></div>
-              <div class="truncate"><span class="text-gray-600 dark:text-gray-400">Commit:</span> <span class="font-mono text-xs">{workspace.branch_ref.substring(0, 8)}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">Branch:</span> <span class="font-mono text-xs">{workspace.branch}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">Base Branch:</span> <span class="font-mono text-xs">{workspace.base_branch}</span></div>
+              <div class="truncate"><span class="text-[var(--sg-text-muted)]">Commit:</span> <span class="font-mono text-xs">{workspace.branch_ref.substring(0, 8)}</span></div>
             </div>
           </div>
         </div>
@@ -462,24 +462,24 @@
         <!-- Resource Changes (only show if we have plan data) -->
         {#if outputs.some(output => output?.step === 'tf/plan')}
           <Card padding="md">
-            <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">📊 Resource Changes</h4>
+            <h4 class="font-medium text-[var(--sg-text)] mb-3">📊 Resource Changes</h4>
             {#if resourceChanges.hasChanges}
               <div class="space-y-2">
                 <div class="flex justify-between">
-                  <span class="text-green-600 dark:text-green-400">+ Add</span>
+                  <span class="text-[var(--sg-success)]">+ Add</span>
                   <span class="font-medium">{resourceChanges.add}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-yellow-600 dark:text-yellow-400">~ Change</span>
+                  <span class="text-[var(--sg-warning)]">~ Change</span>
                   <span class="font-medium">{resourceChanges.change}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-red-600 dark:text-red-400">- Destroy</span>
+                  <span class="text-[var(--sg-error)]">- Destroy</span>
                   <span class="font-medium">{resourceChanges.destroy}</span>
                 </div>
               </div>
             {:else}
-              <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+              <div class="text-center py-4 text-[var(--sg-text-dim)]">
                 <div class="text-2xl mb-1">✨</div>
                 <div class="text-sm">No changes</div>
               </div>
@@ -553,17 +553,17 @@
           
           {#if costData?.total_monthly_cost !== undefined}
             <Card padding="md">
-              <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">💰 Last Plan Cost</h4>
+              <h4 class="font-medium text-[var(--sg-text)] mb-3">💰 Last Plan Cost</h4>
               <div class="text-center">
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div class="text-2xl font-bold text-[var(--sg-success)]">
                   ${costData.total_monthly_cost.toFixed(2)}
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div class="text-sm text-[var(--sg-text-muted)] mt-1">
                   {costData.currency || 'USD'} from last plan
                 </div>
                 {#if costData.diff_monthly_cost !== 0}
                   <div class="mt-2 text-sm">
-                    <span class={costData.diff_monthly_cost > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                    <span class={costData.diff_monthly_cost > 0 ? 'text-[var(--sg-error)]' : 'text-[var(--sg-success)]'}>
                       {costData.diff_monthly_cost > 0 ? '+' : ''}{costData.diff_monthly_cost.toFixed(2)} change
                     </span>
                   </div>
@@ -575,28 +575,28 @@
         
         <!-- Last Operations -->
         <Card padding="md">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">⏰ Recent Operations</h4>
+          <h4 class="font-medium text-[var(--sg-text)] mb-3">⏰ Recent Operations</h4>
           <div class="space-y-3 text-xs md:text-sm">
             {#if lastApplyRun}
               <div>
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400">Last Apply</span>
+                  <span class="text-[var(--sg-text-muted)]">Last Apply</span>
                   <span class={`px-2 py-1 rounded text-xs ${getStateColor(lastApplyRun.state)}`}>
                     {getStateIcon(lastApplyRun.state)}
                   </span>
                 </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">{getRelativeTime(lastApplyRun.created_at)}</div>
+                <div class="text-xs text-[var(--sg-text-dim)]">{getRelativeTime(lastApplyRun.created_at)}</div>
               </div>
             {/if}
             {#if lastPlanRun}
               <div>
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400">Last Plan</span>
+                  <span class="text-[var(--sg-text-muted)]">Last Plan</span>
                   <span class={`px-2 py-1 rounded text-xs ${getStateColor(lastPlanRun.state)}`}>
                     {getStateIcon(lastPlanRun.state)}
                   </span>
                 </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">{getRelativeTime(lastPlanRun.created_at)}</div>
+                <div class="text-xs text-[var(--sg-text-dim)]">{getRelativeTime(lastPlanRun.created_at)}</div>
               </div>
             {/if}
           </div>
@@ -615,7 +615,7 @@
         <div class="text-center">
           <div class="text-xl md:text-2xl mb-1 md:mb-2">📋</div>
           <div class="font-medium text-sm md:text-base">Latest Run</div>
-          <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">View most recent run details</div>
+          <div class="text-xs md:text-sm text-[var(--sg-text-muted)]">View most recent run details</div>
         </div>
       </ClickableCard>
       
@@ -628,7 +628,7 @@
         <div class="text-center">
           <div class="text-xl md:text-2xl mb-1 md:mb-2">📋</div>
           <div class="font-medium text-sm md:text-base">All Runs</div>
-          <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">History of all runs</div>
+          <div class="text-xs md:text-sm text-[var(--sg-text-muted)]">History of all runs</div>
         </div>
       </ClickableCard>
       
@@ -641,7 +641,7 @@
         <div class="text-center">
           <div class="text-xl md:text-2xl mb-1 md:mb-2">🔗</div>
           <div class="font-medium text-sm md:text-base">View on GitHub</div>
-          <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">Open directory in repo</div>
+          <div class="text-xs md:text-sm text-[var(--sg-text-muted)]">Open directory in repo</div>
         </div>
       </ClickableCard>
     </div>
@@ -649,8 +649,8 @@
     <!-- Tabbed Content -->
     <Card padding="none" class="mb-6">
       <!-- Tab Navigation - Single tab now, so just show as header -->
-      <div class="border-b border-gray-200 dark:border-gray-600 px-4 md:px-6 py-3">
-        <h3 class="font-medium text-base md:text-lg text-gray-900 dark:text-gray-100">
+      <div class="border-b border-[var(--sg-border)] px-4 md:px-6 py-3">
+        <h3 class="font-medium text-base md:text-lg text-[var(--sg-text)]">
           📈 Recent Run History
         </h3>
       </div>
@@ -660,28 +660,28 @@
         {#if activeTab === 'history'}
           <!-- Run History -->
           {#if runHistory.length === 0}
-            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div class="text-center py-8 text-[var(--sg-text-dim)]">
               <div class="text-4xl mb-2">📝</div>
               <p>No run history found</p>
             </div>
           {:else}
             <div class="space-y-3">
               {#each runHistory as run}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors gap-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 bg-[var(--sg-bg-2)] rounded-lg hover:bg-[var(--sg-bg-2)] transition-colors gap-3">
                   <div class="flex flex-wrap items-center gap-2">
                     <span class={`px-1.5 md:px-2 py-0.5 md:py-1 rounded text-xs font-medium ${getStateColor(run.state)}`}>
                       {getStateIcon(run.state)} {run.state}
                     </span>
                     <span class="font-medium text-sm md:text-base">{getRunTypeLabel(run.run_type)}</span>
                     {#if run.user}
-                      <span class="text-xs md:text-sm text-gray-600 dark:text-gray-400">by {run.user}</span>
+                      <span class="text-xs md:text-sm text-[var(--sg-text-muted)]">by {run.user}</span>
                     {/if}
                   </div>
                   <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
-                    <span class="text-xs md:text-sm text-gray-500 dark:text-gray-400">{formatDate(run.created_at)}</span>
+                    <span class="text-xs md:text-sm text-[var(--sg-text-dim)]">{formatDate(run.created_at)}</span>
                     <button
                       on:click={() => navigateToRun(run.id)}
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs md:text-sm font-medium whitespace-nowrap"
+                      class="text-[var(--sg-accent)] hover:text-[var(--sg-accent)] text-xs md:text-sm font-medium whitespace-nowrap"
                     >
                       View Details →
                     </button>

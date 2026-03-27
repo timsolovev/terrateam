@@ -92,24 +92,24 @@
     <main class="flex-1 p-6">
       <div class="max-w-4xl mx-auto">
         <!-- Success Message (hidden by default) -->
-        <div id="success-message" class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 hidden">
+        <div id="success-message" class="mb-6 bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg p-4 hidden">
           <div class="flex items-center">
-            <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-[var(--sg-success)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="text-green-800 font-medium">Settings saved successfully!</p>
+            <p class="text-[var(--sg-success)] font-medium">Settings saved successfully!</p>
           </div>
         </div>
 
         <!-- Tab Navigation -->
-        <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="mb-6 border-b border-[var(--sg-border)]">
           <nav class="-mb-px flex space-x-8" aria-label="Settings tabs">
             <button
               on:click={() => setActiveTab('organization')}
               class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors
                 {activeTab === 'organization'
-                  ? 'border-brand-primary text-brand-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+                  : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'
                 }"
               aria-current={activeTab === 'organization' ? 'page' : undefined}
             >
@@ -123,8 +123,8 @@
               on:click={() => setActiveTab('api-keys')}
               class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors
                 {activeTab === 'api-keys'
-                  ? 'border-brand-primary text-brand-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+                  : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'
                 }"
               aria-current={activeTab === 'api-keys' ? 'page' : undefined}
             >
@@ -137,8 +137,8 @@
               on:click={() => setActiveTab('diagnostics')}
               class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors
                 {activeTab === 'diagnostics'
-                  ? 'border-brand-primary text-brand-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? 'border-[var(--sg-accent)] text-[var(--sg-accent)]'
+                  : 'border-transparent text-[var(--sg-text-dim)] hover:text-[var(--sg-text-muted)] hover:border-[var(--sg-border)]'
                 }"
               aria-current={activeTab === 'diagnostics' ? 'page' : undefined}
             >
@@ -163,20 +163,20 @@
               </svg>
             </div>
             
-            <h2 class="text-2xl font-bold text-brand-primary mb-6">{capitalizedOrganization} Settings</h2>
+            <h2 class="text-2xl font-bold text-[var(--sg-text)] mb-6">{capitalizedOrganization} Settings</h2>
             
             <!-- Default {terminology.organization} Selection -->
             <div class="mb-8">
-              <label for="default-{terminology.organization.toLowerCase()}" class="block text-sm font-medium text-brand-secondary mb-3">
+              <label for="default-{terminology.organization.toLowerCase()}" class="block text-sm font-medium text-[var(--sg-text-muted)] mb-3">
                 Default {terminology.organization}
               </label>
-              <p class="text-sm text-brand-secondary mb-4">
+              <p class="text-sm text-[var(--sg-text-muted)] mb-4">
                 Select which {terminology.organization.toLowerCase()} should be selected by default when you login. This helps streamline your workflow by automatically switching to your preferred {terminology.organization.toLowerCase()}.
               </p>
               <select
                 id="default-{terminology.organization.toLowerCase()}"
                 bind:value={selectedDefaultInstallation}
-                class="w-full max-w-md px-3 py-2 border border-brand-primary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-brand-primary text-brand-primary"
+                class="w-full max-w-md px-3 py-2 border border-[var(--sg-border)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:border-[var(--sg-accent)] bg-[var(--sg-bg-1)] text-[var(--sg-text)]"
               >
                 <option value="">Select {articleForOrganization} {terminology.organization.toLowerCase()}...</option>
                 {#each $installations as installation}
@@ -187,10 +187,10 @@
 
             <!-- Theme Selection -->
             <div class="mb-8">
-              <label for="theme-selection" class="block text-sm font-medium text-brand-secondary mb-3">
+              <label for="theme-selection" class="block text-sm font-medium text-[var(--sg-text-muted)] mb-3">
                 Theme Appearance
               </label>
-              <p class="text-sm text-brand-secondary mb-4">
+              <p class="text-sm text-[var(--sg-text-muted)] mb-4">
                 Choose how the interface should appear. System default will automatically match your operating system's theme preference.
               </p>
               <div class="space-y-3">
@@ -199,11 +199,11 @@
                     type="radio"
                     bind:group={selectedTheme}
                     value="system"
-                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    class="h-4 w-4 text-[var(--sg-accent)] border-[var(--sg-border)] focus:ring-[var(--sg-accent)]"
                   />
-                  <span class="ml-3 text-sm text-brand-primary">
+                  <span class="ml-3 text-sm text-[var(--sg-text)]">
                     <span class="font-medium">System default</span>
-                    <span class="block text-brand-secondary">Automatically match your device's theme</span>
+                    <span class="block text-[var(--sg-text-muted)]">Automatically match your device's theme</span>
                   </span>
                 </label>
                 <label class="flex items-center">
@@ -211,11 +211,11 @@
                     type="radio"
                     bind:group={selectedTheme}
                     value="light"
-                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    class="h-4 w-4 text-[var(--sg-accent)] border-[var(--sg-border)] focus:ring-[var(--sg-accent)]"
                   />
-                  <span class="ml-3 text-sm text-brand-primary">
+                  <span class="ml-3 text-sm text-[var(--sg-text)]">
                     <span class="font-medium">Light mode</span>
-                    <span class="block text-brand-secondary">Use the light theme</span>
+                    <span class="block text-[var(--sg-text-muted)]">Use the light theme</span>
                   </span>
                 </label>
                 <label class="flex items-center">
@@ -223,11 +223,11 @@
                     type="radio"
                     bind:group={selectedTheme}
                     value="dark"
-                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    class="h-4 w-4 text-[var(--sg-accent)] border-[var(--sg-border)] focus:ring-[var(--sg-accent)]"
                   />
-                  <span class="ml-3 text-sm text-brand-primary">
+                  <span class="ml-3 text-sm text-[var(--sg-text)]">
                     <span class="font-medium">Dark mode</span>
-                    <span class="block text-brand-secondary">Use the dark theme</span>
+                    <span class="block text-[var(--sg-text-muted)]">Use the dark theme</span>
                   </span>
                 </label>
               </div>
@@ -247,7 +247,7 @@
         </div>
 
         <!-- Settings Information -->
-        <div class="bg-brand-tertiary rounded-lg p-4 md:p-6 border border-brand-secondary">
+        <div class="bg-[var(--sg-bg-2)] rounded-lg p-4 md:p-6 border border-[var(--sg-border-light)]">
           <div class="flex items-start">
             <div class="flex-shrink-0">
               <svg class="w-5 h-5 md:w-6 md:h-6 brand-icon-color" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,8 +255,8 @@
               </svg>
             </div>
             <div class="ml-3 md:ml-4">
-              <h3 class="text-base md:text-lg font-semibold text-brand-primary mb-2">About Default {capitalizedOrganization}</h3>
-              <p class="text-sm md:text-base text-brand-secondary">
+              <h3 class="text-base md:text-lg font-semibold text-[var(--sg-text)] mb-2">About Default {capitalizedOrganization}</h3>
+              <p class="text-sm md:text-base text-[var(--sg-text-muted)]">
                 When you set a default {terminology.organization.toLowerCase()}, it will be automatically selected when you log in or refresh the application.
                 You can still switch between {terminology.organizations.toLowerCase()} at any time using the dropdown in the sidebar.
                 Your preference is saved locally in your browser.
@@ -280,8 +280,8 @@
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">Connection Diagnostics</h2>
-                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                <h2 class="text-lg md:text-xl font-bold text-[var(--sg-text)]">Connection Diagnostics</h2>
+                <p class="text-xs md:text-sm text-[var(--sg-text-dim)]">
                   {VCS_PROVIDERS[currentProvider].displayName} integration status and API connectivity
                 </p>
               </div>
@@ -291,8 +291,8 @@
               disabled={isLoadingDiagnostics}
               class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
                 {isLoadingDiagnostics 
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500'}"
+                  ? 'bg-[var(--sg-bg-2)] text-[var(--sg-text-dim)] cursor-not-allowed' 
+                  : 'bg-[var(--sg-bg-1)] text-[var(--sg-text-muted)] border border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)]'}"
             >
               {#if isLoadingDiagnostics}
                 <svg class="animate-spin -ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -312,31 +312,31 @@
           {#if isLoadingDiagnostics}
             <div class="flex justify-center items-center py-8">
               <LoadingSpinner size="md" />
-              <span class="ml-3 text-gray-600 dark:text-gray-400">Running diagnostics...</span>
+              <span class="ml-3 text-[var(--sg-text-dim)]">Running diagnostics...</span>
             </div>
           {:else if diagnosticsError}
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4">
               <div class="flex items-center">
-                <svg class="w-5 h-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-[var(--sg-error)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <p class="font-medium text-red-800 dark:text-red-400">Connection Failed</p>
-                  <p class="text-sm text-red-700 dark:text-red-300">{diagnosticsError}</p>
+                  <p class="font-medium text-[var(--sg-error)]">Connection Failed</p>
+                  <p class="text-sm text-[var(--sg-error)]">{diagnosticsError}</p>
                 </div>
               </div>
             </div>
           {:else if serverConfig}
             <div class="space-y-4">
               <!-- Overall Status -->
-              <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <div class="bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg p-4">
                 <div class="flex items-center">
-                  <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-[var(--sg-success)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <p class="font-medium text-green-800 dark:text-green-400">All Systems Operational</p>
-                    <p class="text-sm text-green-700 dark:text-green-300">Successfully connected to Terrateam services</p>
+                    <p class="font-medium text-[var(--sg-success)]">All Systems Operational</p>
+                    <p class="text-sm text-[var(--sg-success)]">Successfully connected to Terrateam services</p>
                   </div>
                 </div>
               </div>
@@ -344,14 +344,14 @@
               <!-- Integration Details -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- User Authentication -->
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                   <div class="flex items-start justify-between mb-3">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100">User Authentication</h4>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap ml-2">
+                    <h4 class="font-medium text-[var(--sg-text)]">User Authentication</h4>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] whitespace-nowrap ml-2">
                       Connected
                     </span>
                   </div>
-                  <div class="space-y-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <div class="space-y-2 text-xs md:text-sm text-[var(--sg-text-dim)]">
                     <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span class="whitespace-nowrap">User ID:</span>
                       <span class="font-mono truncate">{$user?.id?.substring(0, 8)}...</span>
@@ -365,14 +365,14 @@
 
                 <!-- Provider Integration -->
                 {#if serverConfig.github && currentProvider === 'github'}
-                  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                     <div class="flex items-start justify-between mb-3">
-                      <h4 class="font-medium text-gray-900 dark:text-gray-100">GitHub Integration</h4>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap ml-2">
+                      <h4 class="font-medium text-[var(--sg-text)]">GitHub Integration</h4>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] whitespace-nowrap ml-2">
                         Active
                       </span>
                     </div>
-                    <div class="space-y-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <div class="space-y-2 text-xs md:text-sm text-[var(--sg-text-dim)]">
                       <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                         <span class="whitespace-nowrap">App Client ID:</span>
                         <span class="font-mono truncate text-xs">{serverConfig.github.app_client_id}</span>
@@ -384,14 +384,14 @@
                     </div>
                   </div>
                 {:else if serverConfig.gitlab && currentProvider === 'gitlab'}
-                  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                     <div class="flex items-start justify-between mb-3">
-                      <h4 class="font-medium text-gray-900 dark:text-gray-100">GitLab Integration</h4>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap ml-2">
+                      <h4 class="font-medium text-[var(--sg-text)]">GitLab Integration</h4>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] whitespace-nowrap ml-2">
                         Active
                       </span>
                     </div>
-                    <div class="space-y-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <div class="space-y-2 text-xs md:text-sm text-[var(--sg-text-dim)]">
                       <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                         <span class="whitespace-nowrap">App ID:</span>
                         <span class="font-mono truncate text-xs">{serverConfig.gitlab.app_id.length > 12 ? serverConfig.gitlab.app_id.substring(0, 12) + '...' : serverConfig.gitlab.app_id}</span>
@@ -407,36 +407,36 @@
                     </div>
                   </div>
                 {:else}
-                  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                     <div class="flex items-start justify-between mb-3">
-                      <h4 class="font-medium text-gray-900 dark:text-gray-100">{VCS_PROVIDERS[currentProvider].displayName} Integration</h4>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 whitespace-nowrap ml-2">
+                      <h4 class="font-medium text-[var(--sg-text)]">{VCS_PROVIDERS[currentProvider].displayName} Integration</h4>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] whitespace-nowrap ml-2">
                         Not Configured
                       </span>
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-[var(--sg-text-dim)]">
                       Server configuration not available for {VCS_PROVIDERS[currentProvider].displayName}
                     </div>
                   </div>
                 {/if}
 
                 <!-- {terminology.organizations} -->
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                   <div class="flex items-start justify-between mb-3">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100">{terminology.organizations}</h4>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 whitespace-nowrap ml-2">
+                    <h4 class="font-medium text-[var(--sg-text)]">{terminology.organizations}</h4>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] whitespace-nowrap ml-2">
                       {$installations.length} Connected
                     </span>
                   </div>
-                  <div class="space-y-1 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <div class="space-y-1 text-xs md:text-sm text-[var(--sg-text-dim)]">
                     {#each $installations.slice(0, 3) as installation}
                       <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                         <span class="truncate">{installation.name}</span>
-                        <span class="text-xs text-gray-500">{installation.tier?.name || 'Free'}</span>
+                        <span class="text-xs text-[var(--sg-text-dim)]">{installation.tier?.name || 'Free'}</span>
                       </div>
                     {/each}
                     {#if $installations.length > 3}
-                      <div class="text-xs text-gray-500">
+                      <div class="text-xs text-[var(--sg-text-dim)]">
                         +{$installations.length - 3} more {terminology.organizations.toLowerCase()}
                       </div>
                     {/if}
@@ -444,14 +444,14 @@
                 </div>
 
                 <!-- Current Session -->
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <div class="bg-[var(--sg-bg-0)] rounded-lg p-4">
                   <div class="flex items-start justify-between mb-3">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100">Current Session</h4>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap ml-2">
+                    <h4 class="font-medium text-[var(--sg-text)]">Current Session</h4>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--sg-success-bg)] text-[var(--sg-success)] whitespace-nowrap ml-2">
                       Active
                     </span>
                   </div>
-                  <div class="space-y-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <div class="space-y-2 text-xs md:text-sm text-[var(--sg-text-dim)]">
                     <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span class="whitespace-nowrap">Selected Org:</span>
                       <span class="truncate">{$selectedInstallation?.name || 'None'}</span>

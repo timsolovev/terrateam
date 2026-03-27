@@ -388,17 +388,17 @@
   function getStateColor(state: string): string {
     switch (state) {
       case 'success':
-        return 'text-green-600 bg-green-100';
+        return 'text-[var(--sg-success)] bg-[var(--sg-success-bg)]';
       case 'completed':
-        return 'text-blue-600 bg-blue-100'; // Neutral blue for completed (could have failures)
+        return 'text-[var(--sg-accent)] bg-[var(--sg-accent-bg)]'; // Neutral blue for completed (could have failures)
       case 'running':
       case 'queued':
-        return 'text-blue-600 bg-blue-100';
+        return 'text-[var(--sg-accent)] bg-[var(--sg-accent-bg)]';
       case 'failure':
       case 'aborted':
-        return 'text-red-600 bg-red-100';
+        return 'text-[var(--sg-error)] bg-[var(--sg-error-bg)]';
       default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-100';
+        return 'text-[var(--sg-text-dim)] bg-[var(--sg-bg-2)]';
     }
   }
 
@@ -411,7 +411,7 @@
     if ((originalState === 'failure' || originalState === 'error') && ignoreErrors === true) {
       return {
         state: 'ignored',
-        color: 'text-yellow-600 bg-yellow-100'
+        color: 'text-[var(--sg-warning)] bg-[var(--sg-warning-bg)]'
       };
     }
 
@@ -470,13 +470,13 @@
       if (hasFailures) {
         return {
           icon: '⚠️',
-          color: 'text-orange-600 bg-orange-100',
+          color: 'text-[var(--sg-warning)] bg-[var(--sg-warning-bg)]',
           label: 'Completed with Failures'
         };
       } else {
         return {
           icon: '🏁',
-          color: 'text-blue-600 bg-blue-100',
+          color: 'text-[var(--sg-accent)] bg-[var(--sg-accent-bg)]',
           label: 'Completed'
         };
       }
@@ -749,7 +749,7 @@
     <div class="mt-4">
       <a 
         href={getBackUrl()} 
-        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+        class="text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] font-medium"
       >
         ← Back to Runs
       </a>
@@ -759,7 +759,7 @@
     <div class="mb-6">
       <a 
         href={getBackUrl()} 
-        class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+        class="inline-flex items-center text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] font-medium"
       >
         <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -772,10 +772,10 @@
     <Card padding="lg" class="mb-6">
       <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
         <div class="flex-1">
-          <h2 class="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2 break-words">
+          <h2 class="text-xl sm:text-2xl font-bold text-[var(--sg-accent)] mb-2 break-words">
             {run.repo}
           </h2>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-sm text-[var(--sg-text-dim)]">
             <span>Dirspaces: <span class="font-medium">{run.dirspaces.length}</span></span>
             {#if run.environment}
               <span>{$currentVCSProvider === 'gitlab' ? 'GitLab' : 'GitHub'} Environment: <span class="font-medium">{run.environment}</span></span>
@@ -792,7 +792,7 @@
               </span>
             </div>
           {/if}
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="text-sm text-[var(--sg-text-dim)]">
             {getRunTypeLabel(run.run_type)}
           </div>
           {#if run.run_id}
@@ -800,7 +800,7 @@
               href={getGitHubActionsUrl(run.owner, run.repo, run.run_id)}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline whitespace-nowrap"
+              class="inline-flex items-center text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] hover:underline whitespace-nowrap"
             >
               <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
@@ -818,9 +818,9 @@
       <!-- Pull Request Information -->
       {#if getPullRequestInfo(run.kind).pullNumber}
         {@const prInfo = getPullRequestInfo(run.kind)}
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mb-6">
+        <div class="border-t border-[var(--sg-border)] pt-6 mb-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400">Pull Request Details</h3>
+            <h3 class="text-lg font-semibold text-[var(--sg-accent)]">Pull Request Details</h3>
             <button
               on:click={() => {
                 // Store the current run ID so PR detail page can navigate back
@@ -832,7 +832,7 @@
                   : `#/runs/pr/${prInfo.pullNumber}`;
                 window.location.hash = prUrl;
               }}
-              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-[var(--sg-accent)] bg-[var(--sg-accent-bg)] border border-[var(--sg-accent)] rounded-md hover:bg-[var(--sg-accent-bg)] transition-colors"
             >
               <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -843,14 +843,14 @@
           <div class="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-6">
             <div>
               <div class="flex items-center space-x-2 mb-3">
-                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
+                <svg class="w-5 h-5 text-[var(--sg-success)] flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
                 </svg>
                 <a
                   href={getPullRequestUrl(run.owner, run.repo, prInfo.pullNumber || 0)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline flex items-center space-x-1"
+                  class="font-medium text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] hover:underline flex items-center space-x-1"
                 >
                   <span>PR #{prInfo.pullNumber}</span>
                   <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -859,7 +859,7 @@
                 </a>
               </div>
               {#if prInfo.pullTitle}
-                <p class="text-gray-700 dark:text-gray-300 text-sm break-words">
+                <p class="text-[var(--sg-text-muted)] text-sm break-words">
                   {prInfo.pullTitle}
                 </p>
               {/if}
@@ -867,12 +867,12 @@
             <div class="mt-2 md:mt-0">
               <div class="space-y-2 text-sm">
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-gray-600 dark:text-gray-400">Branch:</span>
-                  <span class="font-medium font-mono text-xs sm:text-sm text-blue-600 dark:text-blue-400 break-all">{run.branch}</span>
+                  <span class="text-[var(--sg-text-dim)]">Branch:</span>
+                  <span class="font-medium font-mono text-xs sm:text-sm text-[var(--sg-accent)] break-all">{run.branch}</span>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-gray-600 dark:text-gray-400">Target:</span>
-                  <span class="font-medium font-mono text-xs sm:text-sm text-green-600 dark:text-green-400 break-all">{run.base_branch}</span>
+                  <span class="text-[var(--sg-text-dim)]">Target:</span>
+                  <span class="font-medium font-mono text-xs sm:text-sm text-[var(--sg-success)] break-all">{run.base_branch}</span>
                 </div>
               </div>
             </div>
@@ -880,15 +880,15 @@
         </div>
       {:else}
         <!-- Non-PR Run (drift, index, etc.) -->
-        <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mb-6">
-          <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">Run Information</h3>
+        <div class="border-t border-[var(--sg-border)] pt-6 mb-6">
+          <h3 class="text-lg font-semibold text-[var(--sg-accent)] mb-4">Run Information</h3>
           <div class="grid md:grid-cols-2 gap-4 md:gap-6">
             <div>
               <div class="flex items-center space-x-2 mb-3">
-                <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-5 h-5 text-[var(--sg-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span class="font-medium text-gray-900 dark:text-gray-100">
+                <span class="font-medium text-[var(--sg-text)]">
                   {typeof run.kind === 'string' ? run.kind.charAt(0).toUpperCase() + run.kind.slice(1) : 'Manual'} Run
                 </span>
               </div>
@@ -896,12 +896,12 @@
             <div>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Branch:</span>
-                  <span class="font-medium font-mono text-blue-600">{run.branch}</span>
+                  <span class="text-[var(--sg-text-dim)]">Branch:</span>
+                  <span class="font-medium font-mono text-[var(--sg-accent)]">{run.branch}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Base:</span>
-                  <span class="font-medium font-mono text-green-600">{run.base_branch}</span>
+                  <span class="text-[var(--sg-text-dim)]">Base:</span>
+                  <span class="font-medium font-mono text-[var(--sg-success)]">{run.base_branch}</span>
                 </div>
               </div>
             </div>
@@ -910,31 +910,31 @@
       {/if}
 
       <!-- Timing Information -->
-      <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-        <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">Execution Timeline</h3>
+      <div class="border-t border-[var(--sg-border)] pt-6">
+        <h3 class="text-lg font-semibold text-[var(--sg-accent)] mb-4">Execution Timeline</h3>
         <div class="grid md:grid-cols-3 gap-4 md:gap-6">
           <div>
-            <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Started</div>
-            <div class="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{formatDate(run.created_at)}</div>
+            <div class="text-sm text-[var(--sg-text-dim)] mb-1">Started</div>
+            <div class="font-medium text-[var(--sg-text)]">{formatDate(run.created_at)}</div>
           </div>
           {#if run.completed_at}
             <div>
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Completed</div>
-              <div class="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">{formatDate(run.completed_at)}</div>
+              <div class="text-sm text-[var(--sg-text-dim)] mb-1">Completed</div>
+              <div class="font-medium text-[var(--sg-text)]">{formatDate(run.completed_at)}</div>
             </div>
             <div>
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Duration</div>
+              <div class="text-sm text-[var(--sg-text-dim)] mb-1">Duration</div>
               <div class="font-medium">
                 {Math.round((new Date(run.completed_at).getTime() - new Date(run.created_at).getTime()) / 1000 / 60)} minutes
               </div>
             </div>
           {:else}
             <div>
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</div>
-              <div class="font-medium text-blue-600">In Progress</div>
+              <div class="text-sm text-[var(--sg-text-dim)] mb-1">Status</div>
+              <div class="font-medium text-[var(--sg-accent)]">In Progress</div>
             </div>
             <div>
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Running Time</div>
+              <div class="text-sm text-[var(--sg-text-dim)] mb-1">Running Time</div>
               <div class="font-medium">
                 {Math.round((new Date().getTime() - new Date(run.created_at).getTime()) / 1000 / 60)} minutes
               </div>
@@ -946,9 +946,9 @@
       <!-- User Information -->
       {#if run.user}
         <div class="border-t pt-6">
-          <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">Triggered By</h3>
+          <h3 class="text-lg font-semibold text-[var(--sg-accent)] mb-4">Triggered By</h3>
           <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <div class="w-8 h-8 bg-[var(--sg-accent-button)] rounded-full flex items-center justify-center">
               <span class="text-white text-sm font-medium">
                 {run.user.charAt(0).toUpperCase()}
               </span>
@@ -962,34 +962,34 @@
     <!-- Run Outputs -->{#if run}
     <Card padding="lg" class="mb-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400">Execution Outputs</h3>
+        <h3 class="text-lg font-semibold text-[var(--sg-accent)]">Execution Outputs</h3>
 
         <!-- Output Filter Tabs -->
-        <div class="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div class="flex flex-wrap gap-1 bg-[var(--sg-bg-2)] rounded-lg p-1">
           <button 
             on:click={() => activeOutputTab = 'all'}
-            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'all' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'all' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
           >
             <span class="hidden sm:inline">All Steps</span>
             <span class="sm:hidden">All</span>
           </button>
           <button 
             on:click={() => activeOutputTab = 'raw'}
-            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'raw' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'raw' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
           >
             <span class="hidden sm:inline">🔧 Raw Steps</span>
             <span class="sm:hidden">🔧 Raw</span>
           </button>
           <button 
             on:click={() => activeOutputTab = 'cost'}
-            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'cost' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'cost' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
           >
             💰 Cost <span class="hidden sm:inline">({costEstimation.length})</span>
             <span class="sm:hidden text-[10px]">({costEstimation.length})</span>
           </button>
           <button
             on:click={() => activeOutputTab = 'failed'}
-            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'failed' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+            class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap {activeOutputTab === 'failed' ? 'bg-[var(--sg-bg-1)] text-[var(--sg-accent)] shadow-sm' : 'text-[var(--sg-text-dim)] hover:text-[var(--sg-text)]'}"
           >
             ❌ Failed
           </button>
@@ -1003,18 +1003,18 @@
           id="enable-highlighting"
           bind:checked={enablePlanHighlighting}
           on:change={toggleHighlighting}
-          class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+          class="h-4 w-4 text-[var(--sg-accent)] border-[var(--sg-border)] rounded focus:ring-[var(--sg-accent)] cursor-pointer"
         />
-        <label for="enable-highlighting" class="cursor-pointer select-none text-gray-700 dark:text-gray-300">
+        <label for="enable-highlighting" class="cursor-pointer select-none text-[var(--sg-text-muted)]">
           Enable plan syntax highlighting
-          <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">(Beta)</span>
+          <span class="text-xs text-[var(--sg-text-dim)] ml-1">(Beta)</span>
         </label>
       </div>
 
       {#if isLoadingOutputs}
         <div class="flex justify-center items-center py-8">
           <LoadingSpinner size="md" />
-          <span class="ml-3 text-gray-600 dark:text-gray-400">Loading outputs...</span>
+          <span class="ml-3 text-[var(--sg-text-dim)]">Loading outputs...</span>
         </div>
       {:else if outputsError}
         <ErrorMessage type="error" message={outputsError} />
@@ -1023,9 +1023,9 @@
         <!-- Cost Estimation Tab -->
         {#if activeOutputTab === 'cost'}
           {#if costEstimation.length === 0}
-            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div class="text-center py-8 text-[var(--sg-text-dim)]">
               <div class="text-4xl mb-2">💰</div>
-              <p class="text-gray-500 dark:text-gray-400">No cost estimation data available</p>
+              <p class="text-[var(--sg-text-dim)]">No cost estimation data available</p>
             </div>
           {:else}
             <div class="space-y-6">
@@ -1035,40 +1035,40 @@
 
                 {#if costData?.summary}
                   <!-- Cost Summary Card -->
-                  <div class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+                  <div class="bg-[var(--sg-success-bg)] border border-[var(--sg-success)] rounded-lg p-6">
                     <div class="mb-6">
                       <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                        <div class="w-10 h-10 bg-[var(--sg-success-bg)] rounded-full flex items-center justify-center">
                           <span class="text-xl">💰</span>
                         </div>
                         <div>
-                          <h4 class="text-lg font-semibold text-green-800 dark:text-green-400">Cost Impact Summary</h4>
-                          <p class="text-sm text-green-600 dark:text-green-400">Monthly infrastructure costs in {costData?.currency || 'USD'}</p>
+                          <h4 class="text-lg font-semibold text-[var(--sg-success)]">Cost Impact Summary</h4>
+                          <p class="text-sm text-[var(--sg-success)]">Monthly infrastructure costs in {costData?.currency || 'USD'}</p>
                         </div>
                       </div>
                     </div>
                     
                     <!-- Cost Summary Metrics -->
                     <div class="grid md:grid-cols-3 gap-4 md:gap-6">
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center border border-gray-200 dark:border-gray-700">
-                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 text-center border border-[var(--sg-border)]">
+                        <div class="text-2xl font-bold text-[var(--sg-accent)]">
                           ${(costData.summary.total_monthly_cost || 0).toFixed(2)}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Monthly Cost</div>
+                        <div class="text-sm text-[var(--sg-text-dim)] mt-1">Total Monthly Cost</div>
                       </div>
                       
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center border border-gray-200 dark:border-gray-700">
-                        <div class="text-2xl font-bold {(costData.summary?.diff_monthly_cost || 0) > 0 ? 'text-red-600' : (costData.summary?.diff_monthly_cost || 0) < 0 ? 'text-green-600' : 'text-gray-600 dark:text-gray-400'}">
+                      <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 text-center border border-[var(--sg-border)]">
+                        <div class="text-2xl font-bold {(costData.summary?.diff_monthly_cost || 0) > 0 ? 'text-[var(--sg-error)]' : (costData.summary?.diff_monthly_cost || 0) < 0 ? 'text-[var(--sg-success)]' : 'text-[var(--sg-text-dim)]'}">
                           {(costData.summary?.diff_monthly_cost || 0) > 0 ? '+' : ''}${(costData.summary?.diff_monthly_cost || 0).toFixed(2)}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Monthly Change</div>
+                        <div class="text-sm text-[var(--sg-text-dim)] mt-1">Monthly Change</div>
                       </div>
                       
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center border border-gray-200 dark:border-gray-700">
-                        <div class="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                      <div class="bg-[var(--sg-bg-1)] rounded-lg p-4 text-center border border-[var(--sg-border)]">
+                        <div class="text-2xl font-bold text-[var(--sg-text-muted)]">
                           ${(costData.summary.prev_monthly_cost || 0).toFixed(2)}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Previous Monthly Cost</div>
+                        <div class="text-sm text-[var(--sg-text-dim)] mt-1">Previous Monthly Cost</div>
                       </div>
                     </div>
                   </div>
@@ -1076,45 +1076,45 @@
                   <!-- Per-Dirspace Cost Breakdown -->
                   {#if costData?.dirspaces && costData.dirspaces.length > 0}
                     {@const zeroCostDirspaces = costData.dirspaces.filter(d => d.total_monthly_cost === 0 && d.diff_monthly_cost === 0)}
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                      <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Cost Breakdown by Directory</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Per-workspace cost analysis</p>
+                    <div class="bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded-lg overflow-hidden">
+                      <div class="bg-[var(--sg-bg-0)] px-6 py-4 border-b border-[var(--sg-border)]">
+                        <h4 class="text-lg font-semibold text-[var(--sg-text)]">Cost Breakdown by Directory</h4>
+                        <p class="text-sm text-[var(--sg-text-dim)] mt-1">Per-workspace cost analysis</p>
                       </div>
                       
-                      <div class="divide-y divide-gray-200 dark:divide-gray-600">
+                      <div class="divide-y divide-[var(--sg-border)]">
                         {#each costData.dirspaces as dirspace}
                           {#if dirspace.total_monthly_cost > 0 || dirspace.diff_monthly_cost !== 0}
-                            <div class="px-4 sm:px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div class="px-4 sm:px-6 py-4 hover:bg-[var(--sg-bg-2)]">
                               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div class="flex-1 min-w-0">
                                   <div class="flex items-center gap-3">
-                                    <div class="w-3 h-3 rounded-full flex-shrink-0 {dirspace.diff_monthly_cost > 0 ? 'bg-red-400' : dirspace.diff_monthly_cost < 0 ? 'bg-green-400' : 'bg-gray-400'}"></div>
+                                    <div class="w-3 h-3 rounded-full flex-shrink-0 {dirspace.diff_monthly_cost > 0 ? 'bg-[var(--sg-error)]' : dirspace.diff_monthly_cost < 0 ? 'bg-[var(--sg-success)]' : 'bg-[var(--sg-bg-2)]'}"></div>
                                     <div class="min-w-0 flex-1">
-                                      <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{dirspace.dir}</div>
-                                      <div class="text-sm text-gray-500 dark:text-gray-400">Workspace: {dirspace.workspace}</div>
+                                      <div class="font-medium text-[var(--sg-text)] truncate">{dirspace.dir}</div>
+                                      <div class="text-sm text-[var(--sg-text-dim)]">Workspace: {dirspace.workspace}</div>
                                     </div>
                                   </div>
                                 </div>
                                 
                                 <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm flex-shrink-0">
                                   <div class="text-center min-w-[60px]">
-                                    <div class="font-semibold text-gray-900 dark:text-gray-100">${dirspace.total_monthly_cost.toFixed(2)}</div>
-                                    <div class="text-xs text-gray-500">Total</div>
+                                    <div class="font-semibold text-[var(--sg-text)]">${dirspace.total_monthly_cost.toFixed(2)}</div>
+                                    <div class="text-xs text-[var(--sg-text-dim)]">Total</div>
                                   </div>
                                   
                                   {#if dirspace.diff_monthly_cost !== 0}
                                     <div class="text-center min-w-[60px]">
-                                      <div class="font-semibold {dirspace.diff_monthly_cost > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}">
+                                      <div class="font-semibold {dirspace.diff_monthly_cost > 0 ? 'text-[var(--sg-error)]' : 'text-[var(--sg-success)]'}">
                                         {dirspace.diff_monthly_cost > 0 ? '+' : ''}${dirspace.diff_monthly_cost.toFixed(2)}
                                       </div>
-                                      <div class="text-xs text-gray-500">Change</div>
+                                      <div class="text-xs text-[var(--sg-text-dim)]">Change</div>
                                     </div>
                                   {/if}
                                   
                                   <div class="text-center min-w-[60px]">
-                                    <div class="font-semibold text-gray-700 dark:text-gray-300">${dirspace.prev_monthly_cost.toFixed(2)}</div>
-                                    <div class="text-xs text-gray-500">Previous</div>
+                                    <div class="font-semibold text-[var(--sg-text-muted)]">${dirspace.prev_monthly_cost.toFixed(2)}</div>
+                                    <div class="text-xs text-[var(--sg-text-dim)]">Previous</div>
                                   </div>
                                 </div>
                               </div>
@@ -1125,20 +1125,20 @@
                       
                       <!-- Show zero-cost dirspaces in a collapsed section -->
                       {#if zeroCostDirspaces.length > 0}
-                        <details class="border-t border-gray-200 dark:border-gray-600">
-                          <summary class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-sm text-gray-600 dark:text-gray-400 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <details class="border-t border-[var(--sg-border)]">
+                          <summary class="px-6 py-3 bg-[var(--sg-bg-0)] text-sm text-[var(--sg-text-dim)] cursor-pointer hover:bg-[var(--sg-bg-2)]">
                             Show {zeroCostDirspaces.length} directories with no cost impact
                           </summary>
-                          <div class="divide-y divide-gray-100 dark:divide-gray-600">
+                          <div class="divide-y divide-[var(--sg-border)]">
                             {#each zeroCostDirspaces as dirspace}
-                              <div class="px-6 py-3 text-sm bg-white dark:bg-gray-800">
+                              <div class="px-6 py-3 text-sm bg-[var(--sg-bg-1)]">
                                 <div class="flex items-center justify-between">
                                   <div class="flex items-center space-x-3">
-                                    <div class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                                    <span class="text-gray-700 dark:text-gray-300">{dirspace.dir}</span>
-                                    <span class="text-gray-500 dark:text-gray-400">({dirspace.workspace})</span>
+                                    <div class="w-2 h-2 rounded-full bg-[var(--sg-bg-2)]"></div>
+                                    <span class="text-[var(--sg-text-muted)]">{dirspace.dir}</span>
+                                    <span class="text-[var(--sg-text-dim)]">({dirspace.workspace})</span>
                                   </div>
-                                  <span class="text-gray-500 dark:text-gray-400">$0.00</span>
+                                  <span class="text-[var(--sg-text-dim)]">$0.00</span>
                                 </div>
                               </div>
                             {/each}
@@ -1149,27 +1149,27 @@
                   {/if}
                 {:else}
                   <!-- Fallback for unstructured cost data -->
-                  <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                  <div class="bg-[var(--sg-warning-bg)] border border-[var(--sg-warning)] rounded-lg p-4">
                     <div class="flex items-center space-x-2 mb-2">
                       <span class="text-lg">💰</span>
-                      <span class="font-medium text-yellow-800 dark:text-yellow-400">Cost Estimation</span>
+                      <span class="font-medium text-[var(--sg-warning)]">Cost Estimation</span>
                     </div>
                     
                     {#if typedOutput?.payload?.text}
                       <div class="mt-3">
                         <div class="flex items-center justify-between mb-1">
-                          <div class="text-xs text-yellow-700 dark:text-yellow-400">Cost Analysis:</div>
+                          <div class="text-xs text-[var(--sg-warning)]">Cost Analysis:</div>
                           <button 
-                            class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-2 py-1 border border-blue-200 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                            class="text-xs text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] px-2 py-1 border border-[var(--sg-accent)] rounded hover:bg-[var(--sg-accent-bg)] transition-colors"
                             on:click={() => openOutputModal(typedOutput.payload?.text || '', 'Cost Estimation Analysis')}
                           >
                             🔍 Expand
                           </button>
                         </div>
-                        <pre class="text-sm bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600 overflow-x-auto text-gray-800 dark:text-gray-200 max-h-60 whitespace-pre-wrap font-mono">{typedOutput.payload?.text || ''}</pre>
+                        <pre class="text-sm bg-[var(--sg-bg-1)] p-3 rounded border border-[var(--sg-border)] overflow-x-auto text-[var(--sg-text)] max-h-60 whitespace-pre-wrap font-mono">{typedOutput.payload?.text || ''}</pre>
                       </div>
                     {:else}
-                      <pre class="text-sm bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600 overflow-x-auto text-gray-800 dark:text-gray-200">{JSON.stringify(output, null, 2)}</pre>
+                      <pre class="text-sm bg-[var(--sg-bg-1)] p-3 rounded border border-[var(--sg-border)] overflow-x-auto text-[var(--sg-text)]">{JSON.stringify(output, null, 2)}</pre>
                     {/if}
                   </div>
                 {/if}
@@ -1190,43 +1190,43 @@
                 return matchesDirspace && shouldShow;
               })}
               
-              <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div class="border border-[var(--sg-border)] rounded-lg">
                 <button 
                   on:click={() => toggleDirspaceExpansion(dirspaceKey)}
-                  class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                  class="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-inset"
                 >
                   <div class="flex items-center space-x-3 flex-1 min-w-0">
                     <div class="flex-shrink-0">
                       {#if dirspace.success === true}
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-success)]"></div>
                       {:else if dirspace.success === false}
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-error)]"></div>
                       {:else}
-                        <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-bg-2)]"></div>
                       {/if}
                     </div>
                     <div class="flex-1 min-w-0">
-                      <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{dirspace.dir}</div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400 truncate">Workspace: {dirspace.workspace}</div>
+                      <div class="font-medium text-[var(--sg-text)] truncate">{dirspace.dir}</div>
+                      <div class="text-sm text-[var(--sg-text-dim)] truncate">Workspace: {dirspace.workspace}</div>
                       
                       <!-- Terraform summaries removed for memory safety -->
                     </div>
                   </div>
                   <div class="flex items-center space-x-2 flex-shrink-0">
-                    <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    <span class="text-xs sm:text-sm text-[var(--sg-text-dim)]">
                       <span class="hidden sm:inline">{dirspaceOutputs.length} step{dirspaceOutputs.length !== 1 ? 's' : ''}</span>
                       <span class="sm:hidden">{dirspaceOutputs.length} {dirspaceOutputs.length === 1 ? 'step' : 'steps'}</span>
                     </span>
-                    <svg class="w-5 h-5 text-gray-400 dark:text-gray-500 transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 text-[var(--sg-text-dim)] transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
                 
                 {#if isExpanded}
-                  <div class="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                  <div class="border-t border-[var(--sg-border)] bg-[var(--sg-bg-0)]">
                     {#if dirspaceOutputs.length === 0}
-                      <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                      <div class="p-4 text-center text-[var(--sg-text-dim)]">
                         No step outputs available for this dirspace
                       </div>
                     {:else}
@@ -1234,28 +1234,28 @@
                         {#each dirspaceOutputs as output (output.idx)}
                           {@const typedOutput = output}
                           {@const displayState = getDisplayState(typedOutput)}
-                          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-3">
+                          <div class="bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded p-3">
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                               <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                                 <span class="flex-shrink-0">{getStepIcon(typedOutput?.step || 'unknown')}</span>
-                                <span class="font-medium text-gray-900 dark:text-gray-100">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
+                                <span class="font-medium text-[var(--sg-text)]">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
                                 {#if typedOutput?.state}
                                   <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {displayState.color}">
                                     {displayState.state}
                                   </span>
                                 {/if}
-                                <span class="text-xs text-gray-500">idx: {typedOutput?.idx}</span>
+                                <span class="text-xs text-[var(--sg-text-dim)]">idx: {typedOutput?.idx}</span>
                               </div>
                             </div>
                             {#if typedOutput?.payload?.text}
                               <!-- Output not loaded - click to view -->
                               {#if typedOutput.payload._isLiteMode}
                                 <div class="mt-3">
-                                  <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">Output:</div>
-                                  <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                                  <div class="text-xs text-[var(--sg-text-dim)] mb-2">Output:</div>
+                                  <div class="bg-[var(--sg-bg-0)] border border-[var(--sg-border)] rounded-lg p-4">
                                     <div class="flex flex-col gap-3">
-                                      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                                        <svg class="w-5 h-5 text-[var(--sg-text-dim)] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
@@ -1264,7 +1264,7 @@
                                       <button
                                         type="button"
                                         on:click={() => loadFullOutput(typedOutput)}
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-blue-300 dark:border-blue-600 text-sm font-medium rounded-md text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                                        class="inline-flex items-center justify-center px-4 py-2 border border-[var(--sg-accent)] text-sm font-medium rounded-md text-[var(--sg-accent)] bg-[var(--sg-accent-bg)] hover:bg-[var(--sg-accent-bg)] transition-colors"
                                       >
                                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1278,9 +1278,9 @@
                               {:else}
                                 <!-- Display actual step output content with safe loading -->
                                 <div class="mt-3">
-                                  <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                                  <div class="text-xs text-[var(--sg-text-dim)] mb-2">
                                     Output: {#if typedOutput.payload._wasLoadedOnDemand}
-                                      <span class="text-green-600 dark:text-green-400 font-medium">(loaded on demand)</span>
+                                      <span class="text-[var(--sg-success)] font-medium">(loaded on demand)</span>
                                     {/if}
                                   </div>
                                   <SafeOutput
@@ -1300,12 +1300,12 @@
                               {/if}
                             {:else if typedOutput?.step === 'auth/update-terrateam-github-token' || typedOutput?.step === 'auth/oidc'}
                               <!-- Hide debug for auth steps - no meaningful output to show -->
-                              <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 italic">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)] italic">
                                 Authentication step completed
                               </div>
                             {:else}
                               <!-- Fallback to JSON for other steps if no payload.text found -->
-                              <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)]">
                                 No output content available for this step type
                               </div>
                             {/if}
@@ -1331,43 +1331,43 @@
                 return matchesDirspace; // No visibility filtering for raw steps
               })}
               
-              <div class="border border-gray-200 rounded-lg">
+              <div class="border border-[var(--sg-border-light)] rounded-lg">
                 <button 
                   on:click={() => toggleDirspaceExpansion(dirspaceKey)}
-                  class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                  class="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-inset"
                 >
                   <div class="flex items-center space-x-3 flex-1 min-w-0">
                     <div class="flex-shrink-0">
                       {#if dirspace.success === true}
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-success)]"></div>
                       {:else if dirspace.success === false}
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-error)]"></div>
                       {:else}
-                        <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-bg-2)]"></div>
                       {/if}
                     </div>
                     <div class="flex-1 min-w-0">
-                      <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{dirspace.dir}</div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400 truncate">Workspace: {dirspace.workspace}</div>
+                      <div class="font-medium text-[var(--sg-text)] truncate">{dirspace.dir}</div>
+                      <div class="text-sm text-[var(--sg-text-dim)] truncate">Workspace: {dirspace.workspace}</div>
                       
                       <!-- Terraform summaries removed for memory safety -->
                     </div>
                   </div>
                   <div class="flex items-center space-x-2 flex-shrink-0">
-                    <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    <span class="text-xs sm:text-sm text-[var(--sg-text-dim)]">
                       <span class="hidden sm:inline">{dirspaceOutputs.length} step{dirspaceOutputs.length !== 1 ? 's' : ''} (unfiltered)</span>
                       <span class="sm:hidden">{dirspaceOutputs.length} {dirspaceOutputs.length === 1 ? 'step' : 'steps'}</span>
                     </span>
-                    <svg class="w-5 h-5 text-gray-400 dark:text-gray-500 transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 text-[var(--sg-text-dim)] transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
                 
                 {#if isExpanded}
-                  <div class="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                  <div class="border-t border-[var(--sg-border)] bg-[var(--sg-bg-0)]">
                     {#if dirspaceOutputs.length === 0}
-                      <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                      <div class="p-4 text-center text-[var(--sg-text-dim)]">
                         No step outputs available for this dirspace
                       </div>
                     {:else}
@@ -1375,18 +1375,18 @@
                         {#each dirspaceOutputs as output (output.idx)}
                           {@const typedOutput = output}
                           {@const displayState = getDisplayState(typedOutput)}
-                          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-3">
+                          <div class="bg-[var(--sg-bg-1)] border border-[var(--sg-border)] rounded p-3">
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                               <span class="flex-shrink-0">{getStepIcon(typedOutput?.step || 'unknown')}</span>
-                              <span class="font-medium text-gray-900 dark:text-gray-100">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
+                              <span class="font-medium text-[var(--sg-text)]">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
                               {#if typedOutput?.state}
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {displayState.color}">
                                   {displayState.state}
                                 </span>
                               {/if}
-                              <span class="text-xs text-gray-500">idx: {typedOutput?.idx}</span>
+                              <span class="text-xs text-[var(--sg-text-dim)]">idx: {typedOutput?.idx}</span>
                               {#if typedOutput?.payload?.visible_on}
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]">
                                   visible_on: {typedOutput.payload.visible_on}
                                 </span>
                               {/if}
@@ -1396,11 +1396,11 @@
                               <!-- Output not loaded - click to view -->
                               {#if typedOutput.payload._isLiteMode}
                                 <div class="mt-3">
-                                  <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">Output:</div>
-                                  <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                                  <div class="text-xs text-[var(--sg-text-dim)] mb-2">Output:</div>
+                                  <div class="bg-[var(--sg-bg-0)] border border-[var(--sg-border)] rounded-lg p-4">
                                     <div class="flex flex-col gap-3">
-                                      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <div class="flex items-center text-sm text-[var(--sg-text-dim)]">
+                                        <svg class="w-5 h-5 text-[var(--sg-text-dim)] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
@@ -1409,7 +1409,7 @@
                                       <button
                                         type="button"
                                         on:click={() => loadFullOutput(typedOutput)}
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-blue-300 dark:border-blue-600 text-sm font-medium rounded-md text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                                        class="inline-flex items-center justify-center px-4 py-2 border border-[var(--sg-accent)] text-sm font-medium rounded-md text-[var(--sg-accent)] bg-[var(--sg-accent-bg)] hover:bg-[var(--sg-accent-bg)] transition-colors"
                                       >
                                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1423,9 +1423,9 @@
                               {:else}
                                 <!-- Display actual step output content with safe loading -->
                                 <div class="mt-3">
-                                  <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                                  <div class="text-xs text-[var(--sg-text-dim)] mb-2">
                                     Output: {#if typedOutput.payload._wasLoadedOnDemand}
-                                      <span class="text-green-600 dark:text-green-400 font-medium">(loaded on demand)</span>
+                                      <span class="text-[var(--sg-success)] font-medium">(loaded on demand)</span>
                                     {/if}
                                   </div>
                                   <SafeOutput
@@ -1445,12 +1445,12 @@
                               {/if}
                             {:else if typedOutput?.step === 'auth/update-terrateam-github-token' || typedOutput?.step === 'auth/oidc'}
                               <!-- Hide debug for auth steps - no meaningful output to show -->
-                              <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 italic">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)] italic">
                                 Authentication step completed - {typedOutput?.payload?.visible_on ? `visible_on: ${typedOutput.payload.visible_on}` : 'no visibility setting'}
                               </div>
                             {:else}
                               <!-- Fallback to JSON for other steps if no payload.text found -->
-                              <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)]">
                                 No output content available for this step type
                               </div>
                             {/if}
@@ -1467,7 +1467,7 @@
         <!-- Failed Steps Tab -->
         {:else if activeOutputTab === 'failed'}
           {#if failedOutputs.length === 0}
-            <div class="text-center py-8 text-gray-500">
+            <div class="text-center py-8 text-[var(--sg-text-dim)]">
               <div class="text-4xl mb-2">✅</div>
               <p>No failed steps found</p>
             </div>
@@ -1476,54 +1476,54 @@
               {#each Object.entries(failedByDirspace) as [dirspaceKey, dirspaceData]}
                 {@const isExpanded = expandedDirspaces.has(dirspaceKey)}
                 
-                <div class="border border-red-200 dark:border-red-800 rounded-lg bg-red-50/50 dark:bg-red-900/10">
+                <div class="border border-[var(--sg-error)] rounded-lg bg-[var(--sg-error-bg)]">
                   <button 
                     on:click={() => toggleDirspaceExpansion(dirspaceKey)}
-                    class="w-full flex items-center justify-between p-4 text-left hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset"
+                    class="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--sg-error-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-error)] focus:ring-inset"
                   >
                     <div class="flex items-center space-x-3 flex-1 min-w-0">
                       <div class="flex-shrink-0">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-[var(--sg-error)]"></div>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <div class="font-medium text-red-900 dark:text-red-100">{dirspaceData.dir}</div>
-                        <div class="text-sm text-red-700 dark:text-red-300">Workspace: {dirspaceData.workspace}</div>
+                        <div class="font-medium text-[var(--sg-error)]">{dirspaceData.dir}</div>
+                        <div class="text-sm text-[var(--sg-error)]">Workspace: {dirspaceData.workspace}</div>
                       </div>
                     </div>
                     <div class="flex items-center space-x-2 flex-shrink-0">
-                      <span class="text-sm text-red-600 dark:text-red-400">{dirspaceData.outputs.length} failed step{dirspaceData.outputs.length !== 1 ? 's' : ''}</span>
-                      <svg class="w-5 h-5 text-red-400 dark:text-red-500 transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <span class="text-sm text-[var(--sg-error)]">{dirspaceData.outputs.length} failed step{dirspaceData.outputs.length !== 1 ? 's' : ''}</span>
+                      <svg class="w-5 h-5 text-[var(--sg-error)] transform transition-transform {isExpanded ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </button>
                   
                   {#if isExpanded}
-                    <div class="border-t border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20">
+                    <div class="border-t border-[var(--sg-error)] bg-[var(--sg-error-bg)]">
                       <div class="p-4 space-y-3">
                         {#each dirspaceData.outputs as output ((output.step || 'unknown') + (output.payload?._loadTimestamp || ''))}
                           {@const typedOutput = output}
                           {@const displayState = getDisplayState(typedOutput)}
-                          <div class="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-600 rounded p-3">
+                          <div class="bg-[var(--sg-bg-1)] border border-[var(--sg-error)] rounded p-3">
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                               <span class="flex-shrink-0">❌</span>
-                              <span class="font-medium text-red-900 dark:text-red-100">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
+                              <span class="font-medium text-[var(--sg-error)]">{getStepLabel(typedOutput?.step || 'Unknown Step')}</span>
                               {#if typedOutput?.state}
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {displayState.color}">
                                   {displayState.state}
                                 </span>
                               {/if}
-                              <span class="text-xs text-gray-500">idx: {typedOutput?.idx}</span>
+                              <span class="text-xs text-[var(--sg-text-dim)]">idx: {typedOutput?.idx}</span>
                             </div>
                             {#if typedOutput?.payload?.text}
                               <!-- Output not loaded - click to view -->
                               {#if typedOutput.payload._isLiteMode}
                                 <div class="mt-3">
-                                  <div class="text-xs text-red-700 dark:text-red-400 mb-2">Error Output:</div>
-                                  <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4">
+                                  <div class="text-xs text-[var(--sg-error)] mb-2">Error Output:</div>
+                                  <div class="bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4">
                                     <div class="flex flex-col gap-3">
-                                      <div class="flex items-center text-sm text-red-600 dark:text-red-400">
-                                        <svg class="w-5 h-5 text-red-500 dark:text-red-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <div class="flex items-center text-sm text-[var(--sg-error)]">
+                                        <svg class="w-5 h-5 text-[var(--sg-error)] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
@@ -1532,7 +1532,7 @@
                                       <button
                                         type="button"
                                         on:click={() => loadFullOutput(typedOutput)}
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-red-300 dark:border-red-600 text-sm font-medium rounded-md text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+                                        class="inline-flex items-center justify-center px-4 py-2 border border-[var(--sg-error)] text-sm font-medium rounded-md text-[var(--sg-error)] bg-[var(--sg-error-bg)] hover:bg-[var(--sg-error-bg)] transition-colors"
                                       >
                                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1546,9 +1546,9 @@
                               {:else}
                                 <!-- Display actual step output content with safe loading -->
                                 <div class="mt-3">
-                                  <div class="text-xs text-red-700 dark:text-red-400 mb-2">Error Output:
+                                  <div class="text-xs text-[var(--sg-error)] mb-2">Error Output:
                                     {#if typedOutput.payload._wasLoadedOnDemand}
-                                      <span class="ml-2 text-green-600 font-medium">(loaded on demand)</span>
+                                      <span class="ml-2 text-[var(--sg-success)] font-medium">(loaded on demand)</span>
                                     {/if}
                                   </div>
                                   <SafeOutput
@@ -1568,12 +1568,12 @@
                               {/if}
                             {:else if typedOutput?.step === 'auth/update-terrateam-github-token' || typedOutput?.step === 'auth/oidc'}
                               <!-- Hide debug for auth steps - no meaningful output to show -->
-                              <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 italic">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)] italic">
                                 Authentication step failed
                               </div>
                             {:else}
                               <!-- Fallback to JSON for other steps if no payload.text found -->
-                              <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                              <div class="mt-3 text-xs text-[var(--sg-text-dim)]">
                                 No output content available for this step type
                               </div>
                             {/if}
@@ -1594,33 +1594,33 @@
 
     <!-- Technical Details -->
     <Card padding="lg">
-      <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">Run Metadata</h3>
+      <h3 class="text-lg font-semibold text-[var(--sg-accent)] mb-4">Run Metadata</h3>
       <div class="grid md:grid-cols-2 gap-6">
         <div>
-          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">Identifiers</h4>
+          <h4 class="font-medium text-[var(--sg-text)] mb-3">Identifiers</h4>
           <div class="space-y-2 text-sm">
             <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-              <span class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Work Manifest ID:</span>
-              <span class="font-mono text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded break-all">{run.id}</span>
+              <span class="text-[var(--sg-text-dim)] whitespace-nowrap">Work Manifest ID:</span>
+              <span class="font-mono text-[10px] sm:text-xs bg-[var(--sg-bg-2)] text-[var(--sg-text)] px-2 py-1 rounded break-all">{run.id}</span>
             </div>
             {#if run.run_id}
               <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span class="text-gray-600 dark:text-gray-400 whitespace-nowrap">GitHub Actions ID:</span>
-                <span class="font-mono text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded break-all">{run.run_id}</span>
+                <span class="text-[var(--sg-text-dim)] whitespace-nowrap">GitHub Actions ID:</span>
+                <span class="font-mono text-[10px] sm:text-xs bg-[var(--sg-bg-2)] text-[var(--sg-text)] px-2 py-1 rounded break-all">{run.run_id}</span>
               </div>
             {/if}
           </div>
         </div>
         <div class="mt-4 md:mt-0">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-3">Git References</h4>
+          <h4 class="font-medium text-[var(--sg-text)] mb-3">Git References</h4>
           <div class="space-y-2 text-sm">
             <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-              <span class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Branch Ref:</span>
-              <span class="font-mono text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">{run.branch_ref.substring(0, 8)}</span>
+              <span class="text-[var(--sg-text-dim)] whitespace-nowrap">Branch Ref:</span>
+              <span class="font-mono text-[10px] sm:text-xs bg-[var(--sg-bg-2)] text-[var(--sg-text)] px-2 py-1 rounded">{run.branch_ref.substring(0, 8)}</span>
             </div>
             <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-              <span class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Base Ref:</span>
-              <span class="font-mono text-[10px] sm:text-xs bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">{run.base_ref.substring(0, 8)}</span>
+              <span class="text-[var(--sg-text-dim)] whitespace-nowrap">Base Ref:</span>
+              <span class="font-mono text-[10px] sm:text-xs bg-[var(--sg-bg-2)] text-[var(--sg-text)] px-2 py-1 rounded">{run.base_ref.substring(0, 8)}</span>
             </div>
           </div>
         </div>
@@ -1628,11 +1628,11 @@
     </Card>
   {:else if !isLoading && !run}
     <div class="text-center py-12">
-      <p class="text-gray-600 dark:text-gray-400">Run not found.</p>
+      <p class="text-[var(--sg-text-dim)]">Run not found.</p>
       <div class="mt-4">
         <a 
           href={getBackUrl()} 
-          class="text-blue-600 hover:text-blue-800 font-medium"
+          class="text-[var(--sg-accent)] hover:text-[var(--sg-accent)] font-medium"
         >
           ← Back to Runs
         </a>
@@ -1643,23 +1643,23 @@
   <!-- Full-Screen Output Modal -->
   {#if showOutputModal}
     <div class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-2 sm:p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full h-full max-w-7xl max-h-full flex flex-col">
+      <div class="bg-[var(--sg-bg-1)] rounded-lg shadow-xl w-full h-full max-w-7xl max-h-full flex flex-col">
         <!-- Modal Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border-b border-[var(--sg-border)] gap-2">
           <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Output View</h3>
-            <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-all">{modalOutputTitle}</span>
+            <h3 class="text-base sm:text-lg font-semibold text-[var(--sg-text)]">Output View</h3>
+            <span class="text-xs sm:text-sm text-[var(--sg-text-dim)] break-all">{modalOutputTitle}</span>
           </div>
           <div class="flex items-center gap-2">
             <button
-              class="px-2 sm:px-3 py-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              class="px-2 sm:px-3 py-1 text-xs sm:text-sm text-[var(--sg-text-dim)] hover:text-[var(--sg-text)] border border-[var(--sg-border)] rounded hover:bg-[var(--sg-bg-2)] transition-colors"
               on:click={() => navigator.clipboard.writeText(modalOutputContent)}
               title="Copy to clipboard"
             >
               📋 Copy
             </button>
             <button
-              class="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="p-1.5 sm:p-2 text-[var(--sg-text-dim)] hover:text-[var(--sg-text-dim)] hover:text-[var(--sg-text)] rounded-full hover:bg-[var(--sg-bg-2)] transition-colors"
               on:click={closeOutputModal}
               title="Close (Esc)"
             >
@@ -1672,17 +1672,17 @@
 
         <!-- Modal Content -->
         <div class="flex-1 overflow-hidden">
-          <pre class="h-full w-full bg-gray-900 dark:bg-gray-950 text-gray-100 p-3 sm:p-4 overflow-auto text-xs sm:text-sm font-mono whitespace-pre-wrap break-words">{modalOutputContent}</pre>
+          <pre class="h-full w-full bg-[var(--sg-bg-0)] text-[var(--sg-text)] p-3 sm:p-4 overflow-auto text-xs sm:text-sm font-mono whitespace-pre-wrap break-words">{modalOutputContent}</pre>
         </div>
 
         <!-- Modal Footer -->
-        <div class="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+        <div class="p-3 sm:p-4 border-t border-[var(--sg-border)] bg-[var(--sg-bg-0)]">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs sm:text-sm text-[var(--sg-text-dim)]">
             <div>
               {modalOutputContent.split('\n').length} lines • {modalOutputContent.length} characters
             </div>
             <div class="hidden sm:block">
-              Press <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Esc</kbd> to close
+              Press <kbd class="px-2 py-1 bg-[var(--sg-bg-2)] rounded text-xs">Esc</kbd> to close
             </div>
           </div>
         </div>

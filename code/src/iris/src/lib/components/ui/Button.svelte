@@ -2,7 +2,7 @@
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLButtonAttributes {
-    variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'danger';
     size?: 'sm' | 'md' | 'lg';
     loading?: boolean;
     disabled?: boolean;
@@ -15,14 +15,15 @@
   export let disabled: $$Props['disabled'] = false;
   export let fullWidth: $$Props['fullWidth'] = false;
 
-  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-[var(--sg-button-radius)] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
+
   const variantClasses = {
-    primary: 'bg-brand-primary text-brand-primary border border-brand-primary hover:bg-brand-tertiary focus:ring-blue-500',
-    secondary: 'bg-brand-secondary text-brand-primary border border-brand-secondary hover:bg-brand-tertiary focus:ring-gray-500',
-    accent: 'accent-bg hover:bg-accent-hover focus:ring-yellow-500',
-    outline: 'bg-transparent text-brand-primary border border-brand-primary hover:bg-brand-tertiary focus:ring-blue-500',
-    ghost: 'bg-transparent text-brand-primary hover:bg-brand-tertiary focus:ring-blue-500'
+    primary: 'bg-[var(--sg-accent-button)] text-white border border-[var(--sg-accent-button)] hover:bg-[var(--sg-accent-button-hover)] focus:ring-[var(--sg-accent)]',
+    secondary: 'bg-[var(--sg-bg-1)] text-[var(--sg-text)] border border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)] focus:ring-[var(--sg-border)]',
+    accent: 'bg-[var(--sg-accent-button)] text-white hover:bg-[var(--sg-accent-button-hover)] focus:ring-[var(--sg-accent)]',
+    outline: 'bg-transparent text-[var(--sg-text)] border border-[var(--sg-border)] hover:bg-[var(--sg-bg-2)] focus:ring-[var(--sg-accent)]',
+    ghost: 'bg-transparent text-[var(--sg-text)] hover:bg-[var(--sg-bg-2)] focus:ring-[var(--sg-accent)]',
+    danger: 'bg-[var(--sg-error)] text-white hover:opacity-90 focus:ring-[var(--sg-error)]'
   };
 
   const sizeClasses = {

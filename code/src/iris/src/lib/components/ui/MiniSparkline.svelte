@@ -92,7 +92,7 @@
         height={height}
         fill="currentColor"
         opacity="0.1"
-        class="text-amber-500 dark:text-amber-400"
+        class="text-[var(--sg-amber)]"
       />
     {/each}
     

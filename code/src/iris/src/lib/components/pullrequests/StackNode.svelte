@@ -25,13 +25,13 @@
   function getBackgroundClass(level: number): string {
     if (level === 0) {
       // Outer most boxes - darker background
-      return 'bg-gray-200 dark:bg-gray-800';
+      return 'bg-[var(--sg-bg-2)]';
     } else if (level === 1) {
       // Nested boxes - lighter background
-      return 'bg-white dark:bg-gray-700';
+      return 'bg-[var(--sg-bg-1)]';
     } else {
       // Deeper nesting
-      return 'bg-gray-50 dark:bg-gray-600';
+      return 'bg-[var(--sg-bg-0)]';
     }
   }
 
@@ -50,21 +50,21 @@
   function getBorderColorClass(state: string): string {
     switch (state) {
       case 'no_changes':
-        return 'border-gray-300 dark:border-gray-600';
+        return 'border-[var(--sg-border)]';
       case 'plan_failed':
-        return 'border-orange-400 dark:border-orange-600';
+        return 'border-[var(--sg-orange)]';
       case 'plan_pending':
-        return 'border-pink-400 dark:border-pink-600';
+        return 'border-[var(--sg-pink)]';
       case 'apply_failed':
-        return 'border-red-400 dark:border-red-600';
+        return 'border-[var(--sg-error)]';
       case 'apply_pending':
-        return 'border-purple-400 dark:border-purple-600';
+        return 'border-[var(--sg-purple)]';
       case 'apply_ready':
-        return 'border-blue-400 dark:border-blue-600';
+        return 'border-[var(--sg-accent)]';
       case 'apply_success':
-        return 'border-green-400 dark:border-green-600';
+        return 'border-[var(--sg-success)]';
       default:
-        return 'border-gray-300 dark:border-gray-600';
+        return 'border-[var(--sg-border)]';
     }
   }
 
@@ -72,21 +72,21 @@
   function getStateDotColor(state: string): string {
     switch (state) {
       case 'apply_success':
-        return 'bg-green-500';
+        return 'bg-[var(--sg-success)]';
       case 'apply_failed':
-        return 'bg-red-500';
+        return 'bg-[var(--sg-error)]';
       case 'apply_pending':
-        return 'bg-purple-500';
+        return 'bg-[var(--sg-purple)]';
       case 'apply_ready':
-        return 'bg-blue-500';
+        return 'bg-[var(--sg-accent)]';
       case 'plan_pending':
-        return 'bg-pink-500';
+        return 'bg-[var(--sg-pink)]';
       case 'plan_failed':
-        return 'bg-orange-500';
+        return 'bg-[var(--sg-orange)]';
       case 'no_changes':
-        return 'bg-gray-400';
+        return 'bg-[var(--sg-text-dim)]';
       default:
-        return 'bg-gray-400';
+        return 'bg-[var(--sg-text-dim)]';
     }
   }
 
@@ -123,13 +123,13 @@
     <!-- Expandable stack - entire header is clickable -->
     <button
       on:click={toggleExpanded}
-      class="w-full flex items-center justify-between mb-3 text-left focus:outline-none focus:ring-2 focus:ring-brand-primary rounded p-2 -m-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      class="w-full flex items-center justify-between mb-3 text-left focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] rounded p-2 -m-2 hover:bg-[var(--sg-bg-2)] transition-colors"
       aria-label="{expanded ? 'Collapse' : 'Expand'} {stack.name}"
       aria-expanded={expanded}
     >
       <div class="flex items-center gap-3">
         <svg
-          class="w-5 h-5 transition-transform {expanded ? 'rotate-90' : ''} text-gray-600 dark:text-gray-400"
+          class="w-5 h-5 transition-transform {expanded ? 'rotate-90' : ''} text-[var(--sg-text-dim)]"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -142,7 +142,7 @@
           />
         </svg>
         <div class="flex flex-col gap-1">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 {level > 0 ? 'ml-4' : ''}">
+          <h3 class="text-lg font-semibold text-[var(--sg-text)] {level > 0 ? 'ml-4' : ''}">
             {stack.name}
           </h3>
           {#if isStackInner(stack) && stack.dirspaces.length > 0}
@@ -150,7 +150,7 @@
               {#each Object.entries(workspaceStateCounts) as [state, count]}
                 <div class="flex items-center gap-1" title="{count} workspace{count !== 1 ? 's' : ''} {state.replace(/_/g, ' ')}">
                   <div class="w-2 h-2 rounded-full {getStateDotColor(state)}"></div>
-                  <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{count}</span>
+                  <span class="text-xs font-medium text-[var(--sg-text-muted)]">{count}</span>
                 </div>
               {/each}
             </div>
@@ -163,7 +163,7 @@
     <!-- Non-expandable stack (leaf node) - not clickable -->
     <div class="flex items-center justify-between mb-3">
       <div class="flex flex-col gap-1">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 {level > 0 ? 'ml-4' : ''}">
+        <h3 class="text-lg font-semibold text-[var(--sg-text)] {level > 0 ? 'ml-4' : ''}">
           {stack.name}
         </h3>
         {#if isStackInner(stack) && stack.dirspaces.length > 0}
@@ -171,7 +171,7 @@
             {#each Object.entries(workspaceStateCounts) as [state, count]}
               <div class="flex items-center gap-1" title="{count} workspace{count !== 1 ? 's' : ''} {state.replace(/_/g, ' ')}">
                 <div class="w-2 h-2 rounded-full {getStateDotColor(state)}"></div>
-                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{count}</span>
+                <span class="text-xs font-medium text-[var(--sg-text-muted)]">{count}</span>
               </div>
             {/each}
           </div>
@@ -196,17 +196,17 @@
       <div class="mt-3 space-y-2 {level > 0 ? 'ml-4' : ''}">
         {#each stack.dirspaces as { dirspace, state }}
           <div
-            class="flex items-center gap-3 p-2 rounded-md bg-gray-50 dark:bg-gray-800 text-sm"
+            class="flex items-center gap-3 p-2 rounded-md bg-[var(--sg-bg-0)] text-sm"
           >
-            <div class="flex-1 font-mono text-xs text-gray-700 dark:text-gray-300">
+            <div class="flex-1 font-mono text-xs text-[var(--sg-text-muted)]">
               {dirspace.dir}
             </div>
-            <div class="text-xs font-medium text-gray-600 dark:text-gray-400">
+            <div class="text-xs font-medium text-[var(--sg-text-dim)]">
               {dirspace.workspace}
             </div>
-            <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+            <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--sg-bg-1)] border border-[var(--sg-border)]">
               <div class="w-2 h-2 rounded-full {getStateDotColor(state)}"></div>
-              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+              <span class="text-xs font-medium text-[var(--sg-text-muted)]">
                 {state.replace(/_/g, ' ')}
               </span>
             </div>

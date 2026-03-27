@@ -7,6 +7,7 @@
   import { api } from './api';
   import { selectedInstallation, currentVCSProvider } from './stores';
   import { navigateToPRDetail, navigateToStacks, navigateToRun } from './utils/navigation';
+  import { LoadingSpinner } from './components';
   import { onMount } from 'svelte';
 
   export let params: {
@@ -158,17 +159,17 @@
   function getRunStateBadgeClasses(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failure':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'running':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'queued':
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
+        return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)]';
       case 'aborted':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
     }
   }
 
@@ -178,13 +179,13 @@
   function getPRStateBadgeClasses(state: string): string {
     switch (state) {
       case 'open':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'merged':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'closed':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
     }
   }
 
@@ -197,15 +198,15 @@
 <PageLayout activeItem="stacks" title="Stack Detail">
   <div class="space-y-6">
     <!-- Breadcrumb navigation -->
-    <nav class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+    <nav class="flex items-center space-x-2 text-sm text-[var(--sg-text-dim)]">
       <button
         on:click={() => navigateToStacks()}
-        class="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+        class="hover:text-[var(--sg-text-muted)] transition-colors"
       >
         Stacks
       </button>
       <span>/</span>
-      <span class="text-gray-900 dark:text-gray-100">
+      <span class="text-[var(--sg-text)]">
         PR #{params.prNumber}
         {#if params.stackName}
           - {decodeURIComponent(params.stackName)}
@@ -219,7 +220,7 @@
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <h2 class="text-xl font-semibold text-[var(--sg-text)]">
                 PR #{prInfo.pull_number}: {prInfo.title || 'Untitled'}
               </h2>
               <span
@@ -230,7 +231,7 @@
                 {prInfo.state}
               </span>
             </div>
-            <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <div class="flex items-center gap-4 text-sm text-[var(--sg-text-muted)]">
               <div>
                 <span class="font-medium">Branch:</span> {prInfo.branch} → {prInfo.base_branch}
               </div>
@@ -251,7 +252,7 @@
     <!-- Stacks Tree -->
     <Card padding="md">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 class="text-lg font-semibold text-[var(--sg-text)]">
           Infrastructure Stacks
         </h3>
         <Button
@@ -272,58 +273,52 @@
 
     <!-- Runs History -->
     <Card padding="md">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">
         Run History ({runs.length})
       </h3>
 
       {#if isLoadingRuns}
         <div class="flex items-center justify-center py-8">
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"
-            role="status"
-            aria-label="Loading runs"
-          >
-            <span class="sr-only">Loading runs...</span>
-          </div>
+          <LoadingSpinner size="lg" centered={false} />
         </div>
       {:else if runs.length > 0}
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900/50">
+          <table class="min-w-full divide-y divide-[var(--sg-divider)]">
+            <thead class="bg-[var(--sg-bg-0)]">
               <tr>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   Time
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   Type
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   Directory
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   Workspace
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   State
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  class="px-4 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider"
                 >
                   User
                 </th>
@@ -332,19 +327,19 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="bg-[var(--sg-bg-1)] divide-y divide-[var(--sg-divider)]">
               {#each runs as run}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <tr class="hover:bg-[var(--sg-bg-2)] transition-colors">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-[var(--sg-text)]">
                     {formatRelativeTime(run.created_at)}
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-[var(--sg-text)]">
                     {run.run_type}
                   </td>
-                  <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">
+                  <td class="px-4 py-3 text-sm font-mono text-[var(--sg-text)]">
                     {run.dir}
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-[var(--sg-text-muted)]">
                     {run.workspace}
                   </td>
                   <td class="px-4 py-3 whitespace-nowrap">
@@ -356,7 +351,7 @@
                       {run.state}
                     </span>
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-[var(--sg-text-muted)]">
                     {#if run.user}
                       @{run.user}
                     {:else}
@@ -367,7 +362,7 @@
                     {#if run.run_id}
                       <button
                         on:click={() => navigateToRun(run.run_id || '')}
-                        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                        class="text-[var(--sg-accent)] hover:text-[var(--sg-accent)] transition-colors"
                       >
                         View
                       </button>
@@ -379,7 +374,7 @@
           </table>
         </div>
       {:else}
-        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div class="text-center py-8 text-[var(--sg-text-dim)]">
           No runs found for this pull request.
         </div>
       {/if}
@@ -388,12 +383,12 @@
     <!-- Error state -->
     {#if error}
       <div
-        class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800"
+        class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]"
         role="alert"
       >
         <div class="flex">
           <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-5 w-5 text-[var(--sg-error)]" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -402,15 +397,15 @@
             </svg>
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+            <h3 class="text-sm font-medium text-[var(--sg-error)]">
               Error loading stack detail
             </h3>
-            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+            <div class="mt-2 text-sm text-[var(--sg-error)]">
               {error}
             </div>
             <button
               on:click={refresh}
-              class="mt-3 text-sm font-medium text-red-800 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 underline"
+              class="mt-3 text-sm font-medium text-[var(--sg-error)] hover:text-[var(--sg-error)] underline"
             >
               Try again
             </button>

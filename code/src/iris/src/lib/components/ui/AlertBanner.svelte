@@ -17,32 +17,32 @@
   // Style mappings for each kind - subtle and refined
   const styles = {
     critical: {
-      container: 'bg-red-50/80 dark:bg-red-950/10 border-b border-red-100/50 dark:border-red-900/20',
-      text: 'text-red-800 dark:text-red-200',
-      subtext: 'text-red-600/90 dark:text-red-300/80',
-      icon: 'text-red-500 dark:text-red-400',
-      dismiss: 'text-red-600/60 hover:text-red-600 dark:text-red-400/60 dark:hover:text-red-400'
+      container: 'bg-[var(--sg-error-bg)] border-b border-[var(--sg-error)]',
+      text: 'text-[var(--sg-error)]',
+      subtext: 'text-[var(--sg-error)]',
+      icon: 'text-[var(--sg-error)]',
+      dismiss: 'text-[var(--sg-error)] opacity-60 hover:opacity-100'
     },
     warning: {
-      container: 'bg-rose-50 dark:bg-amber-950/10 border-b border-rose-100 dark:border-amber-900/20',
-      text: 'text-rose-800 dark:text-amber-200',
-      subtext: 'text-rose-600 dark:text-amber-300/80',
-      icon: 'text-rose-500 dark:text-amber-400',
-      dismiss: 'text-rose-600/60 hover:text-rose-600 dark:text-amber-400/60 dark:hover:text-amber-400'
+      container: 'bg-[var(--sg-warning-bg)] border-b border-[var(--sg-warning)]',
+      text: 'text-[var(--sg-warning)]',
+      subtext: 'text-[var(--sg-warning)]',
+      icon: 'text-[var(--sg-warning)]',
+      dismiss: 'text-[var(--sg-warning)] opacity-60 hover:opacity-100'
     },
     info: {
-      container: 'bg-blue-50/80 dark:bg-blue-950/10 border-b border-blue-100/50 dark:border-blue-900/20',
-      text: 'text-blue-800 dark:text-blue-200',
-      subtext: 'text-blue-600/90 dark:text-blue-300/80',
-      icon: 'text-blue-500 dark:text-blue-400',
-      dismiss: 'text-blue-600/60 hover:text-blue-600 dark:text-blue-400/60 dark:hover:text-blue-400'
+      container: 'bg-[var(--sg-accent-bg)] border-b border-[var(--sg-accent)]',
+      text: 'text-[var(--sg-accent)]',
+      subtext: 'text-[var(--sg-accent)]',
+      icon: 'text-[var(--sg-accent)]',
+      dismiss: 'text-[var(--sg-accent)] opacity-60 hover:opacity-100'
     },
     success: {
-      container: 'bg-green-50/80 dark:bg-green-950/10 border-b border-green-100/50 dark:border-green-900/20',
-      text: 'text-green-800 dark:text-green-200',
-      subtext: 'text-green-600/90 dark:text-green-300/80',
-      icon: 'text-green-500 dark:text-green-400',
-      dismiss: 'text-green-600/60 hover:text-green-600 dark:text-green-400/60 dark:hover:text-green-400'
+      container: 'bg-[var(--sg-success-bg)] border-b border-[var(--sg-success)]',
+      text: 'text-[var(--sg-success)]',
+      subtext: 'text-[var(--sg-success)]',
+      icon: 'text-[var(--sg-success)]',
+      dismiss: 'text-[var(--sg-success)] opacity-60 hover:opacity-100'
     }
   };
   
@@ -167,7 +167,7 @@
             <button
               type="button"
               on:click={handleSecondaryAction}
-              class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+              class="text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)]"
             >
               {secondaryAction.label}
             </button>
@@ -177,7 +177,7 @@
             <button
               type="button"
               on:click={handlePrimaryAction}
-              class="rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              class="rounded bg-[var(--sg-accent-button)] px-3 py-1 text-sm font-medium text-white hover:bg-[var(--sg-accent-button-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-offset-2"
             >
               {primaryAction.label}
             </button>

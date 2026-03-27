@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { DashboardMetrics, PRWithStacks } from '../../types';
   import { navigateToPRDetail, navigateToStackDetail } from '../../utils/navigation';
+  import { EmptyState, LoadingSpinner } from '../index';
   import { onMount } from 'svelte';
 
   // Props
@@ -105,17 +106,17 @@
   function getStateBadgeClasses(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'pending':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'ready':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'no_changes':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -156,9 +157,9 @@
    * Gets color for failure rate indicator
    */
   function getFailureRateColor(rate: number): string {
-    if (rate >= 25) return 'text-red-600 dark:text-red-400';
-    if (rate >= 10) return 'text-orange-600 dark:text-orange-400';
-    return 'text-green-600 dark:text-green-400';
+    if (rate >= 25) return 'text-[var(--sg-error)]';
+    if (rate >= 10) return 'text-[var(--sg-orange)]';
+    return 'text-[var(--sg-success)]';
   }
 
   /**
@@ -174,19 +175,19 @@
   function getStackStateBadgeClasses(state: string): string {
     switch (state) {
       case 'apply_success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'apply_failed':
       case 'plan_failed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'apply_pending':
       case 'plan_pending':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'apply_ready':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'no_changes':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -218,42 +219,34 @@
   function getStateBorderColor(state: string): string {
     switch (state) {
       case 'success':
-        return 'border-l-green-500';
+        return 'border-l-[var(--sg-success)]';
       case 'failed':
-        return 'border-l-red-500';
+        return 'border-l-[var(--sg-error)]';
       case 'pending':
-        return 'border-l-purple-500';
+        return 'border-l-[var(--sg-purple)]';
       case 'ready':
-        return 'border-l-blue-500';
+        return 'border-l-[var(--sg-accent)]';
       case 'no_changes':
-        return 'border-l-gray-400';
+        return 'border-l-[var(--sg-text-dim)]';
       default:
-        return 'border-l-gray-300';
+        return 'border-l-[var(--sg-text-dim)]';
     }
   }
 </script>
 
 <!-- Loading state -->
 {#if isLoading}
-  <div class="flex items-center justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-      role="status"
-      aria-label="Loading dashboard"
-    >
-      <span class="sr-only">Loading dashboard...</span>
-    </div>
-  </div>
+  <LoadingSpinner size="xl" />
 
 <!-- Error state -->
 {:else if error}
   <div
-    class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800"
+    class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="h-5 w-5 text-[var(--sg-error)]" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -262,10 +255,10 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        <h3 class="text-sm font-medium text-[var(--sg-error)]">
           Error loading dashboard
         </h3>
-        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+        <div class="mt-2 text-sm text-[var(--sg-error)]">
           {error}
         </div>
       </div>
@@ -278,32 +271,32 @@
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <!-- Total PRs -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total PRs</div>
-        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{metrics.totalPRs}</div>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 shadow-sm">
+        <div class="text-sm font-medium text-[var(--sg-text-dim)] mb-1">Total PRs</div>
+        <div class="text-3xl font-bold text-[var(--sg-text)]">{metrics.totalPRs}</div>
       </div>
 
       <!-- Total Stacks -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Stacks</div>
-        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{metrics.totalStacks}</div>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 shadow-sm">
+        <div class="text-sm font-medium text-[var(--sg-text-dim)] mb-1">Total Stacks</div>
+        <div class="text-3xl font-bold text-[var(--sg-text)]">{metrics.totalStacks}</div>
       </div>
 
       <!-- Total Runs -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Runs</div>
-        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{metrics.totalRuns}</div>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 shadow-sm">
+        <div class="text-sm font-medium text-[var(--sg-text-dim)] mb-1">Total Runs</div>
+        <div class="text-3xl font-bold text-[var(--sg-text)]">{metrics.totalRuns}</div>
       </div>
 
       <!-- Repositories -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Repositories</div>
-        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{metrics.uniqueRepos}</div>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 shadow-sm">
+        <div class="text-sm font-medium text-[var(--sg-text-dim)] mb-1">Repositories</div>
+        <div class="text-3xl font-bold text-[var(--sg-text)]">{metrics.uniqueRepos}</div>
       </div>
 
       <!-- Failure Rate -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Failure Rate</div>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-4 shadow-sm">
+        <div class="text-sm font-medium text-[var(--sg-text-dim)] mb-1">Failure Rate</div>
         <div class="text-3xl font-bold {getFailureRateColor(metrics.failureRate)}">
           {formatPercentage(metrics.failureRate)}%
         </div>
@@ -311,57 +304,57 @@
     </div>
 
     <!-- Stack State Distribution -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Stack State Distribution</h3>
+    <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-6 shadow-sm">
+      <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">Stack State Distribution</h3>
       <div class="space-y-3">
         {#if metrics.totalStacks > 0}
           <!-- Stacked bar visualization -->
           <div class="flex h-8 rounded-md overflow-hidden">
             {#if metrics.stackStateCounts.apply_failed > 0}
               <div
-                class="bg-red-500"
+                class="bg-[var(--sg-error)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.apply_failed, metrics.totalStacks)}%"
                 title="Apply Failed: {metrics.stackStateCounts.apply_failed}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.plan_failed > 0}
               <div
-                class="bg-orange-500"
+                class="bg-[var(--sg-orange)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.plan_failed, metrics.totalStacks)}%"
                 title="Plan Failed: {metrics.stackStateCounts.plan_failed}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.apply_pending > 0}
               <div
-                class="bg-purple-500"
+                class="bg-[var(--sg-purple)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.apply_pending, metrics.totalStacks)}%"
                 title="Apply Pending: {metrics.stackStateCounts.apply_pending}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.plan_pending > 0}
               <div
-                class="bg-pink-500"
+                class="bg-[var(--sg-pink)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.plan_pending, metrics.totalStacks)}%"
                 title="Plan Pending: {metrics.stackStateCounts.plan_pending}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.apply_ready > 0}
               <div
-                class="bg-blue-500"
+                class="bg-[var(--sg-accent)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.apply_ready, metrics.totalStacks)}%"
                 title="Apply Ready: {metrics.stackStateCounts.apply_ready}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.apply_success > 0}
               <div
-                class="bg-green-500"
+                class="bg-[var(--sg-success)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.apply_success, metrics.totalStacks)}%"
                 title="Apply Success: {metrics.stackStateCounts.apply_success}"
               ></div>
             {/if}
             {#if metrics.stackStateCounts.no_changes > 0}
               <div
-                class="bg-gray-400"
+                class="bg-[var(--sg-text-dim)]"
                 style="width: {getStatePercentage(metrics.stackStateCounts.no_changes, metrics.totalStacks)}%"
                 title="No Changes: {metrics.stackStateCounts.no_changes}"
               ></div>
@@ -371,36 +364,36 @@
           <!-- Legend -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-red-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Apply Failed: {metrics.stackStateCounts.apply_failed}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-error)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Apply Failed: {metrics.stackStateCounts.apply_failed}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-orange-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Plan Failed: {metrics.stackStateCounts.plan_failed}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-orange)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Plan Failed: {metrics.stackStateCounts.plan_failed}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-purple-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Apply Pending: {metrics.stackStateCounts.apply_pending}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-purple)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Apply Pending: {metrics.stackStateCounts.apply_pending}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-pink-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Plan Pending: {metrics.stackStateCounts.plan_pending}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-pink)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Plan Pending: {metrics.stackStateCounts.plan_pending}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-blue-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Ready: {metrics.stackStateCounts.apply_ready}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-accent)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Ready: {metrics.stackStateCounts.apply_ready}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-green-500"></span>
-              <span class="text-gray-700 dark:text-gray-300">Success: {metrics.stackStateCounts.apply_success}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-success)]"></span>
+              <span class="text-[var(--sg-text-muted)]">Success: {metrics.stackStateCounts.apply_success}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded bg-gray-400"></span>
-              <span class="text-gray-700 dark:text-gray-300">No Changes: {metrics.stackStateCounts.no_changes}</span>
+              <span class="w-3 h-3 rounded bg-[var(--sg-text-dim)]"></span>
+              <span class="text-[var(--sg-text-muted)]">No Changes: {metrics.stackStateCounts.no_changes}</span>
             </div>
           </div>
         {:else}
-          <p class="text-gray-500 dark:text-gray-400 text-sm">No stack state data available</p>
+          <EmptyState title="No stack state data available" />
         {/if}
       </div>
     </div>
@@ -408,18 +401,18 @@
     <!-- Two-column layout for tables -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Top Failing Stacks -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Top Failing Stacks</h3>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">Top Failing Stacks</h3>
         {#if metrics.topFailingStacks.length > 0}
           <div class="space-y-2">
             {#each metrics.topFailingStacks as stack}
-              <div class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-900/50">
+              <div class="flex items-center justify-between p-3 rounded-md bg-[var(--sg-bg-0)]">
                 <div class="flex-1 min-w-0">
-                  <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{stack.stackName}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">{stack.prCount} {stack.prCount === 1 ? 'PR' : 'PRs'}</div>
+                  <div class="font-medium text-[var(--sg-text)] truncate">{stack.stackName}</div>
+                  <div class="text-xs text-[var(--sg-text-dim)]">{stack.prCount} {stack.prCount === 1 ? 'PR' : 'PRs'}</div>
                 </div>
                 <div class="flex-shrink-0 ml-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--sg-error-bg)] text-[var(--sg-error)]">
                     {stack.failureCount} {stack.failureCount === 1 ? 'failure' : 'failures'}
                   </span>
                 </div>
@@ -427,23 +420,23 @@
             {/each}
           </div>
         {:else}
-          <p class="text-gray-500 dark:text-gray-400 text-sm">No failures in this time range</p>
+          <p class="text-[var(--sg-text-dim)] text-sm">No failures in this time range</p>
         {/if}
       </div>
 
       <!-- Top Failing Repos -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Top Failing Repositories</h3>
+      <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">Top Failing Repositories</h3>
         {#if metrics.topFailingRepos.length > 0}
           <div class="space-y-2">
             {#each metrics.topFailingRepos as repo}
-              <div class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-900/50">
+              <div class="flex items-center justify-between p-3 rounded-md bg-[var(--sg-bg-0)]">
                 <div class="flex-1 min-w-0">
-                  <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{repo.repo}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">{repo.prCount} {repo.prCount === 1 ? 'PR' : 'PRs'}</div>
+                  <div class="font-medium text-[var(--sg-text)] truncate">{repo.repo}</div>
+                  <div class="text-xs text-[var(--sg-text-dim)]">{repo.prCount} {repo.prCount === 1 ? 'PR' : 'PRs'}</div>
                 </div>
                 <div class="flex-shrink-0 ml-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--sg-error-bg)] text-[var(--sg-error)]">
                     {repo.failureCount} {repo.failureCount === 1 ? 'failure' : 'failures'}
                   </span>
                 </div>
@@ -451,25 +444,25 @@
             {/each}
           </div>
         {:else}
-          <p class="text-gray-500 dark:text-gray-400 text-sm">No failures in this time range</p>
+          <p class="text-[var(--sg-text-dim)] text-sm">No failures in this time range</p>
         {/if}
       </div>
     </div>
 
     <!-- Open PRs -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+    <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Open Pull Requests</h3>
+        <h3 class="text-lg font-semibold text-[var(--sg-text)]">Open Pull Requests</h3>
         <div class="flex items-center gap-4">
           <!-- Auto-expand toggle -->
           <div class="inline-flex items-center gap-2">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Auto-expand latest</span>
+            <span class="text-sm text-[var(--sg-text-dim)]">Auto-expand latest</span>
             <button
               type="button"
               role="switch"
               aria-checked={autoExpandMostRecent}
               on:click={toggleAutoExpand}
-              class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {autoExpandMostRecent ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'}"
+              class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-offset-2 {autoExpandMostRecent ? 'bg-[var(--sg-accent-button)]' : 'bg-[var(--sg-bg-2)]'}"
             >
               <span
                 aria-hidden="true"
@@ -479,7 +472,7 @@
           </div>
           <button
             on:click={onNavigateToPRs}
-            class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"
+            class="text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] font-medium transition-colors"
           >
             View All →
           </button>
@@ -490,17 +483,17 @@
           {#each metrics.openPRs as pr (pr.prNumber)}
             {@const fullPRData = getFullPRData(pr.prNumber)}
             {@const isMostRecent = mostRecentPR?.prNumber === pr.prNumber}
-            <div class="rounded-lg border border-gray-200 dark:border-gray-700 border-l-4 {getStateBorderColor(pr.state)} overflow-hidden">
+            <div class="rounded-lg border border-[var(--sg-border)] border-l-4 {getStateBorderColor(pr.state)} overflow-hidden">
               <!-- PR Header Row -->
               <button
                 on:click={() => togglePRExpand(pr.prNumber)}
-                class="w-full p-3 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/40 transition-colors text-left"
+                class="w-full p-3 bg-[var(--sg-bg-0)] hover:bg-[var(--sg-bg-2)] transition-colors text-left"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex items-center gap-2">
                     <!-- Expand/Collapse chevron -->
                     <svg
-                      class="w-4 h-4 text-gray-500 transition-transform {expandedPRs[pr.prNumber] ? 'rotate-90' : ''}"
+                      class="w-4 h-4 text-[var(--sg-text-dim)] transition-transform {expandedPRs[pr.prNumber] ? 'rotate-90' : ''}"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -510,16 +503,16 @@
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1">
                         {#if isMostRecent}
-                          <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">Latest</span>
+                          <span class="text-xs font-medium text-[var(--sg-accent)] bg-[var(--sg-accent-bg)] px-1.5 py-0.5 rounded">Latest</span>
                         {/if}
-                        <span class="font-medium text-gray-900 dark:text-gray-100">
+                        <span class="font-medium text-[var(--sg-text)]">
                           #{pr.prNumber}
                         </span>
-                        <span class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                        <span class="text-sm text-[var(--sg-text-dim)] truncate">
                           {pr.prTitle}
                         </span>
                       </div>
-                      <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
+                      <div class="flex items-center gap-3 text-xs text-[var(--sg-text-dim)]">
                         <span class="font-mono">{pr.repo}</span>
                         <span>•</span>
                         <span>{pr.stackCount} {pr.stackCount === 1 ? 'stack' : 'stacks'}</span>
@@ -536,41 +529,41 @@
 
               <!-- Expanded Content -->
               {#if expandedPRs[pr.prNumber] && fullPRData}
-                <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <div class="p-4 bg-[var(--sg-bg-1)] border-t border-[var(--sg-border)]">
                   <!-- Stack summary counts -->
-                  <div class="mb-4 bg-gray-50 dark:bg-gray-900/50 rounded-md p-3">
+                  <div class="mb-4 bg-[var(--sg-bg-0)] rounded-md p-3">
                     <div class="flex items-center justify-between flex-wrap gap-2">
-                      <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <div class="text-sm font-medium text-[var(--sg-text)]">
                         {fullPRData.stacks.length} {fullPRData.stacks.length === 1 ? 'Stack' : 'Stacks'}
                       </div>
                       <div class="flex items-center gap-3 text-xs flex-wrap">
                         {#if fullPRData.stackStateCounts.apply_failed > 0}
-                          <div class="flex items-center gap-1 text-red-600 dark:text-red-400">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                          <div class="flex items-center gap-1 text-[var(--sg-error)]">
+                            <span class="w-2 h-2 rounded-full bg-[var(--sg-error)]"></span>
                             <span>{fullPRData.stackStateCounts.apply_failed} apply failed</span>
                           </div>
                         {/if}
                         {#if fullPRData.stackStateCounts.plan_failed > 0}
-                          <div class="flex items-center gap-1 text-orange-600 dark:text-orange-400">
-                            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                          <div class="flex items-center gap-1 text-[var(--sg-orange)]">
+                            <span class="w-2 h-2 rounded-full bg-[var(--sg-orange)]"></span>
                             <span>{fullPRData.stackStateCounts.plan_failed} plan failed</span>
                           </div>
                         {/if}
                         {#if fullPRData.stackStateCounts.apply_pending > 0}
-                          <div class="flex items-center gap-1 text-purple-600 dark:text-purple-400">
-                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                          <div class="flex items-center gap-1 text-[var(--sg-purple)]">
+                            <span class="w-2 h-2 rounded-full bg-[var(--sg-purple)]"></span>
                             <span>{fullPRData.stackStateCounts.apply_pending} apply pending</span>
                           </div>
                         {/if}
                         {#if fullPRData.stackStateCounts.apply_ready > 0}
-                          <div class="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                          <div class="flex items-center gap-1 text-[var(--sg-accent)]">
+                            <span class="w-2 h-2 rounded-full bg-[var(--sg-accent)]"></span>
                             <span>{fullPRData.stackStateCounts.apply_ready} ready</span>
                           </div>
                         {/if}
                         {#if fullPRData.stackStateCounts.apply_success > 0}
-                          <div class="flex items-center gap-1 text-green-600 dark:text-green-400">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                          <div class="flex items-center gap-1 text-[var(--sg-success)]">
+                            <span class="w-2 h-2 rounded-full bg-[var(--sg-success)]"></span>
                             <span>{fullPRData.stackStateCounts.apply_success} success</span>
                           </div>
                         {/if}
@@ -580,27 +573,27 @@
 
                   <!-- Stacks list -->
                   <div class="space-y-2 mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Stacks</h4>
+                    <h4 class="text-sm font-medium text-[var(--sg-text-muted)]">Stacks</h4>
                     {#each fullPRData.stacks as stack}
                       <button
                         on:click={() => navigateToStackDetail(pr.prNumber, `${stack.stackOuter.name}/${stack.stackInner.name}`)}
-                        class="w-full flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors text-left"
+                        class="w-full flex items-center justify-between p-2 rounded-md bg-[var(--sg-bg-0)] hover:bg-[var(--sg-bg-2)] transition-colors text-left"
                       >
                         <div class="flex items-center gap-2 min-w-0 flex-1">
                           <span class="flex-shrink-0 text-base" aria-hidden="true">
                             {getStackStateIcon(stack.state)}
                           </span>
-                          <span class="font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <span class="font-medium text-[var(--sg-text)] truncate">
                             {stack.stackOuter.name}
                             {#if stack.stackOuter.name !== stack.stackInner.name}
-                              <span class="text-gray-500 dark:text-gray-400">/</span>
+                              <span class="text-[var(--sg-text-dim)]">/</span>
                               {stack.stackInner.name}
                             {/if}
                           </span>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
                           {#if stack.recentRunsCount > 0}
-                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                            <span class="text-xs text-[var(--sg-text-dim)]">
                               {stack.recentRunsCount} {stack.recentRunsCount === 1 ? 'run' : 'runs'}
                             </span>
                           {/if}
@@ -613,15 +606,15 @@
                   </div>
 
                   <!-- Footer actions -->
-                  <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                  <div class="flex items-center justify-between pt-3 border-t border-[var(--sg-border)]">
+                    <div class="text-xs text-[var(--sg-text-dim)]">
                       {#if fullPRData.lastUser}
                         Last activity by @{fullPRData.lastUser}
                       {/if}
                     </div>
                     <button
                       on:click={() => navigateToPRDetail(pr.prNumber)}
-                      class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"
+                      class="text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] font-medium transition-colors"
                     >
                       View Full PR →
                     </button>
@@ -632,13 +625,13 @@
           {/each}
         </div>
       {:else}
-        <p class="text-gray-500 dark:text-gray-400 text-sm">No open pull requests</p>
+        <EmptyState title="No open pull requests" />
       {/if}
     </div>
 
     <!-- Activity Over Time -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity Over Time ({metrics.timeRange} days)</h3>
+    <div class="bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] p-6 shadow-sm">
+      <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">Activity Over Time ({metrics.timeRange} days)</h3>
       {#if metrics.activityByDay.length > 0}
         <!-- Simple bar chart using CSS -->
         <div class="space-y-2">
@@ -646,16 +639,16 @@
             {@const maxRuns = Math.max(...metrics.activityByDay.map(d => d.runs))}
             {@const barWidth = maxRuns > 0 ? (day.runs / maxRuns) * 100 : 0}
             <div class="flex items-center gap-3">
-              <div class="text-xs text-gray-600 dark:text-gray-400 w-20 flex-shrink-0">{formatDate(day.date)}</div>
+              <div class="text-xs text-[var(--sg-text-dim)] w-20 flex-shrink-0">{formatDate(day.date)}</div>
               <div class="flex-1">
                 <div class="flex items-center gap-2">
-                  <div class="flex-1 bg-gray-100 dark:bg-gray-900/50 rounded-full h-6 overflow-hidden">
+                  <div class="flex-1 bg-[var(--sg-bg-2)] rounded-full h-6 overflow-hidden">
                     <div
-                      class="bg-blue-500 h-full rounded-full transition-all duration-300"
+                      class="bg-[var(--sg-accent)] h-full rounded-full transition-all duration-300"
                       style="width: {barWidth}%"
                     ></div>
                   </div>
-                  <div class="text-xs text-gray-700 dark:text-gray-300 w-16 text-right">
+                  <div class="text-xs text-[var(--sg-text-muted)] w-16 text-right">
                     {day.runs} runs
                   </div>
                 </div>
@@ -664,7 +657,7 @@
           {/each}
         </div>
       {:else}
-        <p class="text-gray-500 dark:text-gray-400 text-sm">No activity data available</p>
+        <EmptyState title="No activity data available" />
       {/if}
     </div>
   </div>

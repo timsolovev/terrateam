@@ -115,16 +115,16 @@
   function getCapabilityClass(cap: Capability): string {
     if (typeof cap === 'string') {
       if (cap.includes('read')) {
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       } else if (cap.includes('write')) {
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+        return 'bg-[var(--sg-orange-bg)] text-[var(--sg-orange)]';
       } else if (cap.includes('token')) {
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       }
     } else {
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+      return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
     }
-    return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]';
   }
 </script>
 
@@ -139,15 +139,15 @@
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">API Access Tokens</h2>
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+          <h2 class="text-lg md:text-xl font-bold text-[var(--sg-text)]">API Access Tokens</h2>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]">
             ENTERPRISE
           </span>
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]">
             BETA
           </span>
         </div>
-        <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-xs md:text-sm text-[var(--sg-text-dim)]">
           Create and manage API tokens for programmatic access
         </p>
       </div>
@@ -161,12 +161,12 @@
   </div>
 
   {#if error}
-    <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+    <div class="mb-4 bg-[var(--sg-error-bg)] border border-[var(--sg-error)] rounded-lg p-4">
       <div class="flex items-center">
-        <svg class="w-5 h-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-[var(--sg-error)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-sm text-red-700 dark:text-red-300">{error}</p>
+        <p class="text-sm text-[var(--sg-error)]">{error}</p>
       </div>
     </div>
   {/if}
@@ -174,40 +174,40 @@
   {#if isLoading}
     <div class="flex justify-center items-center py-8">
       <LoadingSpinner size="md" />
-      <span class="ml-3 text-gray-600 dark:text-gray-400">Loading tokens...</span>
+      <span class="ml-3 text-[var(--sg-text-dim)]">Loading tokens...</span>
     </div>
   {:else if tokens.length === 0}
     <div class="text-center py-8">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="mx-auto h-12 w-12 text-[var(--sg-text-dim)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
       </svg>
-      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No API tokens</h3>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      <h3 class="mt-2 text-sm font-medium text-[var(--sg-text)]">No API tokens</h3>
+      <p class="mt-1 text-sm text-[var(--sg-text-dim)]">
         Get started by creating a new API access token.
       </p>
     </div>
   {:else}
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-800">
+      <table class="min-w-full divide-y divide-[var(--sg-border)]">
+        <thead class="bg-[var(--sg-bg-0)]">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">
               Name
             </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">
               Capabilities
             </th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-[var(--sg-text-dim)] uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody class="bg-[var(--sg-bg-1)] divide-y divide-[var(--sg-border)]">
           {#each tokens as token (token.id)}
             <tr>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{token.name}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">{token.id.substring(0, 12)}...</div>
+                <div class="text-sm font-medium text-[var(--sg-text)]">{token.name}</div>
+                <div class="text-xs text-[var(--sg-text-dim)] font-mono">{token.id.substring(0, 12)}...</div>
               </td>
               <td class="px-6 py-4">
                 <div class="flex flex-wrap gap-2">
@@ -221,7 +221,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
                   on:click={() => handleDeleteClick(token)}
-                  class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                  class="text-[var(--sg-error)] hover:text-[var(--sg-error)]"
                 >
                   Delete
                 </button>
@@ -234,12 +234,12 @@
   {/if}
 
   <!-- API Usage Documentation -->
-  <div class="mt-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+  <div class="mt-6 bg-[var(--sg-purple-bg)] border border-[var(--sg-purple)] rounded-lg p-4">
     <div class="flex items-start">
-      <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 text-[var(--sg-purple)] mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
-      <div class="text-sm text-purple-700 dark:text-purple-300">
+      <div class="text-sm text-[var(--sg-purple)]">
         <p class="font-medium mb-1">API Usage</p>
         <p class="mb-2">
           Learn how to use your access tokens to interact with the Terrateam API.
@@ -247,7 +247,7 @@
             href="https://docs.terrateam.io/reference/api"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center font-medium text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline ml-1"
+            class="inline-flex items-center font-medium text-[var(--sg-purple)] hover:opacity-80 underline ml-1"
           >
             See the docs
             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@
             </svg>
           </a>
         </p>
-        <p class="text-xs bg-purple-100 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded px-2 py-1.5">
+        <p class="text-xs bg-[var(--sg-purple-bg)] border border-[var(--sg-purple)] rounded px-2 py-1.5">
           <strong>Beta Notice:</strong> The API is in beta. Some operations may not yet require explicit capabilities, but this may change in future updates. API endpoints and capability requirements are subject to change.
         </p>
       </div>
@@ -263,12 +263,12 @@
   </div>
 
   <!-- Security Notice -->
-  <div class="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+  <div class="mt-4 bg-[var(--sg-accent-bg)] border border-[var(--sg-accent)] rounded-lg p-4">
     <div class="flex items-start">
-      <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 text-[var(--sg-accent)] mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <div class="text-sm text-blue-700 dark:text-blue-300">
+      <div class="text-sm text-[var(--sg-accent)]">
         <p class="font-medium mb-1">Security Best Practices</p>
         <ul class="list-disc list-inside space-y-1">
           <li>Tokens are shown only once upon creation. Store them securely.</li>
@@ -300,17 +300,17 @@
 
 <!-- Delete Confirmation Modal -->
 {#if tokenToDelete}
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-[var(--sg-bg-1)] rounded-lg shadow-xl max-w-md w-full p-6">
       <div class="flex items-start mb-4">
         <div class="flex-shrink-0">
-          <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-6 w-6 text-[var(--sg-error)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
         <div class="ml-3 flex-1">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Delete API Token</h3>
-          <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <h3 class="text-lg font-medium text-[var(--sg-text)]">Delete API Token</h3>
+          <div class="mt-2 text-sm text-[var(--sg-text-dim)]">
             <p>Are you sure you want to delete the token <span class="font-semibold">{tokenToDelete.name}</span>?</p>
             <p class="mt-2">Any applications using this token will immediately lose access. This action cannot be undone.</p>
           </div>

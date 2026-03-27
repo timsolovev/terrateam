@@ -23,12 +23,12 @@
   };
 
   $: classes = [
-    'bg-white dark:!bg-gray-800 rounded-lg w-full text-left block',
-    border ? 'border border-gray-200 dark:border-gray-700' : '',
-    shadow ? 'shadow-sm dark:shadow-gray-900/20' : '',
-    hover && !disabled ? 'hover:shadow-lg dark:hover:shadow-gray-900/40 transition-shadow' : '',
+    'bg-[var(--sg-bg-1)] rounded-lg w-full text-left block',
+    border ? 'border border-[var(--sg-border)]' : '',
+    shadow ? 'shadow-sm' : '',
+    hover && !disabled ? 'hover:shadow-lg transition-shadow' : '',
     disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-blue-400',
+    'focus:outline-none focus:ring-2 focus:ring-[var(--sg-accent)] focus:ring-offset-2',
     padding ? paddingClasses[padding] : '',
     $$props.class || ''
   ].filter(Boolean).join(' ');

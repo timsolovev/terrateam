@@ -229,12 +229,12 @@
 
   function getStateColor(state: string): string {
     switch (state) {
-      case 'success': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-700';
-      case 'failure': return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-700';
-      case 'running': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-700';
-      case 'queued': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700';
-      case 'aborted': return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600';
+      case 'success': return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] border-[var(--sg-success)]';
+      case 'failure': return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)] border-[var(--sg-error)]';
+      case 'running': return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border-[var(--sg-accent)]';
+      case 'queued': return 'bg-[var(--sg-warning-bg)] text-[var(--sg-warning)] border-[var(--sg-warning)]';
+      case 'aborted': return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)] border-[var(--sg-border)]';
+      default: return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)] border-[var(--sg-border)]';
     }
   }
 
@@ -260,10 +260,10 @@
 
   function getTypeColor(type: string): string {
     switch (type) {
-      case 'plan': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-700';
-      case 'apply': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700';
-      case 'index': return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-700';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600';
+      case 'plan': return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] border-[var(--sg-accent)]';
+      case 'apply': return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] border-[var(--sg-success)]';
+      case 'index': return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)] border-[var(--sg-purple)]';
+      default: return 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] border-[var(--sg-border)]';
     }
   }
 
@@ -276,11 +276,11 @@
 <PageLayout activeItem="dashboard" title="Dashboard" subtitle="Overview of your Terraform infrastructure">
   <!-- Welcome Section -->
   <div class="mb-8">
-    <Card padding="lg" class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700">
+    <Card padding="lg" class="bg-gradient-to-r from-[var(--sg-accent-bg)] to-[var(--sg-accent-bg)] border-[var(--sg-accent)]">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between">
         <div class="flex-1">
-          <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome to Terrateam</h2>
-          <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+          <h2 class="text-xl md:text-2xl font-bold text-[var(--sg-text)] mb-2">Welcome to Terrateam</h2>
+          <p class="text-sm md:text-base text-[var(--sg-text-muted)] mb-4">
             New to Terrateam? Check out our getting started guide to learn the basics and set up your first workspace.
           </p>
           <div class="flex flex-wrap gap-3">
@@ -289,9 +289,9 @@
               hover={true}
               on:click={() => window.location.hash = '#/getting-started'}
               aria-label="Open getting started guide"
-              class="inline-block bg-white dark:bg-blue-800/30 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500"
+              class="inline-block bg-[var(--sg-bg-1)] border-[var(--sg-accent)] hover:border-[var(--sg-accent)]"
             >
-              <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+              <div class="flex items-center space-x-2 text-[var(--sg-accent)]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
@@ -303,9 +303,9 @@
               hover={true}
               on:click={() => window.open(EXTERNAL_URLS.SLACK, '_blank')}
               aria-label="Join Slack community"
-              class="inline-block bg-white dark:bg-blue-800/30 border-blue-300 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-500"
+              class="inline-block bg-[var(--sg-bg-1)] border-[var(--sg-accent)] hover:border-[var(--sg-accent)]"
             >
-              <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+              <div class="flex items-center space-x-2 text-[var(--sg-accent)]">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523c-1.393 0-2.522-1.13-2.522-2.523s1.13-2.523 2.522-2.523h2.52v2.523zm1.268 0c0-1.393 1.13-2.523 2.522-2.523s2.522 1.13 2.522 2.523v6.313c0 1.393-1.13 2.522-2.522 2.522s-2.522-1.13-2.522-2.522v-6.313zM8.832 5.042a2.528 2.528 0 0 1-2.522-2.52C6.31 1.13 7.44 0 8.832 0s2.522 1.13 2.522 2.522v2.52H8.832zm0 1.268c1.393 0 2.522 1.13 2.522 2.522s-1.13 2.522-2.522 2.522H2.522C1.13 11.354 0 10.224 0 8.832s1.13-2.522 2.522-2.522h6.31zM18.956 8.832c0-1.393 1.13-2.522 2.522-2.522S24 7.44 24 8.832s-1.13 2.522-2.522 2.522h-2.522V8.832zm-1.268 0c0 1.393-1.13 2.522-2.522 2.522s-2.522-1.13-2.522-2.522V2.522C12.644 1.13 13.774 0 15.166 0s2.522 1.13 2.522 2.522v6.31zM15.166 18.956c1.393 0 2.522 1.13 2.522 2.522S16.56 24 15.166 24s-2.522-1.13-2.522-2.522v-2.522h2.522zm0-1.268c-1.393 0-2.522-1.13-2.522-2.522s1.13-2.522 2.522-2.522h6.312c1.393 0 2.522 1.13 2.522 2.522s-1.13 2.522-2.522 2.522h-6.312z"/>
                 </svg>
@@ -322,23 +322,23 @@
   {#if $installationsLoading}
     <div class="flex justify-center items-center py-12 mb-8">
       <LoadingSpinner size="lg" />
-      <span class="ml-3 text-gray-600 dark:text-gray-400">Loading {terminology.organizations.toLowerCase()}...</span>
+      <span class="ml-3 text-[var(--sg-text-dim)]">Loading {terminology.organizations.toLowerCase()}...</span>
     </div>
   {:else if !$selectedInstallation}
     <!-- Demo Mode Message -->
-    <Card padding="lg" class="mb-8 border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+    <Card padding="lg" class="mb-8 border-[var(--sg-accent)] bg-[var(--sg-accent-bg)]">
       <div class="text-center">
         <div class="flex justify-center mb-4">
-          <svg class="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-12 h-12 text-[var(--sg-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Demo Mode</h3>
-        <p class="text-blue-700 dark:text-blue-300 mb-4">
+        <h3 class="text-xl font-semibold text-[var(--sg-accent)] mb-2">Demo Mode</h3>
+        <p class="text-[var(--sg-accent)] mb-4">
           You're viewing the dashboard in demo mode. Once you connect a {VCS_PROVIDERS[currentProvider].displayName} {terminology.organization.toLowerCase()}, you'll see real run statistics and activity here.
         </p>
         <div class="space-y-3">
-          <div class="text-sm text-blue-600 dark:text-blue-400 bg-white dark:bg-blue-800/30 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
+          <div class="text-sm text-[var(--sg-accent)] bg-[var(--sg-bg-1)] rounded-lg p-3 border border-[var(--sg-accent)]">
             <strong>What you'll see here:</strong> Run success rates, recent activity, running operations, and workspace statistics
           </div>
         </div>
@@ -347,11 +347,11 @@
   {:else if isLoadingStats}
     <div class="flex justify-center items-center py-12 mb-8">
       <LoadingSpinner size="lg" />
-      <span class="ml-3 text-gray-600 dark:text-gray-400">Loading dashboard statistics...</span>
+      <span class="ml-3 text-[var(--sg-text-dim)]">Loading dashboard statistics...</span>
     </div>
   {:else if statsError}
-    <Card padding="lg" class="mb-8 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
-      <div class="flex items-center space-x-2 text-amber-800 dark:text-amber-400">
+    <Card padding="lg" class="mb-8 border-[var(--sg-warning)] bg-[var(--sg-warning-bg)]">
+      <div class="flex items-center space-x-2 text-[var(--sg-warning)]">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
@@ -368,9 +368,9 @@
         aria-label="View failed runs from last 24 hours"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400">{stats.failed24h}</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Failed Runs</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">Last 24 hours</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-error)]">{stats.failed24h}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Failed Runs</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">Last 24 hours</div>
       </ClickableCard>
       
       <ClickableCard 
@@ -380,9 +380,9 @@
         aria-label="View successful runs from last 24 hours"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">{stats.successful24h}</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Successful Runs</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">Last 24 hours</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-success)]">{stats.successful24h}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Successful Runs</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">Last 24 hours</div>
       </ClickableCard>
       
       <ClickableCard 
@@ -392,9 +392,9 @@
         aria-label="View currently running operations"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.running}</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Running Operations</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">Currently active</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-warning)]">{stats.running}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Running Operations</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">Currently active</div>
       </ClickableCard>
       
       <ClickableCard 
@@ -407,9 +407,9 @@
           aria-label="View all runs from last 7 days"
           class="text-center"
         >
-          <div class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.total7d}</div>
-          <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Total Operations</div>
-          <div class="text-xs text-gray-500 dark:text-gray-400">Last 7 days</div>
+          <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{stats.total7d}</div>
+          <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Total Operations</div>
+          <div class="text-xs text-[var(--sg-text-dim)]">Last 7 days</div>
         </ClickableCard>
     </div>
 
@@ -426,9 +426,9 @@
         aria-label="View plan operations from last 7 days"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-indigo-600 dark:text-indigo-400">{stats.conversionRate.toFixed(1)}%</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Plan → Apply Rate</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">{stats.plans} plans, {stats.applies} applies</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{stats.conversionRate.toFixed(1)}%</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Plan → Apply Rate</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">{stats.plans} plans, {stats.applies} applies</div>
       </ClickableCard>
       
       <ClickableCard 
@@ -441,9 +441,9 @@
         aria-label="View completed runs"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-teal-600 dark:text-teal-400">{stats.avgDuration}</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg Duration</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">Minutes</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-accent)]">{stats.avgDuration}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Avg Duration</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">Minutes</div>
       </ClickableCard>
       
       <ClickableCard 
@@ -456,9 +456,9 @@
         aria-label="View active workspaces from last 24 hours"
         class="text-center"
       >
-        <div class="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.workspaces24h}</div>
-        <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Active Workspaces</div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">Last 24 hours</div>
+        <div class="text-2xl md:text-3xl font-bold text-[var(--sg-purple)]">{stats.workspaces24h}</div>
+        <div class="text-xs md:text-sm text-[var(--sg-text-dim)] mt-1">Active Workspaces</div>
+        <div class="text-xs text-[var(--sg-text-dim)]">Last 24 hours</div>
       </ClickableCard>
       
     </div>
@@ -467,8 +467,8 @@
     {#if stats.topUsers.length > 0}
       <div class="mb-8">
         <Card padding="lg">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Most Active Contributors</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Click to view runs by user from the last 7 days</p>
+          <h3 class="text-lg font-semibold text-[var(--sg-text)] mb-4">Most Active Contributors</h3>
+          <p class="text-sm text-[var(--sg-text-dim)] mb-4">Click to view runs by user from the last 7 days</p>
           <div class="space-y-3">
             {#each stats.topUsers as user, index}
               <ClickableCard
@@ -479,16 +479,16 @@
                   navigateToRuns(`created_at:${weekAgo}.. and user:${encodeURIComponent(user.name)}`);
                 }}
                 aria-label="View runs by {user.name} from last 7 days"
-                class="bg-gray-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                class="bg-[var(--sg-bg-0)] hover:bg-[var(--sg-bg-2)] transition-colors"
               >
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div class="flex items-center space-x-3">
-                    <div class="text-lg font-bold text-blue-600 dark:text-blue-400">#{index + 1}</div>
-                    <div class="font-medium text-gray-900 dark:text-gray-100">{user.name}</div>
+                    <div class="text-lg font-bold text-[var(--sg-accent)]">#{index + 1}</div>
+                    <div class="font-medium text-[var(--sg-text)]">{user.name}</div>
                   </div>
                   <div class="flex items-center gap-2 self-start sm:self-center">
-                    <div class="text-sm font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">{user.count} operations</div>
-                    <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="text-sm font-bold text-[var(--sg-accent)] whitespace-nowrap">{user.count} operations</div>
+                    <svg class="w-4 h-4 text-[var(--sg-text-dim)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -504,14 +504,14 @@
     <div class="mb-8">
       <Card padding="lg">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Activity</h3>
+          <h3 class="text-lg font-semibold text-[var(--sg-text)]">Recent Activity</h3>
           <div class="flex items-center gap-2 flex-shrink-0">
             {#if isLoadingActivity}
               <LoadingSpinner size="sm" centered={false} />
             {:else}
               <button
                 on:click={() => loadRecentActivity()}
-                class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
+                class="inline-flex items-center px-3 py-1 border border-[var(--sg-border)] rounded-md shadow-sm text-xs font-medium text-[var(--sg-text-muted)] bg-[var(--sg-bg-1)] hover:bg-[var(--sg-bg-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--sg-accent)] whitespace-nowrap"
               >
                 <svg class="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -524,9 +524,9 @@
               hover={true}
               on:click={() => navigateToRuns()}
               aria-label="View all runs"
-              class="inline-block bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50"
+              class="inline-block bg-[var(--sg-accent-bg)] border-[var(--sg-accent)] hover:bg-[var(--sg-bg-2)]"
             >
-              <div class="flex items-center space-x-1 text-blue-700 dark:text-blue-300">
+              <div class="flex items-center space-x-1 text-[var(--sg-accent)]">
                 <span class="text-xs font-medium whitespace-nowrap">View All</span>
                 <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -537,7 +537,7 @@
         </div>
         
         {#if activityError}
-          <div class="flex items-center space-x-2 text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-md border border-amber-200 dark:border-amber-700">
+          <div class="flex items-center space-x-2 text-[var(--sg-warning)] bg-[var(--sg-warning-bg)] p-3 rounded-md border border-[var(--sg-warning)]">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
@@ -546,16 +546,16 @@
         {:else if isLoadingActivity && recentActivity.length === 0}
           <div class="flex justify-center items-center py-8">
             <LoadingSpinner size="md" />
-            <span class="ml-3 text-gray-600 dark:text-gray-400">Loading recent activity...</span>
+            <span class="ml-3 text-[var(--sg-text-dim)]">Loading recent activity...</span>
           </div>
         {:else if recentActivity.length === 0}
-          <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="text-center py-8 text-[var(--sg-text-dim)]">
+            <svg class="w-12 h-12 mx-auto mb-4 text-[var(--sg-text-dim)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p class="text-sm">No recent activity to display</p>
             <p class="text-sm mt-2">
-              Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Join our Slack community</a>
+              Need help? <a href={EXTERNAL_URLS.SLACK} target="_blank" rel="noopener noreferrer" class="text-[var(--sg-accent)] hover:underline">Join our Slack community</a>
             </p>
           </div>
         {:else}
@@ -566,12 +566,12 @@
                 hover={true}
                 on:click={() => navigateToDetail(activity.id)}
                 aria-label="View details for {activity.run_type || 'unknown'} operation in {activity.repo}"
-                class="bg-gray-50 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-l-4 {
-                  activity.state === 'success' ? 'border-green-400' :
-                  activity.state === 'failure' ? 'border-red-400' :
-                  activity.state === 'running' ? 'border-blue-400' :
-                  activity.state === 'queued' ? 'border-yellow-400' :
-                  'border-gray-400'
+                class="bg-[var(--sg-bg-0)] hover:bg-[var(--sg-bg-2)] transition-colors border-l-4 {
+                  activity.state === 'success' ? 'border-[var(--sg-success)]' :
+                  activity.state === 'failure' ? 'border-[var(--sg-error)]' :
+                  activity.state === 'running' ? 'border-[var(--sg-accent)]' :
+                  activity.state === 'queued' ? 'border-[var(--sg-warning)]' :
+                  'border-[var(--sg-border)]'
                 }"
               >
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -591,28 +591,28 @@
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-2 text-sm">
-                      <span class="font-medium text-gray-900 dark:text-gray-100">{activity.repo}</span>
+                      <span class="font-medium text-[var(--sg-text)]">{activity.repo}</span>
                       {#if activity.dir}
-                        <span class="text-gray-400 dark:text-gray-500">•</span>
-                        <span class="text-gray-600 dark:text-gray-400 font-mono text-xs bg-gray-100 dark:bg-gray-600 px-1 rounded break-all">{activity.dir}</span>
+                        <span class="text-[var(--sg-text-dim)]">•</span>
+                        <span class="text-[var(--sg-text-dim)] font-mono text-xs bg-[var(--sg-bg-2)] px-1 rounded break-all">{activity.dir}</span>
                       {/if}
                     </div>
                     
-                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-[var(--sg-text-dim)] mt-1">
                       <span class="whitespace-nowrap">{formatRelativeTime(activity.created_at)}</span>
                       {#if activity.user}
-                        <span class="text-gray-400 dark:text-gray-500">•</span>
+                        <span class="text-[var(--sg-text-dim)]">•</span>
                         <span class="whitespace-nowrap">by {activity.user}</span>
                       {/if}
                       {#if activity.branch}
-                        <span class="text-gray-400 dark:text-gray-500">•</span>
+                        <span class="text-[var(--sg-text-dim)]">•</span>
                         <span class="break-all">{activity.branch}</span>
                       {/if}
                     </div>
                   </div>
                   
                   <div class="flex-shrink-0 self-start">
-                    <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-[var(--sg-text-dim)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                   </div>

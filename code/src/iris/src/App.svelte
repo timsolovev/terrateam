@@ -38,6 +38,7 @@
   import StackDetail from './lib/StackDetail.svelte';
   import RootHandler from './lib/components/layout/RootHandler.svelte';
   import RegulatedTrialBanner from './lib/components/RegulatedTrialBanner.svelte';
+  import LoadingSpinner from './lib/components/ui/LoadingSpinner.svelte';
   
   // Check for maintenance mode
   const maintenanceConfig = getMaintenanceConfig();
@@ -235,8 +236,8 @@
 {#if maintenanceConfig.isMaintenanceMode}
   <MaintenanceMode message={maintenanceConfig.message} />
 {:else if $isLoading}
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
+  <div class="min-h-screen bg-[var(--sg-bg-0)] flex items-center justify-center">
+    <LoadingSpinner size="xl" centered={false} />
   </div>
 {:else}
   <!-- Global trial notification banner -->

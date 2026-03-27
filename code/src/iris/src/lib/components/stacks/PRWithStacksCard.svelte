@@ -17,17 +17,17 @@
   function getStateBorderColor(state: string): string {
     switch (state) {
       case 'success':
-        return 'border-l-green-500';
+        return 'border-l-[var(--sg-success)]';
       case 'failed':
-        return 'border-l-red-500';
+        return 'border-l-[var(--sg-error)]';
       case 'pending':
-        return 'border-l-purple-500';
+        return 'border-l-[var(--sg-purple)]';
       case 'ready':
-        return 'border-l-blue-500';
+        return 'border-l-[var(--sg-accent)]';
       case 'no_changes':
-        return 'border-l-gray-400';
+        return 'border-l-[var(--sg-text-dim)]';
       default:
-        return 'border-l-gray-300';
+        return 'border-l-[var(--sg-text-dim)]';
     }
   }
 
@@ -37,17 +37,17 @@
   function getStateBadgeClasses(state: string): string {
     switch (state) {
       case 'success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'failed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'pending':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'ready':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'no_changes':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -57,19 +57,19 @@
   function getStackStateBadgeClasses(state: string): string {
     switch (state) {
       case 'apply_success':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
+        return 'bg-[var(--sg-success-bg)] text-[var(--sg-success)]';
       case 'apply_failed':
       case 'plan_failed':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
+        return 'bg-[var(--sg-error-bg)] text-[var(--sg-error)]';
       case 'apply_pending':
       case 'plan_pending':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
+        return 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)]';
       case 'apply_ready':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+        return 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)]';
       case 'no_changes':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+        return 'bg-[var(--sg-bg-2)] text-[var(--sg-text)]';
     }
   }
 
@@ -153,9 +153,9 @@
 </script>
 
 <button
-  class="w-full text-left bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 border-l-4 {getStateBorderColor(
+  class="w-full text-left bg-[var(--sg-bg-1)] rounded-lg border border-[var(--sg-border)] border-l-4 {getStateBorderColor(
     prWithStacks.aggregateState
-  )} shadow-sm dark:shadow-gray-900/20 hover:shadow-lg dark:hover:shadow-gray-900/40 transition-shadow cursor-pointer"
+  )} shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
   aria-label="View PR #{prWithStacks.prNumber} in {prWithStacks.repo} with {prWithStacks.stacks.length} stacks"
   on:click={handleClick}
 >
@@ -164,16 +164,16 @@
     <div class="flex items-start justify-between mb-4">
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-2">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h3 class="text-lg font-semibold text-[var(--sg-text)]">
             PR #{prWithStacks.prNumber}
             {#if prWithStacks.prTitle}
-              <span class="text-gray-600 dark:text-gray-400">: {prWithStacks.prTitle}</span>
+              <span class="text-[var(--sg-text-dim)]">: {prWithStacks.prTitle}</span>
             {/if}
           </h3>
         </div>
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+            class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)]"
           >
             {prWithStacks.repo}
           </span>
@@ -191,51 +191,51 @@
     </div>
 
     <!-- Stack summary counts -->
-    <div class="mb-4 bg-gray-50 dark:bg-gray-900/50 rounded-md p-3">
+    <div class="mb-4 bg-[var(--sg-bg-0)] rounded-md p-3">
       <div class="flex items-center justify-between flex-wrap gap-2">
-        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+        <div class="text-sm font-medium text-[var(--sg-text)]">
           {prWithStacks.stacks.length} {prWithStacks.stacks.length === 1 ? 'Stack' : 'Stacks'}
         </div>
         <div class="flex items-center gap-3 text-xs flex-wrap">
           {#if prWithStacks.stackStateCounts.apply_failed > 0}
-            <div class="flex items-center gap-1 text-red-600 dark:text-red-400">
-              <span class="w-2 h-2 rounded-full bg-red-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-error)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-error)]"></span>
               <span>{prWithStacks.stackStateCounts.apply_failed} apply failed</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.plan_failed > 0}
-            <div class="flex items-center gap-1 text-orange-600 dark:text-orange-400">
-              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-orange)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-orange)]"></span>
               <span>{prWithStacks.stackStateCounts.plan_failed} plan failed</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.apply_pending > 0}
-            <div class="flex items-center gap-1 text-purple-600 dark:text-purple-400">
-              <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-purple)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-purple)]"></span>
               <span>{prWithStacks.stackStateCounts.apply_pending} apply pending</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.plan_pending > 0}
-            <div class="flex items-center gap-1 text-pink-600 dark:text-pink-400">
-              <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-pink)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-pink)]"></span>
               <span>{prWithStacks.stackStateCounts.plan_pending} plan pending</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.apply_ready > 0}
-            <div class="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-accent)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-accent)]"></span>
               <span>{prWithStacks.stackStateCounts.apply_ready} ready</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.apply_success > 0}
-            <div class="flex items-center gap-1 text-green-600 dark:text-green-400">
-              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-success)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-success)]"></span>
               <span>{prWithStacks.stackStateCounts.apply_success} successful</span>
             </div>
           {/if}
           {#if prWithStacks.stackStateCounts.no_changes > 0}
-            <div class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-              <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+            <div class="flex items-center gap-1 text-[var(--sg-text-dim)]">
+              <span class="w-2 h-2 rounded-full bg-[var(--sg-text-dim)]"></span>
               <span>{prWithStacks.stackStateCounts.no_changes} no changes</span>
             </div>
           {/if}
@@ -247,23 +247,23 @@
     <div class="space-y-2 mb-4">
       {#each displayedStacks as stack}
         <div
-          class="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors"
+          class="flex items-center justify-between p-2 rounded-md bg-[var(--sg-bg-0)] hover:bg-[var(--sg-bg-2)] transition-colors"
         >
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <span class="flex-shrink-0 text-base" aria-hidden="true">
               {getStackStateIcon(stack.state)}
             </span>
-            <span class="font-medium text-gray-900 dark:text-gray-100 truncate">
+            <span class="font-medium text-[var(--sg-text)] truncate">
               {stack.stackOuter.name}
               {#if stack.stackOuter.name !== stack.stackInner.name}
-                <span class="text-gray-500 dark:text-gray-400">/</span>
+                <span class="text-[var(--sg-text-dim)]">/</span>
                 {stack.stackInner.name}
               {/if}
             </span>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
             {#if stack.recentRunsCount > 0}
-              <span class="text-xs text-gray-600 dark:text-gray-400">
+              <span class="text-xs text-[var(--sg-text-dim)]">
                 {stack.recentRunsCount} {stack.recentRunsCount === 1 ? 'run' : 'runs'}
               </span>
             {/if}
@@ -281,7 +281,7 @@
       {#if hasMoreStacks}
         <button
           on:click={toggleExpand}
-          class="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors py-2"
+          class="w-full text-center text-sm text-[var(--sg-accent)] hover:text-[var(--sg-accent-hover)] font-medium transition-colors py-2"
           aria-label="{expanded ? 'Show fewer' : 'Show all'} stacks"
           aria-expanded={expanded}
         >
@@ -294,7 +294,7 @@
 
     <!-- Metrics footer -->
     <div
-      class="flex items-center gap-4 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400"
+      class="flex items-center gap-4 pt-3 border-t border-[var(--sg-border)] text-xs text-[var(--sg-text-dim)]"
     >
       {#if prWithStacks.lastActivity}
         <div class="flex items-center gap-1">
@@ -307,19 +307,19 @@
       {/if}
       {#if prWithStacks.totalRunningCount > 0}
         <div class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span class="w-2 h-2 rounded-full bg-[var(--sg-accent)]"></span>
           <span>{prWithStacks.totalRunningCount} running</span>
         </div>
       {/if}
       {#if prWithStacks.totalFailureCount > 0}
         <div class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-red-500"></span>
+          <span class="w-2 h-2 rounded-full bg-[var(--sg-error)]"></span>
           <span>{prWithStacks.totalFailureCount} failed runs</span>
         </div>
       {/if}
       {#if prWithStacks.totalSuccessCount > 0}
         <div class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          <span class="w-2 h-2 rounded-full bg-[var(--sg-success)]"></span>
           <span>{prWithStacks.totalSuccessCount} successful runs</span>
         </div>
       {/if}

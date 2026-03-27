@@ -1,5 +1,6 @@
 <script lang="ts">
   import PRWithStacksCard from './PRWithStacksCard.svelte';
+  import { LoadingSpinner } from '../index';
   import type { PRWithStacks, StackState } from '../../types';
 
   // Props
@@ -159,12 +160,12 @@
 
 <!-- State filter buttons -->
 <div class="flex items-center gap-2 flex-wrap">
-  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Quick Filters:</span>
+  <span class="text-sm font-medium text-[var(--sg-text-muted)]">Quick Filters:</span>
   <button
     on:click={() => setStateFilter('')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === ''
-      ? 'bg-blue-600 text-white'
-      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
+      ? 'bg-[var(--sg-accent-button)] text-white'
+      : 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)]'}"
     aria-label="Show all PRs"
     aria-pressed={stateFilter === ''}
   >
@@ -173,8 +174,8 @@
   <button
     on:click={() => setStateFilter('apply_failed')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'apply_failed'
-      ? 'bg-red-600 text-white'
-      : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'}"
+      ? 'bg-[var(--sg-error)] text-white'
+      : 'bg-[var(--sg-error-bg)] text-[var(--sg-error)] hover:bg-[var(--sg-error-bg)]'}"
     aria-label="Show PRs with apply failures"
     aria-pressed={stateFilter === 'apply_failed'}
   >
@@ -183,8 +184,8 @@
   <button
     on:click={() => setStateFilter('plan_failed')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'plan_failed'
-      ? 'bg-orange-600 text-white'
-      : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50'}"
+      ? 'bg-[var(--sg-orange)] text-white'
+      : 'bg-[var(--sg-orange-bg)] text-[var(--sg-orange)] hover:bg-[var(--sg-orange-bg)] hover:opacity-90'}"
     aria-label="Show PRs with plan failures"
     aria-pressed={stateFilter === 'plan_failed'}
   >
@@ -193,8 +194,8 @@
   <button
     on:click={() => setStateFilter('apply_pending')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'apply_pending'
-      ? 'bg-purple-600 text-white'
-      : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50'}"
+      ? 'bg-[var(--sg-purple)] text-white'
+      : 'bg-[var(--sg-purple-bg)] text-[var(--sg-purple)] hover:bg-[var(--sg-purple-bg)] hover:opacity-90'}"
     aria-label="Show PRs with apply pending"
     aria-pressed={stateFilter === 'apply_pending'}
   >
@@ -203,8 +204,8 @@
   <button
     on:click={() => setStateFilter('plan_pending')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'plan_pending'
-      ? 'bg-pink-600 text-white'
-      : 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-900/50'}"
+      ? 'bg-[var(--sg-pink)] text-white'
+      : 'bg-[var(--sg-pink-bg)] text-[var(--sg-pink)] hover:bg-[var(--sg-pink-bg)] hover:opacity-90'}"
     aria-label="Show PRs with plan pending"
     aria-pressed={stateFilter === 'plan_pending'}
   >
@@ -213,8 +214,8 @@
   <button
     on:click={() => setStateFilter('apply_ready')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'apply_ready'
-      ? 'bg-blue-600 text-white'
-      : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'}"
+      ? 'bg-[var(--sg-accent-button)] text-white'
+      : 'bg-[var(--sg-accent-bg)] text-[var(--sg-accent)] hover:bg-[var(--sg-accent-bg)]'}"
     aria-label="Show PRs ready to apply"
     aria-pressed={stateFilter === 'apply_ready'}
   >
@@ -223,8 +224,8 @@
   <button
     on:click={() => setStateFilter('apply_success')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'apply_success'
-      ? 'bg-green-600 text-white'
-      : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'}"
+      ? 'bg-[var(--sg-success)] text-white'
+      : 'bg-[var(--sg-success-bg)] text-[var(--sg-success)] hover:bg-[var(--sg-success-bg)]'}"
     aria-label="Show successful PRs"
     aria-pressed={stateFilter === 'apply_success'}
   >
@@ -233,8 +234,8 @@
   <button
     on:click={() => setStateFilter('no_changes')}
     class="px-3 py-1 rounded-md text-sm font-medium transition-colors {stateFilter === 'no_changes'
-      ? 'bg-gray-600 text-white'
-      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
+      ? 'bg-[var(--sg-text-dim)] text-white'
+      : 'bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)]'}"
     aria-label="Show PRs with no changes"
     aria-pressed={stateFilter === 'no_changes'}
   >
@@ -243,7 +244,7 @@
   {#if hasActiveFilters}
     <button
       on:click={resetFilters}
-      class="px-3 py-1 rounded-md text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+      class="px-3 py-1 rounded-md text-sm font-medium bg-[var(--sg-bg-2)] text-[var(--sg-text-muted)] hover:bg-[var(--sg-bg-2)] transition-colors"
     >
       Reset Quick Filters
     </button>
@@ -252,25 +253,17 @@
 
 <!-- Loading state -->
 {#if isLoading}
-  <div class="flex items-center justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-      role="status"
-      aria-label="Loading stacks"
-    >
-      <span class="sr-only">Loading stacks...</span>
-    </div>
-  </div>
+  <LoadingSpinner size="xl" />
 
 <!-- Error state -->
 {:else if error}
   <div
-    class="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800"
+    class="rounded-md bg-[var(--sg-error-bg)] p-4 border border-[var(--sg-error)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="h-5 w-5 text-[var(--sg-error)]" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -279,15 +272,15 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        <h3 class="text-sm font-medium text-[var(--sg-error)]">
           Error loading stacks
         </h3>
-        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+        <div class="mt-2 text-sm text-[var(--sg-error)]">
           {error}
         </div>
         <button
           on:click={onRefresh}
-          class="mt-3 text-sm font-medium text-red-800 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 underline"
+          class="mt-3 text-sm font-medium text-[var(--sg-error)] hover:text-[var(--sg-error)] underline"
         >
           Try again
         </button>
@@ -298,12 +291,12 @@
 <!-- Partial errors warning -->
 {:else if loadErrors.length > 0}
   <div
-    class="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4 border border-yellow-200 dark:border-yellow-800"
+    class="rounded-md bg-[var(--sg-warning-bg)] p-4 border border-[var(--sg-warning)]"
     role="alert"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="h-5 w-5 text-[var(--sg-warning)]" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
             d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -312,10 +305,10 @@
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+        <h3 class="text-sm font-medium text-[var(--sg-warning)]">
           Some stacks could not be loaded
         </h3>
-        <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+        <div class="mt-2 text-sm text-[var(--sg-warning)]">
           Failed to load stacks for {loadErrors.length} PR{loadErrors.length > 1 ? 's' : ''}.
           Showing {filteredPRs.length} PR{filteredPRs.length !== 1 ? 's' : ''} that loaded successfully.
         </div>
@@ -336,7 +329,7 @@
     <!-- Empty state -->
     <div class="text-center py-12">
       <svg
-        class="mx-auto h-12 w-12 text-gray-400"
+        class="mx-auto h-12 w-12 text-[var(--sg-text-dim)]"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -348,8 +341,8 @@
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No pull requests found</h3>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      <h3 class="mt-2 text-sm font-semibold text-[var(--sg-text)]">No pull requests found</h3>
+      <p class="mt-1 text-sm text-[var(--sg-text-dim)]">
         {#if hasActiveFilters || searchQuery || repoFilter}
           No pull requests match your current filters. Try adjusting or resetting your filters.
         {:else}
