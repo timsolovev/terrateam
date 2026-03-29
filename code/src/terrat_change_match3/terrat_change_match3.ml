@@ -712,11 +712,17 @@ let match_dir_map dirspaces dir_map =
        (dirspaces, []))
 
 let match_diff_list ?(force_matches = []) config diff_list =
+  (* If this fpath maps to a symlink we want to rewrite it to be the symlink *)
   let map_symlink_file_path symlinks fpath =
-    match Iter.head (CCTrie.String.below fpath symlinks) with
-    | Some (dst, srcs) when CCString.prefix ~pre:dst fpath ->
+    match
+      ( CCTrie.String.find fpath symlinks,
+        Iter.head (CCTrie.String.below (Filename.dirname fpath) symlinks) )
+    with
+    | Some srcs, _ ->
+        CCList.map (fun src -> CCString.replace ~which:`Left ~sub:fpath ~by:src fpath) srcs
+    | _, Some (dst, srcs) when CCString.prefix ~pre:dst fpath ->
         CCList.map (fun src -> CCString.replace ~which:`Left ~sub:dst ~by:src fpath) srcs
-    | Some _ | None -> [ fpath ]
+    | _, (Some _ | None) -> [ fpath ]
   in
   let modifies_lookup =
     build_modifies_lookup @@ Iter.to_list @@ Dirspace_map.values config.Config.dirspaces
