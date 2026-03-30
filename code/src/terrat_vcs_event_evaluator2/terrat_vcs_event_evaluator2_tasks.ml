@@ -2985,6 +2985,44 @@ struct
           let open Irm in
           fetch Keys.job
           >>= function
+          | {
+              Tjc.Job.type_ =
+                Tjc.Job.Type_.Plan
+                  { kind = Some (Tjc.Job.Type_.Kind.Drift { reconcile = true }) as kind; tag_query };
+              context;
+              initiator;
+              _;
+            } ->
+              (* If we've just finished a drift plan with reconciliation on,
+                 then time to run the apply *)
+              Logs.info (fun m -> m "%s : DRIFT : RECONCILE" (Builder.log_id s));
+              Builder.run_db s ~f:(fun db ->
+                  S.Job_context.Job.create
+                    ~request_id:(Builder.log_id s)
+                    db
+                    (Tjc.Job.Type_.Apply { tag_query; kind; force = false })
+                    context
+                    initiator)
+              >>= fun job ->
+              Logs.info (fun m ->
+                  m "%s : CREATE_JOB : new_job= %a" (Builder.log_id s) Uuidm.pp job.Tjc.Job.id);
+              let s' =
+                s
+                |> Builder.State.orig_store
+                |> Keys.Key.add Keys.job job
+                |> Keys.Key.add Keys.work_manifest_event None
+                |> Builder.State.forward_store_value Keys.context s
+                |> Tasks_base.forward_std_keys s
+                |> CCFun.flip Builder.State.set_orig_store s
+                |> Builder.State.set_log_id (Uuidm.to_string job.Tjc.Job.id)
+              in
+              Builder.eval s' Keys.run_apply
+          | {
+              Tjc.Job.type_ = Tjc.Job.Type_.Plan { kind = Some (Tjc.Job.Type_.Kind.Drift _); _ };
+              _;
+            } ->
+              Logs.info (fun m -> m "%s : DRIFT_COMPLETE" (Builder.log_id s));
+              Abb.Future.return (Ok ())
           | ( { Tjc.Job.type_ = Tjc.Job.Type_.Apply _; _ }
             | { Tjc.Job.type_ = Tjc.Job.Type_.Autoapply; _ }
             | { Tjc.Job.type_ = Tjc.Job.Type_.Autoplan; _ }
@@ -3071,44 +3109,6 @@ struct
                   else
                     match job with
                     | { Tjc.Job.type_ = Tjc.Job.Type_.Apply _; _ } -> Abb.Future.return (Ok ())
-                    | {
-                     Tjc.Job.type_ =
-                       Tjc.Job.Type_.(
-                         Plan
-                           {
-                             tag_query;
-                             kind = Some Tjc.Job.Type_.Kind.(Drift { reconcile = true }) as kind;
-                           });
-                     _;
-                    } ->
-                        (* If we've just finished a drift plan with
-                           reconciliation on, then time to run the apply *)
-                        let { Tjc.Job.context; initiator; _ } = job in
-                        Builder.run_db s ~f:(fun db ->
-                            S.Job_context.Job.create
-                              ~request_id:(Builder.log_id s)
-                              db
-                              (Tjc.Job.Type_.Apply { tag_query; kind; force = false })
-                              context
-                              initiator)
-                        >>= fun job ->
-                        Logs.info (fun m ->
-                            m
-                              "%s : CREATE_JOB : new_job= %a"
-                              (Builder.log_id s)
-                              Uuidm.pp
-                              job.Tjc.Job.id);
-                        let s' =
-                          s
-                          |> Builder.State.orig_store
-                          |> Keys.Key.add Keys.job job
-                          |> Keys.Key.add Keys.work_manifest_event None
-                          |> Builder.State.forward_store_value Keys.context s
-                          |> Tasks_base.forward_std_keys s
-                          |> CCFun.flip Builder.State.set_orig_store s
-                          |> Builder.State.set_log_id (Uuidm.to_string job.Tjc.Job.id)
-                        in
-                        Builder.eval s' Keys.run_apply
                     | { Tjc.Job.type_ = Tjc.Job.Type_.(Plan _ | Autoplan); _ }
                       when can_stack_auto_apply working_layer ->
                         let { Tjc.Job.context; initiator; _ } = job in
