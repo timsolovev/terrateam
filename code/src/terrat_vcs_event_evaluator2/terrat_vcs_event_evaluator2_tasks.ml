@@ -480,9 +480,29 @@ struct
                                   flat_all_unapplied_matches))
                   | Tjc.Job.Type_.(Plan { tag_query = _; kind = Some (Tjc.Job.Type_.Kind.Drift _) })
                     ->
-                      (* In the case that it is a plan for drift, then plan all layers in one go. *)
+                      (* In the case that it is a plan for drift, then plan all
+                         layers in one go.  We match against [all_matches]
+                         because in the case of planning drift, we explicitly do
+                         not care if any dirspace is considered applied.
+
+                         Consider this scenario:
+
+                         1. Drift run against [main], find no drift.
+
+                         2. Nobody merges anything to [main].
+
+                         3. Drift runs again.  It runs nothing.
+
+                         The reason (3) happens is because we consider all
+                         dirspaces in [main] as "applied" because their plans
+                         came back with no changes.  This is what we would do in
+                         a PR flow, but not what we want to do in a drift flow.
+                         There could be drift between (1) and (2). So we ignore
+                         anything considered "applied" in (3) and run everything
+                         again.
+                       *)
                       CCList.filter (Terrat_change_match3.match_tag_query ~tag_query)
-                      @@ CCList.flatten all_unapplied_matches
+                      @@ CCList.flatten all_matches
                   | Tjc.Job.Type_.Autoplan
                   | Tjc.Job.Type_.Plan _
                   | Tjc.Job.Type_.Gate_approval _
