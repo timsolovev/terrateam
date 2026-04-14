@@ -10,6 +10,7 @@ The `automerge` configuration can be used to automatically merge the pull reques
 automerge:
   enabled: false
   delete_branch: false
+  merge_strategy: auto
   require_explicit_apply: false
 ```
 
@@ -18,7 +19,20 @@ automerge:
 | --- | --- | --- |
 | enabled | boolean | Specifies whether automerge is enabled. Default is false. |
 | delete_branch | boolean | Specifies whether the branch should be deleted after the PR is merged. Default is false. |
+| merge_strategy | string | The merge method to use when automerging. One of `auto`, `merge`, `rebase`, or `squash`. Default is `auto`. See [Merge Strategy](#merge-strategy) for details. |
 | require_explicit_apply | boolean | Specifies whether an explicit "terrateam apply" is necessary for `automerge` functionality to be applied. Default is false. |
+
+## Merge Strategy
+The `merge_strategy` key controls how Terrateam merges the pull request.
+
+| Value | Description |
+| --- | --- |
+| `auto` | On GitHub, attempts a merge commit first and falls back to squash if the repository does not allow merge commits. On GitLab, performs a standard (non-squash) merge. This is the default. |
+| `merge` | Creates a merge commit. |
+| `rebase` | Rebases the commits from the pull request onto the base branch. Supported on GitHub. |
+| `squash` | Squashes all commits in the pull request into a single commit. |
+
+The selected strategy must be allowed by the repository's merge settings. If the strategy is disabled at the repository level, the merge will fail (except for `auto`, which falls back on GitHub as described above).
 
 ## Examples
 ### Enable Automerge
@@ -36,6 +50,15 @@ automerge:
 ```
 
 This configuration will enable automerge and delete the source branch after a successful apply and git merge.
+
+### Enable Automerge with Squash
+```yaml
+automerge:
+  enabled: true
+  merge_strategy: squash
+```
+
+This configuration will enable automerge and squash all commits in the pull request into a single commit when merging.
 
 ## Considerations
 When enabling automerge, keep the following in mind:
