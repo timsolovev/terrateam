@@ -72,7 +72,7 @@ RUN eval $(opam env) && \
     opam install -j$(nproc --all) -y --no-depexts dune menhir && \
     xargs -a code/opam.pins opam install -j$(nproc --all) -y --no-depexts && \
     ulimit -s 524288 && ulimit -a && \
-    time make -C code -j$(nproc --all) test-terrat release-terrat release-ttm && \
+    time make -C code test-terrat terrat && \
     mv _build /build-cache
 
 # Use provided BASE_IMAGE if specified, otherwise use the build-base stage
@@ -88,7 +88,7 @@ WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./_build && \
     eval $(opam env) && \
-    time make -C code -j$(nproc --all) release_terrat_code_indexer
+    time make -C code terrat_code_indexer
 
 # Build target for ttm
 FROM build-setup AS ttm-build
@@ -96,7 +96,7 @@ WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./_build && \
     eval $(opam env) && \
-    time make -C code -j$(nproc --all) release-ttm && \
+    time make -C code ttm && \
     _build/default/code/src/ttm/ttm.exe --help
 
 # Build target for terrat-ee
@@ -105,7 +105,7 @@ WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./_build && \
     eval $(opam env) && \
-    time make -C code -j$(nproc --all) test-terrat release_terrat_ee release_iris
+    time make -C code test-terrat terrat_ee iris
 
 # Build target for terrat-oss
 FROM build-setup AS terrat-oss-build
@@ -113,7 +113,7 @@ WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
     mv /build-cache ./_build && \
     eval $(opam env) && \
-    time make -C code -j$(nproc --all) test-terrat release_terrat_oss release_iris
+    time make -C code test-terrat terrat_oss iris
 
 # Final code-indexer image
 FROM alpine:3.22 AS code-indexer
