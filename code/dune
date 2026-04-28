@@ -1,0 +1,18 @@
+(dirs src tests)
+
+(env
+ (dev
+  (flags
+   (:standard
+    -strict-sequence
+    -strict-formats
+    -w
+    "+d+f+p+u+s+40+K+L+R")))
+ (release
+  (flags
+   (:standard
+    -strict-sequence
+    -strict-formats
+    -noassert
+    -w
+    "+d+f+p+u+s+40+K+L+R"))))
