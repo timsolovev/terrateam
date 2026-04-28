@@ -1,4 +1,4 @@
-module Stubs = Otls_bindings.Stubs (Otls_stubs)
+module Stubs = Otls_stubs
 
 type err = [ `Error ]
 

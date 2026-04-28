@@ -1,3 +1,33 @@
 (executable
  (name ttm)
- (libraries ISO8601 abb cmdliner logs logs.cli logs.fmt logs.threaded mirage-crypto-rng.unix ttm_kv ttm_secrets))
+ (libraries ISO8601 abb cmdliner logs logs.cli logs.fmt logs.threaded mirage-crypto-rng.unix ttm_kv ttm_secrets)
+ (link_flags (:standard (:include ttm_link_flags.sexp))))
+
+; ttm is the distributed CLI client. We statically link it on Linux so
+; users can drop the binary onto any musl-compatible system without
+; chasing runtime .so deps. Mirrors the pre-dune posture (pds.conf
+; expressed this via a virtual `static_meta_pkg` target on which
+; [src.ttm.selector.linux] depended, plus `pkg-config --static --libs
+; libcurl` flags carried in via abb_curl's meta_linkopts).
+;
+; Other terrateam executables (terrat_oss, terrat_ee, terrat_code_indexer)
+; intentionally stay dynamic — they only run inside Docker images that
+; ship the runtime libs, so static linking would only inflate them.
+;
+; macOS path emits no flags: Apple discourages static linking against
+; the system frameworks that Rust crates pull in, and the pds setup
+; never tried it either.
+(rule
+ (target ttm_link_flags.sexp)
+ (action
+  (with-stdout-to %{target}
+   (bash
+    "case '%{ocaml-config:system}' in
+       linux)
+         out='(-cclib -static -cclib -no-pie';
+         for tok in $(pkg-config --static --libs libcurl libffi libuv gmp); do
+           out=\"$out -cclib $tok\";
+         done;
+         echo \"$out)\";;
+       *) echo '()';;
+     esac"))))

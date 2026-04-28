@@ -1,0 +1,10 @@
+(rule
+ (target libjsonschema_c_wrapper.a)
+ (deps
+  (glob_files_rec src/*)
+  Cargo.toml
+  Cargo.lock)
+ (action
+  (progn
+   (run cargo build --release --target-dir target)
+   (bash "cp target/release/libjsonschema_c_wrapper.a %{target}"))))
