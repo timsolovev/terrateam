@@ -5,6 +5,10 @@ description: Ensure infrastructure changes are approved by the right teams using
 
 import { Steps } from '@astrojs/starlight/components';
 
+:::note[Enterprise Edition]
+CODEOWNERS enforcement via `require_completed_reviews` is an Enterprise Edition feature. It is included in [Hosted SaaS](https://terrateam.io) and self-hosted Enterprise deployments. Setting `require_completed_reviews: true` on the Open Source Edition is not permitted — Terrateam rejects the configuration and posts a comment on the pull request. See [Editions](/editions/).
+:::
+
 Terrateam integrates with CODEOWNERS to ensure that infrastructure changes are reviewed and approved by the appropriate teams or individuals before being applied. This is particularly important for maintaining governance and compliance in large organizations where different teams own different parts of the infrastructure.
 
 ## Configuring CODEOWNERS Enforcement

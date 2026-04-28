@@ -3,6 +3,10 @@ title: access_control
 description: The access_control configuration reference
 ---
 
+:::note[Enterprise Edition]
+Enabling access control (`access_control.enabled: true`) is an Enterprise Edition feature. It is included in [Hosted SaaS](https://terrateam.io) and self-hosted Enterprise deployments. On the Open Source Edition, access control is permanently disabled — setting `enabled: true` is not permitted and Terrateam will reject the configuration. See [Editions](/editions/).
+:::
+
 The `access_control` configuration provides a powerful and flexible way to manage who can perform various operations on your Terraform resources. By defining policies based on user roles, GitHub teams, and repository collaborators, you can ensure that only authorized individuals can trigger potentially impactful actions like applying changes to your infrastructure.
 
 ## Default Configuration
