@@ -2167,6 +2167,16 @@ struct
                     repo
                     db)))
 
+    let maybe_finalize_when_all_applied =
+      let open Irm in
+      fun s { Bs.Fetcher.fetch } ->
+        fetch Keys.all_unapplied_matches
+        >>= function
+        | [] ->
+            Logs.info (fun m -> m "%s : ALL_DIRSPACES_APPLIED" (Builder.log_id s));
+            fetch Keys.finalize_unfinished_terrateam_checks
+        | _ -> Abb.Future.return (Ok ())
+
     let run_plan =
       run ~name:"run_plan" (fun s ({ Bs.Fetcher.fetch } as fetcher) ->
           let open Irm in
@@ -2179,9 +2189,7 @@ struct
           let open Abb.Future.Infix_monad in
           Tf_op_wm.Plan.run ~dest_branch_ref ~branch_ref ~branch ~name:"plan_wm" s fetcher
           >>= function
-          | Ok wms ->
-              (* Do something useful here? *)
-              Abb.Future.return (Ok ())
+          | Ok wms -> maybe_finalize_when_all_applied s fetcher
           | Error (#Str_template.err as err) ->
               let open Irm in
               fetch Keys.publish_comment
@@ -2198,9 +2206,7 @@ struct
           fetch Keys.working_branch_name
           >>= fun branch ->
           Tf_op_wm.Apply.run ~dest_branch_ref ~branch_ref ~branch ~name:"apply_wm" s fetcher
-          >>= fun wms ->
-          (* Do something useful here? *)
-          Abb.Future.return (Ok ()))
+          >>= fun wms -> maybe_finalize_when_all_applied s fetcher)
 
     let maybe_complete_job =
       run ~name:"maybe_complete_job" (fun s { Bs.Fetcher.fetch } ->
@@ -2988,6 +2994,33 @@ struct
               create_commit_checks' create_commit_checks branch_ref checks
           | _ -> Abb.Future.return (Ok ()))
 
+    let finalize_unfinished_terrateam_checks =
+      run ~name:"finalize_unfinished_terrateam_checks" (fun s { Bs.Fetcher.fetch } ->
+          let module Ch = Terrat_commit_check in
+          let module Status = Ch.Status in
+          let open Irm in
+          fetch Keys.commit_checks
+          >>= fun commit_checks ->
+          let unfinished =
+            CCList.filter_map
+              (function
+                | { Ch.status = Status.(Completed | Failed | Canceled); _ } -> None
+                | { Ch.status = Status.(Queued | Running); title; _ } as c
+                  when CCString.prefix ~pre:"terrateam plan" title
+                       || CCString.prefix ~pre:"terrateam apply" title ->
+                    Some { c with Ch.status = Status.Completed; description = "Completed" }
+                | _ -> None)
+              commit_checks
+          in
+          match unfinished with
+          | [] -> Abb.Future.return (Ok ())
+          | _ ->
+              fetch Keys.branch_ref
+              >>= fun branch_ref ->
+              fetch Keys.create_commit_checks
+              >>= fun create_commit_checks ->
+              create_commit_checks' create_commit_checks branch_ref unfinished)
+
     let run_next_layer =
       run ~name:"run_next_layer" (fun s { Bs.Fetcher.fetch } ->
           let can_stack_auto_apply l =
@@ -3052,6 +3085,8 @@ struct
               | [] ->
                   Logs.info (fun m -> m "%s : ALL_DIRSPACES_APPLIED" (Builder.log_id s));
                   fetch Keys.maybe_create_completed_apply_check
+                  >>= fun () ->
+                  fetch Keys.finalize_unfinished_terrateam_checks
                   >>= fun () -> fetch Keys.maybe_automerge
               | _ :: _ -> (
                   let module Dc = Terrat_change_match3.Dirspace_config in
@@ -3268,6 +3303,9 @@ struct
     |> Hmap.add (coerce Keys.eval_push_event) Tasks.eval_push_event
     |> Hmap.add (coerce Keys.eval_work_manifest_event) Tasks.eval_work_manifest_event
     |> Hmap.add (coerce Keys.eval_work_manifest_failure) Tasks.eval_work_manifest_failure
+    |> Hmap.add
+         (coerce Keys.finalize_unfinished_terrateam_checks)
+         Tasks.finalize_unfinished_terrateam_checks
     |> Hmap.add (coerce Keys.initiator) Tasks.initiator
     |> Hmap.add (coerce Keys.iter_job) Tasks.iter_job
     |> Hmap.add (coerce Keys.matches) Tasks.matches
