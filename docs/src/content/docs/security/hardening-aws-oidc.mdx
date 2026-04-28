@@ -85,7 +85,7 @@ If someone manually dispatches the workflow or adds a new one, the actor will be
 ## Layer 3: Enterprise Access Control
 
 :::tip[Enterprise Feature]
-`ci_config_update` and `terrateam_config_update` are available in the [Enterprise edition](/self-hosted/editions).
+`ci_config_update` and `terrateam_config_update` are available in the [Enterprise edition](/editions/).
 :::
 
 Even with the trust policy locked down, someone could open a PR modifying `terrateam.yml` to add malicious steps. Enterprise [`ci_config_update`](/reference/configuration/access-control) prevents Terrateam from operating on any PR that modifies the workflow file unless the author is explicitly authorized:
@@ -195,4 +195,4 @@ As a workaround, GitHub allows you to [customize the `sub` claim](https://docs.g
 | 3 | Enterprise `ci_config_update` | Unauthorized modification of the workflow file |
 | 4 | Custom `sub` claim | Runs from non-dispatch events, public repos, or GitHub-hosted runners |
 
-For maximum security, combine all four layers. Layers 1 and 2 are available to all users. Layer 3 requires [Enterprise](/self-hosted/editions). Layer 4 is available to all users and provides the strongest trust policy enforcement.
+For maximum security, combine all four layers. Layers 1 and 2 are available to all users. Layer 3 requires [Enterprise](/editions/). Layer 4 is available to all users and provides the strongest trust policy enforcement.

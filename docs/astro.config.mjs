@@ -57,6 +57,7 @@ export default defineConfig({
             { label: "Welcome", link: "/overview/" },
             { label: "How It Works", link: "/overview/how-it-works" },
             { label: "Core Concepts", link: "/overview/core-concepts" },
+            { label: "Editions", link: "/editions/" },
           ],
         },
         {
@@ -199,7 +200,6 @@ export default defineConfig({
             { label: "AWS ECS", link: "/quickstart/self-hosted/aws" },
             { label: "Environment Variables", link: "/self-hosted/environment-variables" },
             { label: "Observability and Metrics", link: "/self-hosted/observability-metrics" },
-            { label: "Editions", link: "/self-hosted/editions" },
           ],
         },
         {
@@ -329,6 +329,7 @@ export default defineConfig({
     '/self-hosted/docker-compose': '/quickstart/self-hosted/docker-compose',
     '/self-hosted/kubernetes': '/quickstart/self-hosted/kubernetes',
     '/self-hosted/instructions': '/quickstart/self-hosted/',
+    '/self-hosted/editions': '/editions/',
     
     // Configuration references
     '/configuration-reference/access-control': '/reference/configuration/access-control',

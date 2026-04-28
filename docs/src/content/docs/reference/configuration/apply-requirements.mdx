@@ -50,6 +50,35 @@ apply_requirements:
 In this configuration, changes in the "tf1" directory require an approval from the user "alice", while changes in the "tf2" directory require an approval from the user "bob".
 By adjusting these settings, you can customize the apply requirements to match your team's workflows and policies.
 
+### `approved` Check Keys
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `enabled` | boolean | Whether the `approved` check is active. Default `false`. |
+| `any_of` | array | Approval rules where any single match satisfies the check. Combined with `any_of_count`. |
+| `any_of_count` | integer | Number of distinct `any_of` matches required. Default `1`. |
+| `all_of` | array | Approval rules where every entry must be matched by an approval. |
+| `require_completed_reviews` | boolean | Enforce that all CODEOWNERS-required reviewers (and any other VCS-required reviewers) have approved the pull request before apply can run. Default `false`. **Enterprise Edition only** — see below. |
+
+### CODEOWNERS Enforcement (`require_completed_reviews`)
+
+:::note[Enterprise Edition]
+`require_completed_reviews` is an Enterprise Edition feature. It is included in [Hosted SaaS](https://terrateam.io) and self-hosted Enterprise deployments. Setting it to `true` on the Open Source Edition is not permitted — Terrateam rejects the configuration and posts a comment on the pull request. See [Editions](/editions/).
+:::
+
+When `require_completed_reviews: true`, Terrateam blocks `apply` until every reviewer that the VCS marks as required — including CODEOWNERS — has approved the pull request. Use this to enforce CODEOWNERS as a hard gate on the apply step rather than only on merge.
+
+```yaml
+apply_requirements:
+  checks:
+    - tag_query: ''
+      approved:
+        enabled: true
+        require_completed_reviews: true
+```
+
+For full guidance, scoped examples, and how this interacts with CODEOWNERS files, see the [CODEOWNERS enforcement guide](/configuration/access-control/codeowners).
+
 ## Access Control and Apply Overrides
 Terrateam's access control feature allows you to define a set of capabilities, such as plan and apply, and specify which users can perform those operations. This feature can be used to manage apply overrides and control who has the ability to bypass apply requirements.
 

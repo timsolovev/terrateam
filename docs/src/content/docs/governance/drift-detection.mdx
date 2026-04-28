@@ -5,6 +5,10 @@ description: Automatically detect and reconcile infrastructure drift with Terrat
 
 import { Steps } from '@astrojs/starlight/components';
 
+:::note[Edition Differences]
+Drift detection is included in **both editions**. The Open Source Edition supports a **single drift schedule** per repository. **Multiple drift schedules per repository** is an Enterprise Edition feature — configuring more than one entry under `drift.schedules` on the Open Source Edition is not permitted and Terrateam will reject the configuration. See [Editions](/editions/).
+:::
+
 Infrastructure drift is a common challenge when managing infrastructure as code. It occurs when the actual state of your infrastructure differs from the desired state defined in your Terraform configuration. Terrateam's Drift Detection and Reconciliation feature helps you identify and address drift, ensuring that your infrastructure remains consistent and compliant.
 
 ## What is Drift Detection?
