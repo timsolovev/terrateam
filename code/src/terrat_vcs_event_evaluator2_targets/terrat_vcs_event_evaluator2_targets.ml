@@ -428,6 +428,9 @@ module Make (S : Terrat_vcs_provider2.S) = struct
   let maybe_create_completed_apply_check : unit Key.t =
     Hmap.Key.create "maybe_create_completed_apply_check"
 
+  let finalize_unfinished_terrateam_checks : unit Key.t =
+    Hmap.Key.create "finalize_unfinished_terrateam_checks"
+
   let can_run_plan : unit Key.t = Hmap.Key.create "can_run_plan"
   let run_plan : unit Key.t = Hmap.Key.create "run_plan"
   let can_run_apply : unit Key.t = Hmap.Key.create "can_run_apply"
