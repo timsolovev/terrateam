@@ -53,7 +53,7 @@ module Mask = struct
                | _, acc -> l :: acc)
              [])
 
-  let overlaps s1 s2 buf pos len =
+  let overlaps s1 s2 buf pos _len =
     let start = CCInt.max (pos - CCString.length s1) 0 in
     match CCString.find ~start ~sub:s1 (Bytes.unsafe_to_string buf) with
     | -1 -> false
