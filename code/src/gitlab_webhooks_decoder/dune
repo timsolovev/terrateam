@@ -1,0 +1,4 @@
+(library
+ (name gitlab_webhooks_decoder)
+ (libraries cohttp containers gitlab_webhooks yojson)
+ (preprocess (pps ppx_deriving.show)))

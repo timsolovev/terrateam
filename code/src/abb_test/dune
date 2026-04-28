@@ -1,0 +1,3 @@
+(library
+ (name abb_test)
+ (libraries containers oth oth_abb abb_intf abb_future_combinators))

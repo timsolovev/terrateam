@@ -1,0 +1,3 @@
+(tests
+ (names loop_test serial_test)
+ (libraries oth))

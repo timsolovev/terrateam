@@ -1,0 +1,3 @@
+(library
+ (name pgsql_pagination)
+ (libraries abb abbs containers pgsql_io))

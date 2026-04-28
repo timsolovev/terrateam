@@ -1,0 +1,4 @@
+(library
+ (name abb_intf)
+ (libraries unix)
+ (preprocess (pps ppx_deriving.show ppx_deriving.eq)))

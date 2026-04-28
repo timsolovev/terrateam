@@ -1,0 +1,3 @@
+(library
+ (name oth_abb)
+ (libraries containers duration oth abb_intf abb_future_combinators))

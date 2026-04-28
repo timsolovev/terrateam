@@ -1,0 +1,4 @@
+(library
+ (name terrat_tag_query_lexer)
+ (libraries containers sedlex terrat_tag_query_parser)
+ (preprocess (pps sedlex.ppx)))

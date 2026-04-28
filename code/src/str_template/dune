@@ -1,0 +1,4 @@
+(library
+ (name str_template)
+ (libraries containers lua_pattern)
+ (preprocess (pps ppx_deriving.show)))

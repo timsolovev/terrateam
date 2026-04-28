@@ -1,0 +1,4 @@
+(test
+ (name test)
+ (libraries jsonschema_check oth)
+ (preprocess (pps ppx_deriving.show)))

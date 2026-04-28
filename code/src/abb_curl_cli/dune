@@ -1,0 +1,3 @@
+(executable
+ (name abb_curl_cli)
+ (libraries ISO8601 abb_curl abb_scheduler_luv logs))

@@ -1,0 +1,3 @@
+(library
+ (name hljs)
+ (libraries brtl_js2))

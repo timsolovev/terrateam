@@ -1,0 +1,3 @@
+(library
+ (name abb_dns)
+ (libraries abb_future_combinators abb_intf abb_io cstruct dns-client dns-client.resolvconf logs mirage-crypto-rng.unix mtime mtime.clock))

@@ -1,0 +1,3 @@
+(library
+ (name otls_bindings)
+ (libraries ctypes ctypes.foreign ctypes.stubs))

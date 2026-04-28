@@ -1,0 +1,3 @@
+(tests
+ (names buffered tempfile)
+ (libraries oth_abb abb_scheduler_select abb_io))

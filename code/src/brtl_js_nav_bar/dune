@@ -1,0 +1,3 @@
+(library
+ (name brtl_js_nav_bar)
+ (libraries abb_js brtl_js uri))

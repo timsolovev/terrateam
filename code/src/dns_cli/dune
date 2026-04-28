@@ -1,0 +1,3 @@
+(executable
+ (name dns_cli)
+ (libraries abb abbs abb_dns))

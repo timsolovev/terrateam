@@ -1,0 +1,3 @@
+(executable
+ (name hcl_ast_cli)
+ (libraries containers hcl_ast))

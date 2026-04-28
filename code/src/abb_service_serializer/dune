@@ -1,0 +1,3 @@
+(library
+ (name abb_service_serializer)
+ (libraries abb_channel abb_service_local))
