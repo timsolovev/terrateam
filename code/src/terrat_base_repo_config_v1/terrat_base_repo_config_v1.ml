@@ -2552,11 +2552,13 @@ let of_version_1 v1 =
 let of_version_1_json json =
   match Terrat_repo_config.Version_1.of_yojson json with
   | Ok config -> of_version_1 config
-  | Error _ -> (
+  | Error err -> (
       match
         Jsonschema_check.validate_json_schema ~schema:config_schema (Yojson.Safe.to_string json)
       with
-      | Ok () -> assert false
+      | Ok () ->
+          Error
+            (`Repo_config_schema_err [ { Jsonschema_check.Validation_err.msg = err; path = "" } ])
       | Error errors -> Error (`Repo_config_schema_err errors))
 
 let of_version_1_json_derived = of_version_1_json
