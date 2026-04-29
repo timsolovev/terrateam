@@ -19,6 +19,7 @@ RUN apk add --no-cache \
     curl-static \
     git \
     gmp-dev \
+    gmp-static \
     libffi-dev \
     libidn2-static \
     libpsl-static \
@@ -37,6 +38,8 @@ RUN apk add --no-cache \
     musl-dev \
     nghttp2-static \
     nghttp2-dev \
+    nghttp3-dev \
+    nghttp3-static \
     npm \
     opam \
     openssh \
