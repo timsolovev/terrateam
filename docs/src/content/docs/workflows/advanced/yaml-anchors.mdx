@@ -58,29 +58,49 @@ workflows:
 
 ### Reusable Workflow Steps
 
-Create standard workflow patterns:
+Anchor each step individually so they can be combined into a flat list:
 
 ```yaml
 definitions:
-  validation_steps: &validation_steps
-    - type: init
-    - type: run
-      cmd: ["terraform", "fmt", "-check"]
-    - type: run
-      cmd: ["terraform", "validate"]
-    
-  security_steps: &security_steps
-    - type: checkov
-    - type: run
-      cmd: ["tfsec", "."]
+  # Anchor individual steps, not the surrounding list
+  step_init: &step_init
+    type: init
+  step_fmt: &step_fmt
+    type: run
+    cmd: ["terraform", "fmt", "-check"]
+  step_validate: &step_validate
+    type: run
+    cmd: ["terraform", "validate"]
+  step_checkov: &step_checkov
+    type: checkov
+  step_tfsec: &step_tfsec
+    type: run
+    cmd: ["tfsec", "."]
 
 workflows:
   - name: default
     plan:
-      - *validation_steps
-      - *security_steps
+      - *step_init
+      - *step_fmt
+      - *step_validate
+      - *step_checkov
+      - *step_tfsec
       - type: plan
       - type: cost_estimation
+```
+
+If you want to reuse a complete step list, anchor it and reference it as the entire value (not as one entry in a larger list):
+
+```yaml
+definitions:
+  full_plan: &full_plan
+    - type: init
+    - type: plan
+    - type: checkov
+
+workflows:
+  - name: default
+    plan: *full_plan
 ```
 
 ### Environment-Specific Configurations
@@ -170,6 +190,8 @@ access_control:
 
 Build sophisticated reusable patterns:
 
+Anchor individual steps so you can compose them into different workflow lists without producing nested arrays:
+
 ```yaml
 definitions:
   # Base configuration for all workflows
@@ -177,51 +199,61 @@ definitions:
     engine:
       version: 1.6.0
       tf_version: 1.5.0
-    
-  # Standard validation for all plans
-  plan_validation: &plan_validation
-    - type: init
-    - type: run
-      cmd: ["terraform", "fmt", "-check"]
-    - type: run
-      cmd: ["terraform", "validate"]
-      
-  # Security scanning template
-  security_scan: &security_scan
-    - type: checkov
-      when: always
-    - type: run
-      cmd: ["tfsec", ".", "--format", "json"]
-      when: always
-      
-  # Complete plan workflow
-  full_plan: &full_plan
-    - *plan_validation
-    - type: plan
-    - *security_scan
-    - type: cost_estimation
-      when: always
-      
-  # Notification template
-  notifications: &notifications
-    - type: run
-      cmd: ["echo", "Deployment complete"]
-      when: apply_succeeded
+
+  # Individual step anchors (compose these into flat lists)
+  step_init: &step_init
+    type: init
+  step_fmt: &step_fmt
+    type: run
+    cmd: ["terraform", "fmt", "-check"]
+  step_validate: &step_validate
+    type: run
+    cmd: ["terraform", "validate"]
+  step_plan: &step_plan
+    type: plan
+  step_checkov: &step_checkov
+    type: checkov
+    when: always
+  step_tfsec: &step_tfsec
+    type: run
+    cmd: ["tfsec", ".", "--format", "json"]
+    when: always
+  step_cost: &step_cost
+    type: cost_estimation
+    when: always
+  step_notify: &step_notify
+    type: run
+    cmd: ["echo", "Deployment complete"]
+    when: apply_succeeded
 
 workflows:
   - name: feature-branch
     <<: *base_config
     tag_query: "feature"
-    plan: *full_plan
-    
+    plan:
+      - *step_init
+      - *step_fmt
+      - *step_validate
+      - *step_plan
+      - *step_checkov
+      - *step_tfsec
+      - *step_cost
+
   - name: main-branch
     <<: *base_config
     tag_query: "main"
-    plan: *full_plan
+    plan:
+      - *step_init
+      - *step_fmt
+      - *step_validate
+      - *step_plan
+      - *step_checkov
+      - *step_tfsec
+      - *step_cost
     apply:
       - type: init
       - type: apply
-      - *notifications
+      - *step_notify
 ```
 
 ### Directory Configuration Templates
@@ -238,36 +270,42 @@ definitions:
       region: us-east-1
       encrypt: true
       
-  # Standard tags for all directories
-  base_tags: &base_tags
-    - "$dir"
-    - "$workspace"
-    
+  # Anchor individual tag values so they can be composed into flat lists
+  tag_dir: &tag_dir "$dir"
+  tag_workspace: &tag_workspace "$workspace"
+
   # Module directories configuration
   module_config: &module_config
     autoplan: false
     tags:
-      - *base_tags
+      - *tag_dir
+      - *tag_workspace
       - "module"
 
 dirs:
   - path: terraform/networking
     <<: *s3_backend
     tags:
-      - *base_tags
+      - *tag_dir
+      - *tag_workspace
       - "networking"
       - "core"
-      
+
   - path: terraform/compute
     <<: *s3_backend
     tags:
-      - *base_tags
+      - *tag_dir
+      - *tag_workspace
       - "compute"
       - "application"
-      
+
   - path: modules/**
     <<: *module_config
 ```
+
+:::note
+You cannot anchor a list and splice it into another list (`- *base_tags` inside `tags:` produces a nested list, which is invalid). Anchor individual scalar values instead and list them out, or use the entire anchored list as the whole value (`tags: *base_tags`) without adding more entries.
+:::
 
 ## Advanced Techniques
 
@@ -302,40 +340,49 @@ workflows:
 
 ### Conditional Patterns
 
-Create flexible templates:
+Anchor each step individually and assemble per-environment lists from those steps. YAML cannot merge two lists into one, so the production list has to repeat the base entries — but each step is still defined exactly once.
 
 ```yaml
 definitions:
-  # Base steps all workflows need
-  required_steps: &required_steps
-    - type: init
-    - type: plan
-    
-  # Optional compliance steps
-  compliance_steps: &compliance_steps
-    - type: checkov
-    - type: cost_estimation
-    - type: run
-      cmd: ["compliance-check"]
-      
+  # Anchor individual steps
+  step_init: &step_init
+    type: init
+  step_plan: &step_plan
+    type: plan
+  step_checkov: &step_checkov
+    type: checkov
+  step_cost: &step_cost
+    type: cost_estimation
+  step_compliance: &step_compliance
+    type: run
+    cmd: ["compliance-check"]
+
   # Development workflow - basic
   dev_plan: &dev_plan
-    - *required_steps
-    
+    - *step_init
+    - *step_plan
+
   # Production workflow - full compliance
   prod_plan: &prod_plan
-    - *required_steps
-    - *compliance_steps
+    - *step_init
+    - *step_plan
+    - *step_checkov
+    - *step_cost
+    - *step_compliance
 
 workflows:
   - name: development
     tag_query: "dev"
     plan: *dev_plan
-    
+
   - name: production
     tag_query: "production"
     plan: *prod_plan
 ```
+
+:::caution
+Avoid `- *required_steps` inside another list. Because YAML has no list-merge operator, the anchor expands as a nested list (`[[init, plan], [checkov, ...]]`), which Terrateam rejects.
+:::
 
 ## Best Practices
 
@@ -354,19 +401,22 @@ definitions:
     version: 1.6.0
     tf_version: 1.5.0
     
-  # Validation steps
-  validate: &validate
-    - type: init
-    - type: run
-      cmd: ["terraform", "fmt", "-check"]
-    - type: run
-      cmd: ["terraform", "validate"]
-      
-  # Security scanning
-  security: &security
-    - type: checkov
-    - type: cost_estimation
-    
+  # Individual step anchors (compose into flat lists below)
+  step_init: &step_init
+    type: init
+  step_fmt: &step_fmt
+    type: run
+    cmd: ["terraform", "fmt", "-check"]
+  step_validate: &step_validate
+    type: run
+    cmd: ["terraform", "validate"]
+  step_plan: &step_plan
+    type: plan
+  step_checkov: &step_checkov
+    type: checkov
+  step_cost: &step_cost
+    type: cost_estimation
+
   # Environment credentials
   dev_env: &dev_env
     AWS_ROLE_ARN: arn:aws:iam::111111111111:role/terrateam-dev
@@ -395,12 +445,15 @@ workflows:
       <<: *tf_latest
       environment: *dev_env
     plan:
-      - *validate
-      - type: plan
-      - *security
+      - *step_init
+      - *step_fmt
+      - *step_validate
+      - *step_plan
+      - *step_checkov
+      - *step_cost
     apply_requirements:
       - approved
-      
+
   - name: production
     <<: *tf_latest
     tag_query: "production"
@@ -408,9 +461,12 @@ workflows:
       <<: *tf_latest
       environment: *prod_env
     plan:
-      - *validate
-      - type: plan
-      - *security
+      - *step_init
+      - *step_fmt
+      - *step_validate
+      - *step_plan
+      - *step_checkov
+      - *step_cost
     apply_requirements:
       - approved: 2
       - status_checks
