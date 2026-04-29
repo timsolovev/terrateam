@@ -78,8 +78,14 @@ RUN eval $(opam env) && \
 # Use provided BASE_IMAGE if specified, otherwise use the build-base stage
 FROM ${BASE_IMAGE:-build-base} AS build-setup
 
-# Copy source files
-RUN rm -rfv /mono
+# Refresh source files. We do NOT `rm -rfv /mono` here — iris's npm build
+# emits to /mono/code/src/iris/dist/ as a side effect of the dune rule,
+# and dune only tracks the build.tag stamp inside _build/. If we wipe
+# /mono before COPY, dist/ is gone but build.tag survives in /build-cache,
+# so `make iris` in the per-target stages thinks the rule is
+# satisfied and doesn't re-run npm — and the final COPY of iris/dist/
+# fails. Preserving the prior /mono lets dist/ survive; COPY refreshes
+# changed source files on top.
 COPY ./ /mono
 
 # Build target for code-indexer
