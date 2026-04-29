@@ -222,6 +222,13 @@ struct
         fetch Keys.publish_comment
         >>= fun publish_comment ->
         publish_comment' publish_comment (Terrat_vcs_provider2.Msg.Run_work_manifest_err err)
+    | `Job_failed run_id ->
+        let open Irm in
+        fetch Keys.publish_comment
+        >>= fun publish_comment ->
+        publish_comment'
+          publish_comment
+          (Terrat_vcs_provider2.Msg.Work_manifest_run_failed { run_id })
     | `Error ->
         let open Irm in
         fetch Keys.publish_comment

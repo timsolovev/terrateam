@@ -96,6 +96,7 @@ module Tmpl = struct
   let account_expired_err = read "account_expired_err.tmpl"
   let repo_config = read "repo_config.tmpl"
   let unexpected_temporary_err = read "unexpected_temporary_err.tmpl"
+  let work_manifest_run_failed = jinja "work_manifest_run_failed.tmpl"
   let failed_to_start_workflow = read "failed_to_start_workflow.tmpl"
 
   let failed_to_start_identity_verification_workflow =

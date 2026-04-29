@@ -2732,7 +2732,8 @@ struct
                 |> Tasks_base.forward_std_keys s
                 |> Keys.Key.add
                      Keys.work_manifest_event
-                     (Some (Keys.Work_manifest_event.Fail { work_manifest; error = `Error }))
+                     (Some
+                        (Keys.Work_manifest_event.Fail { work_manifest; error = `Job_failed run_id }))
                 |> CCFun.flip Builder.State.set_orig_store s
               in
               Builder.eval s' Keys.eval_work_manifest_event)
