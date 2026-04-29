@@ -108,6 +108,21 @@ jobs:
           docker rm ttm-extract
           chmod +x ./ttm-linux-${{ matrix.arch }}
 
+      - name: Verify ttm binary is statically linked (${{ matrix.arch }})
+        if: matrix.target == 'ttm'
+        run: |
+          if ! file ./ttm-linux-${{ matrix.arch }} | grep -q 'statically linked'; then
+              echo "ERROR: ./ttm-linux-${{ matrix.arch }} is not statically linked:" >&2
+              file ./ttm-linux-${{ matrix.arch }} >&2
+              exit 1
+          fi
+
+      - name: Smoke-test ttm binary (${{ matrix.arch }})
+        if: matrix.target == 'ttm'
+        # Runner arch matches matrix.arch (see strategy.matrix.include),
+        # so this exec is native — no qemu emulation, no cross-arch confusion.
+        run: ./ttm-linux-${{ matrix.arch }} --help
+
       - name: Upload ttm binary (${{ matrix.arch }})
         if: matrix.target == 'ttm'
         uses: actions/upload-artifact@v4
