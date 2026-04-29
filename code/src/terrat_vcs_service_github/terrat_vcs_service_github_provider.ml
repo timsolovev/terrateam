@@ -4629,6 +4629,16 @@ module Comment = struct
              "UNLOCK_SUCCESS"
              Tmpl.unlock_success
              kv
+    | Msg.Work_manifest_run_failed { run_id } ->
+        let kv = `Assoc [ ("run_id", `String run_id) ] in
+        Abbs_future_combinators.Result.ignore
+        @@ Gcm_api.apply_template_and_publish_jinja
+             ~request_id
+             client
+             pull_request
+             "WORK_MANIFEST_RUN_FAILED"
+             Tmpl.work_manifest_run_failed
+             kv
 end
 
 module Repo_config = struct

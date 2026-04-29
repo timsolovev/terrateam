@@ -37,6 +37,7 @@ type run_work_manifest_err =
   [ `Failed_to_start_with_msg_err of string
   | `Failed_to_start
   | `Missing_workflow
+  | `Job_failed of string
   | `Error
   ]
 
@@ -170,6 +171,7 @@ module Msg = struct
     | Tier_check of Terrat_tier.Check.t
     | Unexpected_temporary_err
     | Unlock_success
+    | Work_manifest_run_failed of { run_id : string }
 end
 
 module type S = sig
