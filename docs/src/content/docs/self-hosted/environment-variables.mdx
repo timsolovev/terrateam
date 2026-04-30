@@ -90,4 +90,72 @@ HTTP_PROXY=https://username:password@proxy.local:8080
 HTTPS_PROXY=https://username:password@proxy.local:8080
 ```
 
+### Custom CA Certificates
+
+For environments that use a private Certificate Authority (such as a corporate
+TLS-inspecting proxy, a self-hosted GitHub Enterprise Server with an internal
+CA, or a private artifact registry), Terrateam can install additional trusted
+CA certificates into the container's trust store at startup.
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `CUSTOM_CA_CERT` | One or more PEM-encoded CA certificates to install into the container's system trust store | `-----BEGIN CERTIFICATE-----\nMIID...\n-----END CERTIFICATE-----` |
+
+When `CUSTOM_CA_CERT` is set, Terrateam parses every
+`-----BEGIN CERTIFICATE-----` / `-----END CERTIFICATE-----` block from the
+value, writes each one to `/usr/local/share/ca-certificates/`, and runs
+`update-ca-certificates` so the certificates are trusted system-wide inside
+the container. Any existing custom certificates installed by a previous
+startup are removed first, so the variable always reflects the full set of
+custom CAs you want trusted.
+
+If `CUSTOM_CA_CERT` is not set, no custom certificates are installed and
+Terrateam starts up normally using only the certificates baked into the
+image.
+
+#### Providing a single certificate
+
+```bash
+CUSTOM_CA_CERT="-----BEGIN CERTIFICATE-----
+MIIDdz...long base64 body...
+-----END CERTIFICATE-----"
+```
+
+#### Providing multiple certificates
+
+Concatenate the PEM blocks. Terrateam splits them apart automatically:
+
+```bash
+CUSTOM_CA_CERT="-----BEGIN CERTIFICATE-----
+MIID...root CA...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIE...intermediate CA...
+-----END CERTIFICATE-----"
+```
+
+#### Loading from a file
+
+When using Docker Compose, load the certificate from a file on the host:
+
+```yaml
+services:
+  terrat:
+    image: ghcr.io/terrateamio/terrat:latest
+    environment:
+      CUSTOM_CA_CERT: ${CUSTOM_CA_CERT}
+```
+
+```bash
+export CUSTOM_CA_CERT="$(cat /path/to/your-ca-bundle.pem)"
+docker compose up -d
+```
+
+Only PEM-format certificates are supported. DER-encoded certificates must be
+converted first:
+
+```bash
+openssl x509 -inform DER -in your-ca.der -out your-ca.pem
+```
+
 For troubleshooting configuration issues, see the [Troubleshooting Guide](/self-hosted/troubleshooting/).
