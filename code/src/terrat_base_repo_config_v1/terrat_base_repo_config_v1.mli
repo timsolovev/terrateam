@@ -569,9 +569,21 @@ module Engine : sig
 end
 
 module Hooks : sig
+  module Drift_create_issue : sig
+    module Group_by : sig
+      type t =
+        [ `All
+        | `Dirspace
+        ]
+      [@@deriving show, yojson, eq]
+    end
+
+    type t = { group_by : Group_by.t [@default `All] } [@@deriving make, show, yojson, eq]
+  end
+
   module Hook_op : sig
     type t =
-      | Drift_create_issue
+      | Drift_create_issue of Drift_create_issue.t
       | Env of Workflow_step.Env.t
       | Oidc of Workflow_step.Oidc.t
       | Run of Workflow_step.Run.t

@@ -767,6 +767,14 @@
     "hook-op-drift-create-issue": {
       "additionalProperties": false,
       "properties": {
+        "group_by": {
+          "default": "all",
+          "enum": [
+            "all",
+            "dirspace"
+          ],
+          "type": "string"
+        },
         "type": {
           "const": "drift_create_issue",
           "type": "string"
