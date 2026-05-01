@@ -9,6 +9,7 @@
   import LoadingSpinner from './components/ui/LoadingSpinner.svelte';
   import { VCS_PROVIDERS } from './vcs/providers';
   import AccessTokenSection from './components/settings/AccessTokenSection.svelte';
+  import GitLabAccessTokenSection from './components/settings/GitLabAccessTokenSection.svelte';
 
   // Tab management
   type SettingsTab = 'organization' | 'api-keys' | 'diagnostics';
@@ -245,6 +246,10 @@
             </button>
           </div>
         </div>
+
+        {#if currentProvider === 'gitlab' && $selectedInstallation}
+          <GitLabAccessTokenSection installation={$selectedInstallation} {serverConfig} />
+        {/if}
 
         <!-- Settings Information -->
         <div class="bg-[var(--sg-bg-2)] rounded-lg p-4 md:p-6 border border-[var(--sg-border-light)]">
