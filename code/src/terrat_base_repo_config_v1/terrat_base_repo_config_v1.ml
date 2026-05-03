@@ -910,6 +910,17 @@ module Engine = struct
     [@@deriving make, show, yojson, eq]
   end
 
+  module Stategraph = struct
+    type t = {
+      outputs : Tf_outputs.t; [@default Tf_outputs.make ()]
+      override_tf_cmd : string option;
+      tf_cmd : string; [@default "terraform"]
+      tf_version : string option;
+      version : string option;
+    }
+    [@@deriving make, show, yojson, eq]
+  end
+
   module Terraform = struct
     type t = {
       outputs : Tf_outputs.t; [@default Tf_outputs.make ()]
@@ -937,6 +948,7 @@ module Engine = struct
     | Opentofu of Opentofu.t
     | Other of Yojson.Safe.t
     | Pulumi
+    | Stategraph of Stategraph.t
     | Terraform of Terraform.t
     | Terragrunt of Terragrunt.t
   [@@deriving show, yojson, eq]
@@ -1900,7 +1912,23 @@ let of_version_1_workflow_engine cdktf terraform_version terragrunt default_engi
                       ?tf_version:(CCOption.or_ ~else_:default_tf_version tg.E.tf_version)
                       ?version:(CCOption.or_ ~else_:default_wrapper_version tg.E.version)
                       ())))
-      | E.Engine_pulumi _ -> Ok (Some Engine.Pulumi))
+      | E.Engine_pulumi _ -> Ok (Some Engine.Pulumi)
+      | E.Engine_stategraph sg ->
+          let module E = Terrat_repo_config_engine_stategraph in
+          Ok
+            (Some
+               Engine.(
+                 Stategraph
+                   (Stategraph.make
+                      ?outputs:
+                        (CCOption.or_ ~else_:default_tf_outputs
+                        @@ CCOption.map of_version_1_engine_tf_outputs sg.E.outputs)
+                      ?override_tf_cmd:
+                        (CCOption.or_ ~else_:default_override_tf_cmd sg.E.override_tf_cmd)
+                      ?tf_cmd:(CCOption.or_ ~else_:default_tf_cmd sg.E.tf_cmd)
+                      ?tf_version:(CCOption.or_ ~else_:default_tf_version sg.E.tf_version)
+                      ?version:(CCOption.or_ ~else_:default_wrapper_version sg.E.version)
+                      ()))))
   | true, _, _, _ ->
       (* Cdktf *)
       Ok (Some Engine.(Cdktf (Cdktf.make ?tf_cmd:default_tf_cmd ?tf_version:default_tf_version ())))
@@ -2228,7 +2256,20 @@ let of_version_1_engine default_tf_version engine =
                       ?outputs:(CCOption.map of_version_1_engine_tf_outputs tg.E.outputs)
                       ?override_tf_cmd:tg.E.override_tf_cmd
                       ())))
-      | E.Engine_pulumi _ -> Ok (Some Engine.Pulumi))
+      | E.Engine_pulumi _ -> Ok (Some Engine.Pulumi)
+      | E.Engine_stategraph sg ->
+          let module E = Terrat_repo_config_engine_stategraph in
+          Ok
+            (Some
+               Engine.(
+                 Stategraph
+                   (Stategraph.make
+                      ?tf_cmd:sg.E.tf_cmd
+                      ?tf_version:(CCOption.or_ ~else_:default_tf_version sg.E.tf_version)
+                      ?version:sg.E.version
+                      ?outputs:(CCOption.map of_version_1_engine_tf_outputs sg.E.outputs)
+                      ?override_tf_cmd:sg.E.override_tf_cmd
+                      ()))))
   | Some default_tf_version, _ ->
       Ok (Some Engine.(Terraform (Terraform.make ~version:default_tf_version ())))
   | None, None -> Ok None
@@ -2896,6 +2937,18 @@ let to_version_1_engine engine =
   | Engine.Pulumi ->
       let module P = Terrat_repo_config.Engine_pulumi in
       E.Engine_pulumi { P.name = `Pulumi }
+  | Engine.Stategraph sg ->
+      let module S = Terrat_repo_config.Engine_stategraph in
+      let { Engine.Stategraph.tf_cmd; tf_version; version; outputs; override_tf_cmd } = sg in
+      E.Engine_stategraph
+        {
+          S.name = `Stategraph;
+          tf_cmd = Some tf_cmd;
+          tf_version;
+          version;
+          outputs = Some (to_version_1_engine_tf_outputs outputs);
+          override_tf_cmd;
+        }
 
 let to_version_1_run_on = function
   | Workflow_step.Run_on.Always -> `Always

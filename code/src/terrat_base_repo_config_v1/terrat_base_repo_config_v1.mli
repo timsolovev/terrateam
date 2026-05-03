@@ -536,6 +536,17 @@ module Engine : sig
     [@@deriving make, show, yojson, eq]
   end
 
+  module Stategraph : sig
+    type t = {
+      outputs : Tf_outputs.t; [@default Tf_outputs.make ()]
+      override_tf_cmd : string option;
+      tf_cmd : string; [@default "terraform"]
+      tf_version : string option;
+      version : string option;
+    }
+    [@@deriving make, show, yojson, eq]
+  end
+
   module Terraform : sig
     type t = {
       outputs : Tf_outputs.t; [@default Tf_outputs.make ()]
@@ -563,6 +574,7 @@ module Engine : sig
     | Opentofu of Opentofu.t
     | Other of Yojson.Safe.t
     | Pulumi
+    | Stategraph of Stategraph.t
     | Terraform of Terraform.t
     | Terragrunt of Terragrunt.t
   [@@deriving show, yojson, eq]

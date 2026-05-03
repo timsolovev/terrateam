@@ -485,6 +485,9 @@
           "$ref": "#/definitions/engine-fly"
         },
         {
+          "$ref": "#/definitions/engine-stategraph"
+        },
+        {
           "$ref": "#/definitions/engine-custom"
         },
         {
@@ -627,6 +630,34 @@
       "properties": {
         "name": {
           "const": "pulumi",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "engine-stategraph": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "stategraph",
+          "type": "string"
+        },
+        "outputs": {
+          "$ref": "#/definitions/engine-tf-outputs"
+        },
+        "override_tf_cmd": {
+          "type": "string"
+        },
+        "tf_cmd": {
+          "type": "string"
+        },
+        "tf_version": {
+          "type": "string"
+        },
+        "version": {
           "type": "string"
         }
       },
