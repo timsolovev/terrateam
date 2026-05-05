@@ -329,6 +329,7 @@ export default defineConfig({
     '/self-hosted/getting-started': '/quickstart/self-hosted/',
     '/self-hosted/docker-compose': '/quickstart/self-hosted/docker-compose',
     '/self-hosted/kubernetes': '/quickstart/self-hosted/kubernetes',
+    '/self-hosted/aws': '/quickstart/self-hosted/aws',
     '/self-hosted/instructions': '/quickstart/self-hosted/',
     '/self-hosted/editions': '/editions/',
     
