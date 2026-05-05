@@ -506,6 +506,7 @@ struct
                   | Tjc.Job.Type_.Autoplan
                   | Tjc.Job.Type_.Plan _
                   | Tjc.Job.Type_.Gate_approval _
+                  | Tjc.Job.Type_.Help
                   | Tjc.Job.Type_.Index
                   | Tjc.Job.Type_.Repo_config
                   | Tjc.Job.Type_.Unlock _
@@ -568,6 +569,7 @@ struct
               | T.Autoapply
               | T.Autoplan
               | T.Gate_approval _
+              | T.Help
               | T.Index
               | T.Repo_config
               | T.Unlock _
@@ -666,7 +668,8 @@ struct
                        all_unapplied_matches;
                        working_layer;
                      })
-            | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false
+            | T.Gate_approval _ | T.Help | T.Index | T.Repo_config | T.Unlock _ | T.Push ->
+                assert false
           in
           let open Irm in
           let module M = Keys.Matches in
@@ -2099,7 +2102,8 @@ struct
                         (S.Api.Ref.to_string base_branch_name));
                   fetch Keys.publish_dest_branch_no_match
                   >>= fun () -> Abb.Future.return (Error `Error)
-              | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false)
+              | T.Gate_approval _ | T.Help | T.Index | T.Repo_config | T.Unlock _ | T.Push ->
+                  assert false)
           | Error `No_matching_source_branch -> (
               fetch Keys.job
               >>= fun job ->
@@ -2120,7 +2124,8 @@ struct
                         (S.Api.Ref.to_string branch_name));
                   fetch Keys.publish_dest_branch_no_match
                   >>= fun () -> Abb.Future.return (Error `Noop)
-              | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false))
+              | T.Gate_approval _ | T.Help | T.Index | T.Repo_config | T.Unlock _ | T.Push ->
+                  assert false))
 
     let update_context_branch_hashes =
       run ~name:"update_context_branch_hashes" (fun s { Bs.Fetcher.fetch } ->
@@ -2667,6 +2672,7 @@ struct
                     H.complete_job s job @@ fetch Keys.publish_repo_config
                 | Tjc.Job.Type_.Unlock _ -> H.complete_job s job @@ fetch Keys.publish_unlock
                 | Tjc.Job.Type_.Index -> H.complete_job s job @@ fetch Keys.publish_index_complete
+                | Tjc.Job.Type_.Help -> H.complete_job s job @@ fetch Keys.publish_help
                 | Tjc.Job.Type_.Push -> fetch Keys.eval_push_event
                 | Tjc.Job.Type_.Gate_approval _ ->
                     H.complete_job s job @@ fetch Keys.store_gate_approval)
@@ -3135,6 +3141,7 @@ struct
                       | Tjc.Job.Type_.Autoapply
                       | Tjc.Job.Type_.Autoplan
                       | Tjc.Job.Type_.Gate_approval _
+                      | Tjc.Job.Type_.Help
                       | Tjc.Job.Type_.Index
                       | Tjc.Job.Type_.Plan _
                       | Tjc.Job.Type_.Push
@@ -3198,10 +3205,11 @@ struct
                     | {
                      Tjc.Job.type_ =
                        Tjc.Job.Type_.(
-                         Autoapply | Gate_approval _ | Index | Repo_config | Unlock _ | Push);
+                         Autoapply | Gate_approval _ | Help | Index | Repo_config | Unlock _ | Push);
                      _;
                     } -> Abb.Future.return (Ok ())))
           | { Tjc.Job.type_ = Tjc.Job.Type_.Gate_approval _; _ }
+          | { Tjc.Job.type_ = Tjc.Job.Type_.Help; _ }
           | { Tjc.Job.type_ = Tjc.Job.Type_.Index; _ }
           | { Tjc.Job.type_ = Tjc.Job.Type_.Repo_config; _ }
           | { Tjc.Job.type_ = Tjc.Job.Type_.Unlock _; _ }
