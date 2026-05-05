@@ -1,5 +1,6 @@
 module Apply = Terrat_job_type_apply
 module Gate_approval = Terrat_job_type_gate_approval
+module Help = Terrat_job_type_help
 module Index = Terrat_job_type_index
 module Kind = Terrat_job_type_kind
 module Kind_drift = Terrat_job_type_kind_drift

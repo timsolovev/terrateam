@@ -45,6 +45,19 @@
       ],
       "type": "object"
     },
+    "help": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "help",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
     "index": {
       "additionalProperties": false,
       "properties": {
@@ -134,6 +147,9 @@
         },
         {
           "$ref": "#/definitions/gate-approval"
+        },
+        {
+          "$ref": "#/definitions/help"
         },
         {
           "$ref": "#/definitions/index"
