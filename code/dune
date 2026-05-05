@@ -16,3 +16,13 @@
     -noassert
     -w
     "+d+f+p+u+s+40+K+L+R"))))
+
+; Aggregate alias: `dune build @code/terrat` produces the full terrateam backend
+(alias
+ (name terrat)
+ (deps
+  src/terrat_oss/terrat_oss.exe
+  src/terrat_ee/terrat_ee.exe
+  src/terrat_code_indexer/terrat_code_indexer.exe
+  src/ttm/ttm.exe
+  (alias src/iris/all)))

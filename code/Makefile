@@ -7,6 +7,13 @@
 .PHONY: github-api gitlab-api gitlab-webhooks
 .PHONY: clean
 
+# Disable make-level parallelism. Every target here is a single `dune
+# build` invocation, and dune holds a workspace lock — so running two
+# goals concurrently (`make -j foo bar`) just serialises on the lock at
+# best, fails at worst. Dune's own scheduler handles all the parallelism
+# that actually matters within each invocation, so we lose nothing here.
+.NOTPARALLEL:
+
 # Dune lives at the repo root so that `(dirs code api_schemas)` can reach
 # the api_schemas/ tree. All commands here delegate to dune, invoked from
 # the parent directory.
@@ -18,10 +25,16 @@ ROOT := $(CURDIR)/..
 
 all: terrat
 
-# Aggregate target: builds all server binaries, the UI assets, and ttm.
-terrat: terrat_oss terrat_ee terrat_code_indexer iris ttm
+# Aggregate target: builds all server binaries, the UI assets, and ttm in
+# a single dune invocation (the @code/terrat alias is defined in
+# code/dune). One invocation matters because dune holds a workspace lock —
+# listing the sub-targets as make prerequisites would let `make -j`
+# launch them in parallel and the second dune call would block on the
+# first. Dune's own scheduler parallelises within the single call.
+terrat:
+	cd $(ROOT) && $(DUNE) build @code/terrat
 
-# Server binaries
+# Per-binary targets, useful for narrowing dev iteration to one server.
 terrat_oss:
 	cd $(ROOT) && $(DUNE) build code/src/terrat_oss/terrat_oss.exe
 
@@ -45,9 +58,22 @@ test-terrat:
 
 # Schema regenerators. Each normalises the source JSON, wipes the
 # generated directory, runs the generator, then formats the output.
-terrat-schemas: terrat-api terrat-repo-config terrat-webhooks terrat-capabilities
-terrat-schemas: terrat-job-context terrat-job
-terrat-schemas: gitlab-api gitlab-webhooks github-api
+#
+# Sub-targets are invoked sequentially via recursive $(MAKE) rather than
+# listed as prerequisites: each one calls `dune build` for its generator
+# and dune holds a workspace lock, so `make -j` over prerequisites would
+# serialise on the lock at best, fail at worst. Recipe lines run
+# sequentially regardless of -j, which is what we want here.
+terrat-schemas:
+	$(MAKE) terrat-api
+	$(MAKE) terrat-repo-config
+	$(MAKE) terrat-webhooks
+	$(MAKE) terrat-capabilities
+	$(MAKE) terrat-job-context
+	$(MAKE) terrat-job
+	$(MAKE) gitlab-api
+	$(MAKE) gitlab-webhooks
+	$(MAKE) github-api
 
 terrat-api:
 	cd $(ROOT) && $(DUNE) build code/src/openapi_cli/openapi_cli.exe
