@@ -2706,43 +2706,83 @@ struct
               >>= fun () -> Abb.Future.return (Error err))
 
     let eval_work_manifest_failure =
+      let module Wm = Terrat_work_manifest3 in
+      let query_work_manifest_by_run_id s run_id =
+        Builder.run_db s ~f:(fun db ->
+            time_it
+              s
+              (fun m log_id time ->
+                m "%s : WORK_MANIFEST : QUERY_BY_RUN_ID : run_id = %s : time=%f" log_id run_id time)
+              (fun () -> S.Work_manifest.query_by_run_id ~request_id:(Builder.log_id s) db run_id))
+      in
+      let query_job_by_work_manifest s work_manifest_id =
+        Builder.run_db s ~f:(fun db ->
+            time_it
+              s
+              (fun m log_id time ->
+                m
+                  "%s : JOB : QUERY_BY_WORK_MANIFEST : work_manifest_id = %a : time=%f"
+                  log_id
+                  Uuidm.pp
+                  work_manifest_id
+                  time)
+              (fun () ->
+                S.Job_context.Job.query_by_work_manifest_id
+                  ~request_id:(Builder.log_id s)
+                  db
+                  ~work_manifest_id
+                  ()))
+      in
+      let fail_running_job s work_manifest_id =
+        let open Irm in
+        query_job_by_work_manifest s work_manifest_id
+        >>= function
+        | Some { Tjc.Job.state = Tjc.Job.State.Running; id = job_id; _ } ->
+            Builder.run_db s ~f:(fun db -> update_job_state_failed s job_id db)
+        | Some _ | None -> Abb.Future.return (Ok ())
+      in
+      let bail_out_aborted s work_manifest_id run_id =
+        let open Irm in
+        Logs.info (fun m ->
+            m
+              "%s : WORK_MANIFEST_FAILURE_IGNORED_ABORTED : work_manifest_id = %a : run_id = %s"
+              (Builder.log_id s)
+              Uuidm.pp
+              work_manifest_id
+              run_id);
+        fail_running_job s work_manifest_id >>= fun () -> Abb.Future.return (Error `Noop)
+      in
+      let dispatch_fail_event s work_manifest run_id =
+        Logs.info (fun m ->
+            m
+              "%s : WORK_MANIFEST_FAILURE : work_manifest_id = %a"
+              (Builder.log_id s)
+              Uuidm.pp
+              work_manifest.Wm.id);
+        let s' =
+          s
+          |> Builder.State.orig_store
+          |> Tasks_base.forward_std_keys s
+          |> Keys.Key.add
+               Keys.work_manifest_event
+               (Some (Keys.Work_manifest_event.Fail { work_manifest; error = `Job_failed run_id }))
+          |> CCFun.flip Builder.State.set_orig_store s
+        in
+        Builder.eval s' Keys.eval_work_manifest_event
+      in
       run ~name:"eval_work_manifest_failure" (fun s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.run_id
           >>= fun run_id ->
-          Builder.run_db s ~f:(fun db ->
-              time_it
-                s
-                (fun m log_id time ->
-                  m
-                    "%s : WORK_MANIFEST : QUERY_BY_RUN_ID : run_id = %s : time=%f"
-                    log_id
-                    run_id
-                    time)
-                (fun () -> S.Work_manifest.query_by_run_id ~request_id:(Builder.log_id s) db run_id))
+          query_work_manifest_by_run_id s run_id
           >>= function
           | None ->
               Logs.info (fun m ->
                   m "%s : WORK_MANIFEST_NOT_FOUND : run_id = %s" (Builder.log_id s) run_id);
               Abb.Future.return (Error `Noop)
-          | Some work_manifest ->
-              Logs.info (fun m ->
-                  m
-                    "%s : WORK_MANIFEST_FAILURE : work_manifest_id = %a"
-                    (Builder.log_id s)
-                    Uuidm.pp
-                    work_manifest.Terrat_work_manifest3.id);
-              let s' =
-                s
-                |> Builder.State.orig_store
-                |> Tasks_base.forward_std_keys s
-                |> Keys.Key.add
-                     Keys.work_manifest_event
-                     (Some
-                        (Keys.Work_manifest_event.Fail { work_manifest; error = `Job_failed run_id }))
-                |> CCFun.flip Builder.State.set_orig_store s
-              in
-              Builder.eval s' Keys.eval_work_manifest_event)
+          | Some { Wm.state = Wm.State.Aborted; id = work_manifest_id; _ } ->
+              bail_out_aborted s work_manifest_id run_id
+          | Some work_manifest -> dispatch_fail_event s work_manifest run_id)
 
     let eval_push_event =
       run ~name:"eval_push_event" (fun s { Bs.Fetcher.fetch } ->
