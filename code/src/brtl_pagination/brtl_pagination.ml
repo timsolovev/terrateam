@@ -23,8 +23,8 @@ module Make (M : S) = struct
   let make ?(page_param = "page") page uri =
     match Uri.get_query_param' uri page_param with
     | None -> Some { page_param; dir = Next; uri; page }
-    | Some ("n" :: pg) -> Some { page_param; dir = Next; uri; page }
-    | Some ("p" :: pg) -> Some { page_param; dir = Prev; uri; page }
+    | Some ("n" :: _) -> Some { page_param; dir = Next; uri; page }
+    | Some ("p" :: _) -> Some { page_param; dir = Prev; uri; page }
     | Some _ -> None
 
   let to_next t =

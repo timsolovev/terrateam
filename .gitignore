@@ -1,4 +1,5 @@
 # Build output
+_build
 docs/dist/
 code/build/
 
@@ -24,18 +25,17 @@ pnpm-debug.log*
 # Temporary files
 *~
 
-# Custom build files
-pds.mk
-Ocamlrules.mk.in
-
 # Python cache
 *__pycache__.*
 
-# OCaml and Dune project files
+# Dune-generated merlin config
 code/.merlin
-code/dune
-code/dune-project
-code/dune-workspace
+
+# Iris UI build artifacts (npm runs in source tree; api.json is a tracked symlink)
+code/src/iris/dist
+code/src/iris/node_modules
+code/src/iris/build.tag
+code/src/iris/src/lib/api-types-generated.ts
 
 # Vercel
 .vercel

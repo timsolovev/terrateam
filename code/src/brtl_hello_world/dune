@@ -1,0 +1,3 @@
+(executable
+ (name brtl_hello_world)
+ (libraries abb brtl brtl_mw_log containers logs logs.fmt))

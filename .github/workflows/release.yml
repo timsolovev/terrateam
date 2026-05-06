@@ -45,14 +45,20 @@ jobs:
         run: |
           ./scripts/create_tag
 
-  build-amd64:
+  build:
     needs: set-version-tag
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.runs-on }}
     environment: ${{ github.event.inputs.environment || 'production' }}
 
     strategy:
       matrix:
         target: [code-indexer, terrat-ee, terrat-oss, ttm]
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runs-on: ubuntu-22.04
+          - arch: arm64
+            runs-on: ubuntu-22.04-arm64
 
     env:
       VERSION_TAG: ${{ needs.set-version-tag.outputs.version_tag }}
@@ -83,7 +89,7 @@ jobs:
         run: |
           ./scripts/base_image >> $GITHUB_ENV
 
-      - name: Build and push ${{ matrix.target }} (amd64)
+      - name: Build and push ${{ matrix.target }} (${{ matrix.arch }})
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -92,91 +98,41 @@ jobs:
           target: ${{ matrix.target }}
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE }}
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.target }}:${{ env.VERSION_TAG }}-amd64
+          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.target }}:${{ env.VERSION_TAG }}-${{ matrix.arch }}
 
-      - name: Extract ttm binary (amd64)
+      - name: Extract ttm binary (${{ matrix.arch }})
         if: matrix.target == 'ttm'
         run: |
-          docker create --name ttm-extract ghcr.io/${{ github.repository_owner }}/ttm:${{ env.VERSION_TAG }}-amd64
-          docker cp ttm-extract:/usr/local/bin/ttm ./ttm-linux-amd64
+          docker create --name ttm-extract ghcr.io/${{ github.repository_owner }}/ttm:${{ env.VERSION_TAG }}-${{ matrix.arch }}
+          docker cp ttm-extract:/usr/local/bin/ttm ./ttm-linux-${{ matrix.arch }}
           docker rm ttm-extract
-          chmod +x ./ttm-linux-amd64
+          chmod +x ./ttm-linux-${{ matrix.arch }}
 
-      - name: Upload ttm binary (amd64)
+      - name: Verify ttm binary is statically linked (${{ matrix.arch }})
+        if: matrix.target == 'ttm'
+        run: |
+          if ! file ./ttm-linux-${{ matrix.arch }} | grep -q 'statically linked'; then
+              echo "ERROR: ./ttm-linux-${{ matrix.arch }} is not statically linked:" >&2
+              file ./ttm-linux-${{ matrix.arch }} >&2
+              exit 1
+          fi
+
+      - name: Smoke-test ttm binary (${{ matrix.arch }})
+        if: matrix.target == 'ttm'
+        # Runner arch matches matrix.arch (see strategy.matrix.include),
+        # so this exec is native — no qemu emulation, no cross-arch confusion.
+        run: ./ttm-linux-${{ matrix.arch }} --help
+
+      - name: Upload ttm binary (${{ matrix.arch }})
         if: matrix.target == 'ttm'
         uses: actions/upload-artifact@v4
         with:
-          name: ttm-linux-amd64
-          path: ttm-linux-amd64
-          retention-days: 7
-
-  build-arm64:
-    needs: set-version-tag
-    runs-on: ubuntu-22.04-arm64
-    environment: ${{ github.event.inputs.environment || 'production' }}
-
-    strategy:
-      matrix:
-        target: [code-indexer, terrat-ee, terrat-oss, ttm]
-
-    env:
-      VERSION_TAG: ${{ needs.set-version-tag.outputs.version_tag }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      TERRATEAM_UI_ANALYTICS: ${{ github.event.inputs.environment == 'production' && vars.TERRATEAM_POSTHOG_TOKEN || 'false' }}
-      TERRATEAM_ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
-      MATRIX_TARGET: ${{ matrix.target }}
-
-    permissions:
-      contents: write
-      packages: write
-      id-token: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-tags: true
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set base image
-        run: |
-          ./scripts/base_image >> $GITHUB_ENV
-
-      - name: Build and push ${{ matrix.target }} (arm64)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/terrat/Dockerfile
-          push: true
-          target: ${{ matrix.target }}
-          build-args: |
-            BASE_IMAGE=${{ env.BASE_IMAGE }}
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.target }}:${{ env.VERSION_TAG }}-arm64
-
-      - name: Extract ttm binary (arm64)
-        if: matrix.target == 'ttm'
-        run: |
-          docker create --name ttm-extract ghcr.io/${{ github.repository_owner }}/ttm:${{ env.VERSION_TAG }}-arm64
-          docker cp ttm-extract:/usr/local/bin/ttm ./ttm-linux-arm64
-          docker rm ttm-extract
-          chmod +x ./ttm-linux-arm64
-
-      - name: Upload ttm binary (arm64)
-        if: matrix.target == 'ttm'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ttm-linux-arm64
-          path: ttm-linux-arm64
+          name: ttm-linux-${{ matrix.arch }}
+          path: ttm-linux-${{ matrix.arch }}
           retention-days: 7
 
   create-multi-arch-manifest:
-    needs: [set-version-tag, build-amd64, build-arm64]
+    needs: [set-version-tag, build]
     runs-on: ubuntu-22.04
 
     outputs:

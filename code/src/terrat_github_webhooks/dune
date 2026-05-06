@@ -1,0 +1,5 @@
+(library
+ (name terrat_github_webhooks)
+ (wrapped false)
+ (libraries json_schema yojson)
+ (preprocess (pps ppx_deriving.eq ppx_deriving.make ppx_deriving.show ppx_deriving_yojson)))

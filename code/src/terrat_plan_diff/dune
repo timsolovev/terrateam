@@ -1,0 +1,3 @@
+(library
+ (name terrat_plan_diff)
+ (libraries containers lua_pattern))

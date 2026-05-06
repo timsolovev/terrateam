@@ -1,0 +1,3 @@
+(library
+ (name abb_fut)
+ (libraries abb_intf))

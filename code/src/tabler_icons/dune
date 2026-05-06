@@ -1,0 +1,4 @@
+(library
+ (name tabler_icons)
+ (wrapped false)
+ (libraries brtl_js2))

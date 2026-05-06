@@ -19,6 +19,7 @@ RUN apk add --no-cache \
     curl-static \
     git \
     gmp-dev \
+    gmp-static \
     libffi-dev \
     libidn2-static \
     libpsl-static \
@@ -37,6 +38,8 @@ RUN apk add --no-cache \
     musl-dev \
     nghttp2-static \
     nghttp2-dev \
+    nghttp3-dev \
+    nghttp3-static \
     npm \
     opam \
     openssh \
@@ -58,96 +61,80 @@ RUN opam init -ay --disable-sandboxing --bare
 
 # Copy source files
 COPY ./ /mono
-WORKDIR /
+WORKDIR /mono
 
-# Set up opam repositories and dependencies
+# Set up opam switch and dependencies. The list of pinned packages lives in
+# code/opam.pins (one `<name>.<version>` per line) — the shape `opam install`
+# accepts as-is via `xargs`.
 RUN eval $(opam env) && \
     opam switch create -y 5.3.0 && \
     eval $(opam env) && \
-    opam repository add opam-acsl mono/opam && \
+    opam repository add opam-acsl opam && \
     opam pin add -y cmdliner 1.3.0 && \
     opam pin add -y containers 3.12 && \
-    opam pin add -y cmdliner 1.3.0 && \
-    opam pin add -y pds 6.54 --no-depexts && \
-    opam pin add -y hll 4.3 --no-depexts && \
-    mkdir -p opam-mono/compilers opam-mono/packages && \
-    echo 'opam-version: "2.0"' > opam-mono/repo && \
-    opam repository add opam-mono opam-mono && \
-    cd /mono/code && \
-    hll generate \
-      -n monorepo \
-      --opam-dir ../../opam-mono \
-      --tag 1.0 \
-      --test-deps-as-regular-deps \
-      --url-override file://$PWD && \
-    opam update opam-mono && \
-    opam info monorepo && \
-    opam install -j$(nproc --all) -y --deps-only --no-depexts monorepo && \
+    opam install -j$(nproc --all) -y --no-depexts dune menhir && \
+    xargs -a code/opam.pins opam install -j$(nproc --all) -y --no-depexts && \
     ulimit -s 524288 && ulimit -a && \
-    time pds -d && \
-    time make -j$(nproc --all) test-terrat release-terrat release-ttm && \
-    mv build /build-cache
+    time make -C code test-terrat terrat && \
+    mv _build /build-cache
 
 # Use provided BASE_IMAGE if specified, otherwise use the build-base stage
 FROM ${BASE_IMAGE:-build-base} AS build-setup
 
-# Copy source files
-RUN rm -rfv /mono
+# Refresh source files. We do NOT `rm -rfv /mono` here — iris's npm build
+# emits to /mono/code/src/iris/dist/ as a side effect of the dune rule,
+# and dune only tracks the build.tag stamp inside _build/. If we wipe
+# /mono before COPY, dist/ is gone but build.tag survives in /build-cache,
+# so `make iris` in the per-target stages thinks the rule is
+# satisfied and doesn't re-run npm — and the final COPY of iris/dist/
+# fails. Preserving the prior /mono lets dist/ survive; COPY refreshes
+# changed source files on top.
 COPY ./ /mono
 
 # Build target for code-indexer
 FROM build-setup AS code-indexer-build
-WORKDIR /mono/code
+WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
-    mv /build-cache ./build && \
-    eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k release_terrat_code_indexer \
-        || time make -j1 release_terrat_code_indexer) && \
-    find . -name '*.tap' -exec cat '{}' \;
+    mv /build-cache ./_build && \
+    eval $(opam env) && \
+    time make -C code terrat_code_indexer
 
 # Build target for ttm
 FROM build-setup AS ttm-build
-WORKDIR /mono/code
-
+WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
-    mv /build-cache ./build && \
-    eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k release-ttm \
-    || time make -j1 release-ttm) && \
-    build/release/ttm/ttm.native --help && \
-    find . -name '*.tap' -exec cat '{}' \;
+    mv /build-cache ./_build && \
+    eval $(opam env) && \
+    time make -C code ttm && \
+    _build/default/code/src/ttm/ttm.exe --help
 
 # Build target for terrat-ee
 FROM build-setup AS terrat-ee-build
-WORKDIR /mono/code
+WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
-    mv /build-cache ./build && \
-    eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k test-terrat release_terrat_ee release_iris \
-     || time make -j1 test-terrat release_terrat_ee release_iris) && \
-    find . -name '*.tap' -exec cat '{}' \;
+    mv /build-cache ./_build && \
+    eval $(opam env) && \
+    time make -C code test-terrat terrat_ee iris
 
 # Build target for terrat-oss
 FROM build-setup AS terrat-oss-build
-WORKDIR /mono/code
+WORKDIR /mono
 RUN ulimit -s 524288 && ulimit -a && \
-    mv /build-cache ./build && \
-    eval $(opam env) && pds -d && \
-    (time make -j$(nproc --all) -k test-terrat release_terrat_oss release_iris \
-     || time make -j1 test-terrat release_terrat_oss release_iris) && \
-    find . -name '*.tap' -exec cat '{}' \;
+    mv /build-cache ./_build && \
+    eval $(opam env) && \
+    time make -C code test-terrat terrat_oss iris
 
 # Final code-indexer image
 FROM alpine:3.22 AS code-indexer
 RUN addgroup -S terrat && adduser -S -G terrat terrat
-COPY --from=code-indexer-build /mono/code/build/release/terrat_code_indexer/terrat_code_indexer.native /usr/local/bin/terrat_code_indexer
+COPY --from=code-indexer-build /mono/_build/default/code/src/terrat_code_indexer/terrat_code_indexer.exe /usr/local/bin/terrat_code_indexer
 USER terrat
 WORKDIR /mnt
 ENTRYPOINT ["/usr/local/bin/terrat_code_indexer"]
 
 # Final ttm image
 FROM alpine:3.22 AS ttm
-COPY --from=ttm-build /mono/code/build/release/ttm/ttm.native /usr/local/bin/ttm
+COPY --from=ttm-build /mono/_build/default/code/src/ttm/ttm.exe /usr/local/bin/ttm
 WORKDIR /mnt
 ENTRYPOINT ["/usr/local/bin/ttm"]
 
@@ -185,8 +172,8 @@ RUN chown -R terrat:terrat /etc/service /usr/local/share/terrat /etc/nginx /var/
 COPY docker/terrat/service/terrat /etc/service/terrat/run
 COPY docker/terrat/service/nginx /etc/service/nginx/run
 COPY docker/terrat/nginx.conf.template /etc/nginx/nginx.conf.template
-COPY --from=terrat-ee-build /mono/code/build/release/terrat_ee/terrat_ee.native /usr/local/bin/terrat
-COPY --from=terrat-ee-build /mono/code/build/release/iris/dist/ /usr/local/share/terrat/ui/assets/
+COPY --from=terrat-ee-build /mono/_build/default/code/src/terrat_ee/terrat_ee.exe /usr/local/bin/terrat
+COPY --from=terrat-ee-build /mono/code/src/iris/dist/ /usr/local/share/terrat/ui/assets/
 USER terrat
 EXPOSE 8080
 CMD ["runsvdir", "/etc/service"]
@@ -225,8 +212,8 @@ RUN chown -R terrat:terrat /etc/service /usr/local/share/terrat /etc/nginx /var/
 COPY docker/terrat/service/terrat /etc/service/terrat/run
 COPY docker/terrat/service/nginx /etc/service/nginx/run
 COPY docker/terrat/nginx.conf.template /etc/nginx/nginx.conf.template
-COPY --from=terrat-oss-build /mono/code/build/release/terrat_oss/terrat_oss.native /usr/local/bin/terrat
-COPY --from=terrat-oss-build /mono/code/build/release/iris/dist/ /usr/local/share/terrat/ui/assets/
+COPY --from=terrat-oss-build /mono/_build/default/code/src/terrat_oss/terrat_oss.exe /usr/local/bin/terrat
+COPY --from=terrat-oss-build /mono/code/src/iris/dist/ /usr/local/share/terrat/ui/assets/
 USER terrat
 EXPOSE 8080
 CMD ["runsvdir", "/etc/service"]

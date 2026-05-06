@@ -1,0 +1,4 @@
+(library
+ (name hcl_lexer)
+ (libraries containers hcl_parser sedlex)
+ (preprocess (pps sedlex.ppx)))

@@ -1,0 +1,3 @@
+(executable
+ (name lua_pattern_sed)
+ (libraries lua_pattern))

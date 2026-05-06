@@ -1,0 +1,4 @@
+(library
+ (name terrat_vcs_provider2_nyi)
+ (libraries pgsql_io terrat_vcs_api_nyi terrat_vcs_provider2)
+ (flags (:standard -w -27-32-53)))

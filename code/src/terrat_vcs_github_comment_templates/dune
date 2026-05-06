@@ -1,0 +1,3 @@
+(library
+ (name terrat_vcs_github_comment_templates)
+ (libraries brtl terrat_files terrat_plan_diff))

@@ -1,0 +1,2 @@
+(library
+ (name lua_pattern))

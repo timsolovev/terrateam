@@ -1,0 +1,3 @@
+(executable
+ (name otls_bindings_gen)
+ (libraries ctypes ctypes.foreign ctypes.stubs otls_bindings))

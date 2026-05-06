@@ -4,24 +4,25 @@
 - When you don't know how to do something, you consult the existing code in the project and match it.
 
 # Dune and make files
-- Never try to update dune files.
-- Never try to update Makefiles.
-- When updating the build, modify pds.conf.
+- The build is dune-driven. The Makefile here is a thin wrapper that delegates to `dune` from the repo root (where `dune-project` lives).
+- To add or change a library's dependencies, edit its `code/src/<name>/dune` directly.
+- New code conventionally lives in `code/src/<name>/` with a small `dune` declaring `(library (name <name>) (libraries ...))`. Tests live in `code/tests/<name>/` with `(test (name test) (libraries ...))`.
 
 # Editing Ocaml files
-- After editing an Ocaml file, run ocamlformat -i src/<module>/<filename>
-- After an edit build the terrat make target to verify the change is correct.
+- After editing an Ocaml file, run `ocamlformat -i src/<module>/<filename>`
+- After an edit, build the relevant `make` target to verify the change is correct.
 
 # Building
-- To build <target> run make -k -j$(nproc) <target>
-- To build the Terrateam API schemas run make terrat-schemas
-- To build Terrateam client and server run make terrat
+- To build a target run `make -j$(nproc) <target>` from `code/`.
+- To build the Terrateam API schemas run `make terrat-schemas`.
+- To build Terrateam client and server run `make terrat`.
+- Targets are also reachable directly via dune from the repo root, e.g. `dune build code/src/terrat_oss/terrat_oss.exe`. `dune-workspace` pins `(profile release)` as the default; the devcontainer overrides via `DUNE_PROFILE=dev`.
 - Always use `tail` to reduce the amount of data being processed when building.
-- If building fails, run make <target> and use tail to get the build error.
+- If building fails, run `make <target>` and use `tail` to get the build error.
 
 # Testing
-- To test <target> run make test-{release,debug}_<target>
-- Unit tests go in `code/tests/<name>` where <name> matches the library in `code/src/<name>`
+- To run tests: `make test-terrat` (runs `dune runtest code/tests/`).
+- Unit tests go in `code/tests/<name>` where `<name>` matches the library in `code/src/<name>`.
 
 # Style
 - When using long module names, create a short alias name using `let module`, i.e. `let module <short_name> = <long name> in`.

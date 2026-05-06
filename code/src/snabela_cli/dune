@@ -1,0 +1,3 @@
+(executable
+ (name snabela_cli)
+ (libraries cmdliner containers process sln snabela toml))

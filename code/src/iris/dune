@@ -1,0 +1,35 @@
+; Iris (Svelte/Vite SPA). Vite keeps its own incremental cache in-tree
+; under node_modules/, so we run the build in the real source tree
+; (outside dune's _build/ sandbox) and emit a single build.tag stamp
+; file that dune tracks. The resulting static assets land in
+; code/src/iris/dist/, which the production Docker image consumes.
+
+(rule
+ (target build.tag)
+ (deps
+  package.json
+  package-lock.json
+  index.html
+  vite.config.js
+  svelte.config.js
+  tailwind.config.js
+  postcss.config.js
+  tsconfig.json
+  knip.json
+  ../../../api_schemas/terrat/api.json
+  (glob_files_rec src/*)
+  (glob_files_rec scripts/*)
+  (glob_files_rec public/*))
+ (action
+  (progn
+   (bash
+    "cd $DUNE_SOURCEROOT/code/src/iris && \
+       (test -L api.json || ln -sf ../../../api_schemas/terrat/api.json api.json) && \
+       for i in 1 2 3; do npm install && break || { echo \"npm install failed (try $i/3), sleeping 15s...\"; sleep 15; }; done && \
+       npm run generate-api-types && \
+       npm run build")
+   (bash "touch %{target}"))))
+
+(alias
+ (name all)
+ (deps build.tag))

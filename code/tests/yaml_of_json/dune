@@ -1,0 +1,4 @@
+(test
+ (name test)
+ (libraries yaml_of_json oth)
+ (preprocess (pps ppx_deriving.show)))

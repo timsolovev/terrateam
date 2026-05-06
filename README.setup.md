@@ -1,68 +1,61 @@
 ## Installation
 
-This project uses [opam](https://opam.ocaml.org/), but not [dune](https://dune.build/). That is why the setup is slightly unusual,
-but because it is simple; it's easy to setup if you're thorough. If these instructions do not work, check out
-[docker/terrat/Dockerfile](./docker/terrat/Dockerfile) as this file contains a similar workflow, but may be updated more often (search for `opam env`).
+This project uses [opam](https://opam.ocaml.org/) and [dune](https://dune.build/). If these
+instructions go stale, [docker/terrat/Dockerfile](./docker/terrat/Dockerfile) is the canonical
+reference — its `build-base` stage runs the same setup and is exercised by CI on every push.
 
-First create a local opam switch as follows (execute this from the repository's root):
+Create a local opam switch from the repository's root:
 
 ```shell
 opam switch create -y 5.3.0 --no-depexts
 eval $(opam env)
-opam pin add -y cmdliner 1.3.0
-opam pin add -y containers 3.12
-opam pin add -y cmdliner 1.3.0
 ```
 
-Now we want to reach this state:
-
-```
-→ opam repository
-[NOTE] These are the repositories in use by the current switch. Use '--all' to see all configured repositories.
-
-<><> Repository configuration for switch /home/tamiya/dev/terrateam <><><><><>
- 1 tt-opam-mono file:///home/tamiya/dev/terrateam/opam-mono
- 2 tt-opam-acsl file:///home/tamiya/dev/terrateam/opam
- 3 default      https://opam.ocaml.org
-```
-
-Execute the following:
+Add the local `opam/` directory as an opam repository (it carries terrateam-specific packages
+that aren't in the default opam-repository):
 
 ```shell
 opam repository add tt-opam-acsl opam
-opam pin add -y pds 6.54 --no-depexts
-opam pin add -y hll 4.3 --no-depexts
-mkdir -p opam-mono/compilers opam-mono/packages
-echo 'opam-version: "2.0"' > opam-mono/repo
-opam repository add tt-opam-mono opam-mono
 ```
 
-Now inside the `code` directory:
-
-```
-cd code
-hll generate -n monorepo --opam-dir ../opam-mono --tag 1.0 --test-deps-as-regular-deps --url-override file://$PWD
-opam update tt-opam-mono
-opam info monorepo
-ulimit -s 524288 && ulimit -a && pds -d && time make -j$(nproc --all) test test-terrat release-terrat release-ttm
-opam install ocaml-lsp-server ocamlformat-rpc dot-merlin-reader
-```
-
-Then make sure the right flag is passed to the LSP server (if you're using vscode), so put the following:
-
-```
-cat code/.vscode/settings.json 
-{
-  "ocaml.server.args": [ "--fallback-read-dot-merlin" ],
-}
-```
-
-Finally, execute the following for internal dependencies to be found by the LSP:
+Pin a couple of packages that need a specific version before the rest of the install can
+solve cleanly:
 
 ```shell
-make .merlin
+opam pin add -y cmdliner 1.3.0
+opam pin add -y containers 3.12
 ```
 
-Now, launching `vscode` from the [code](./code) directory, within a shell augmented with the output of `opam env`
-(e.g. execute `eval $(opam env)` in your shell) should provide you with the usual features (symbol linking, jump to definition, etc.).
-If not, create an issue, and assign it to [@tamiyasigmar](https://github.com/tamiyasigmar)!
+Install dune and menhir, then everything pinned in `code/opam.pins`:
+
+```shell
+opam install -j$(nproc --all) -y --no-depexts dune menhir
+xargs -a code/opam.pins opam install -j$(nproc --all) -y --no-depexts
+```
+
+For an IDE-friendly setup, also install the LSP server and formatter:
+
+```shell
+opam install -y ocaml-lsp-server ocamlformat
+```
+
+You can now build:
+
+```shell
+cd code
+make terrat        # builds terrat-oss/ee/ttm/code-indexer + iris UI assets
+make test-terrat   # runs the test suite
+```
+
+Targets are also reachable directly via dune from the repository root:
+
+```shell
+dune build code/src/terrat_oss/terrat_oss.exe
+dune runtest code/tests/
+```
+
+`dune-workspace` pins `(profile release)` as the default; pass `--profile dev`
+or set `DUNE_PROFILE=dev` for a debug build.
+
+Dune writes its merlin configuration as part of `dune build`, so VS Code / OCaml LSP work
+out of the box once the switch is active (`eval $(opam env)`).

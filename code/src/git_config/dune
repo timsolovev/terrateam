@@ -1,0 +1,4 @@
+(library
+ (name git_config)
+ (libraries containers ppx_deriving sedlex sln)
+ (preprocess (pps ppx_deriving.ord ppx_deriving.show sedlex.ppx)))

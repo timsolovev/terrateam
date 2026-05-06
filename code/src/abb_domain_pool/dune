@@ -1,0 +1,3 @@
+(library
+ (name abb_domain_pool)
+ (libraries logs))

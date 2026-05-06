@@ -1,0 +1,4 @@
+(tests
+ (names change_matcher3 plan_diff tag_query tag_set)
+ (libraries containers oth terrat)
+ (preprocess (pps ppx_deriving.show)))

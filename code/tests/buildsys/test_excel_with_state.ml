@@ -18,7 +18,7 @@ module Excel = struct
 
     let with_finally f ~finally =
       let ret = f () in
-      finally ();
+      ignore (finally ());
       ret
   end
 
