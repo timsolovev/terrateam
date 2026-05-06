@@ -1,0 +1,6 @@
+(lang dune 3.16)
+
+; Default profile is "release"
+;
+; Override via DUNE_PROFILE=dev or `dune build --profile dev`
+(profile release)

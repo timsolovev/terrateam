@@ -1,0 +1,3 @@
+(test
+ (name basic)
+ (libraries oth abb_fut abb_channel abb_channel_queue))

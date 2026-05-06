@@ -1,0 +1,4 @@
+(library
+ (name jsonu)
+ (libraries containers json_of_yaml yojson yaml_of_json ppx_deriving)
+ (preprocess (pps ppx_deriving.show)))

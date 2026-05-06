@@ -463,7 +463,7 @@ struct
       match job.Tjc.Job.type_ with
       | T.Plan { tag_query; kind = _ } | T.Apply { tag_query; kind = _; force = _ } -> tag_query
       | T.Autoapply | T.Autoplan -> Terrat_tag_query.any
-      | T.Gate_approval _ | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false
+      | T.Gate_approval _ | T.Help | T.Index | T.Repo_config | T.Unlock _ | T.Push -> assert false
     in
     Abbs_future_combinators.List_result.map
       ~f:(fun ((environment, runs_on), dirspaceflows) ->

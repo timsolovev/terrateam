@@ -1,0 +1,6 @@
+(library
+ (name revops)
+ (wrapped false)
+ (libraries containers unix)
+ (ocamlopt_flags (:standard -w -27))
+ (ocamlc_flags (:standard -w -27)))

@@ -369,6 +369,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
     Hmap.Key.create "branch_dirspaces"
 
   let publish_repo_config : unit Key.t = Hmap.Key.create "publish_repo_config"
+  let publish_help : unit Key.t = Hmap.Key.create "publish_help"
   let comment_id : int option Key.t = Hmap.Key.create "comment_id"
   let react_to_comment : unit Key.t = Hmap.Key.create "react_to_comment"
   let work_manifest_id : Uuidm.t option Key.t = Hmap.Key.create "work_manifest_id"

@@ -1,0 +1,16 @@
+; terrat_files_gitlab embeds GitLab SQL/template files via ocaml-crunch,
+; mirroring the pattern used by terrat_files for github (see ../terrat_files/dune).
+
+(library
+ (name terrat_files_gitlab)
+ (wrapped false))
+
+(rule
+ (target terrat_files_gitlab_sql.ml)
+ (deps (source_tree sql))
+ (action (with-stdout-to %{target} (run ocaml-crunch -m plain sql))))
+
+(rule
+ (target terrat_files_gitlab_tmpl.ml)
+ (deps (source_tree tmpl))
+ (action (with-stdout-to %{target} (run ocaml-crunch -m plain tmpl))))

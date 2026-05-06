@@ -1,0 +1,3 @@
+(executable
+ (name openapi_cli)
+ (libraries cmdliner openapi_conv))

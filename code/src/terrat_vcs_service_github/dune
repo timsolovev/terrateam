@@ -1,0 +1,5 @@
+(library
+ (name terrat_vcs_service_github)
+ (wrapped false)
+ (libraries brtl_permissions logs minijinja pgsql_io pgsql_pagination pgsql_pool sha sln terrat_api terrat_code_idx terrat_files terrat_github terrat_github_webhooks terrat_github_webhooks_decoder terrat_metrics terrat_plan_diff terrat_scope terrat_session terrat_sql_of_tag_query terrat_task terrat_telemetry terrat_user terrat_vcs_api_github terrat_vcs_event_evaluator terrat_vcs_event_evaluator2 terrat_vcs_github_comment terrat_vcs_kv_store terrat_vcs_provider2 terrat_vcs_provider2_github terrat_vcs_service terrat_vcs_stacks)
+ (preprocess (pps ppx_deriving.eq ppx_deriving.ord ppx_deriving.show ppx_deriving_yojson)))

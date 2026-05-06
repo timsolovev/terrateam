@@ -1,0 +1,3 @@
+(library
+ (name opentofu_mods)
+ (libraries containers hcl_ast))

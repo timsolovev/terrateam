@@ -1,0 +1,4 @@
+(library
+ (name terrat_comment)
+ (libraries containers terrat_tag_query)
+ (preprocess (pps ppx_deriving.show)))

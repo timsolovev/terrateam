@@ -1,0 +1,3 @@
+(library
+ (name terrat_telemetry)
+ (libraries abb abb_curl abbs logs terrat_config terrat_work_manifest3 uri))

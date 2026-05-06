@@ -1,0 +1,3 @@
+(test
+ (name basic)
+ (libraries uri oth oth_abb abb_scheduler_select cohttp_abb))

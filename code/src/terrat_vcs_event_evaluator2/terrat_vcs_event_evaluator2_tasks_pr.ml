@@ -608,6 +608,12 @@ struct
           >>= fun publish_comment ->
           publish_comment' publish_comment (Msg.Repo_config repo_config_with_provenance))
 
+    let publish_help =
+      run ~name:"publish_help" (fun s { Bs.Fetcher.fetch } ->
+          let open Irm in
+          fetch Keys.publish_comment
+          >>= fun publish_comment -> publish_comment' publish_comment Msg.Help)
+
     let comment_id =
       run ~name:"comment_id" (fun s { Bs.Fetcher.fetch } ->
           (* This is a default value in case no comment id is set in the store
@@ -1412,28 +1418,50 @@ struct
           >>= fun () ->
           fetch Keys.pull_request_event
           >>= fun pull_request_event ->
-          let job_type =
-            match pull_request_event with
-            | E.Open | E.Sync | E.Ready_for_review -> Some Tjc.Job.Type_.Autoplan
-            | E.Close -> Some Tjc.Job.Type_.Autoapply
-            | E.Comment { comment_id; comment } -> (
-                match comment with
-                | Terrat_comment.Apply { tag_query } ->
-                    Some (Tjc.Job.Type_.Apply { tag_query; kind = None; force = false })
-                | Terrat_comment.Gate_approval { tokens } ->
-                    Some (Tjc.Job.Type_.Gate_approval { tokens })
-                | Terrat_comment.Plan { tag_query } ->
-                    Some (Tjc.Job.Type_.Plan { tag_query; kind = None })
-                | Terrat_comment.Apply_force { tag_query } ->
-                    Some (Tjc.Job.Type_.Apply { tag_query; kind = None; force = true })
-                | Terrat_comment.Repo_config -> Some Tjc.Job.Type_.Repo_config
-                | Terrat_comment.Unlock unlocks ->
-                    Some (Tjc.Job.Type_.Unlock (CCList.sort_uniq ~cmp:CCString.compare unlocks))
-                | Terrat_comment.Index -> Some Tjc.Job.Type_.Index
-                | Terrat_comment.Help
-                | Terrat_comment.Apply_autoapprove _
-                | Terrat_comment.Feedback _ -> raise (Failure "nyi"))
-          in
+          (match pull_request_event with
+          | E.Comment { comment = Terrat_comment.Feedback feedback; _ } ->
+              fetch Keys.account
+              >>= fun account ->
+              fetch Keys.repo
+              >>= fun repo ->
+              fetch Keys.pull_request_id
+              >>= fun pull_request_id ->
+              Logs.info (fun m ->
+                  m
+                    "%s : FEEDBACK : account=%s : repo=%s : pull_number=%s : user=%s : %s"
+                    (Builder.log_id s)
+                    (S.Api.Account.to_string account)
+                    (S.Api.Repo.to_string repo)
+                    (S.Api.Pull_request.Id.to_string pull_request_id)
+                    (CCOption.map_or ~default:"" S.Api.User.to_string user)
+                    feedback);
+              Abb.Future.return (Ok None)
+          | E.Open | E.Sync | E.Ready_for_review ->
+              Abb.Future.return (Ok (Some Tjc.Job.Type_.Autoplan))
+          | E.Close -> Abb.Future.return (Ok (Some Tjc.Job.Type_.Autoapply))
+          | E.Comment { comment_id = _; comment } -> (
+              match comment with
+              | Terrat_comment.Apply { tag_query } ->
+                  Abb.Future.return
+                    (Ok (Some (Tjc.Job.Type_.Apply { tag_query; kind = None; force = false })))
+              | Terrat_comment.Gate_approval { tokens } ->
+                  Abb.Future.return (Ok (Some (Tjc.Job.Type_.Gate_approval { tokens })))
+              | Terrat_comment.Plan { tag_query } ->
+                  Abb.Future.return (Ok (Some (Tjc.Job.Type_.Plan { tag_query; kind = None })))
+              | Terrat_comment.Apply_force { tag_query } ->
+                  Abb.Future.return
+                    (Ok (Some (Tjc.Job.Type_.Apply { tag_query; kind = None; force = true })))
+              | Terrat_comment.Repo_config ->
+                  Abb.Future.return (Ok (Some Tjc.Job.Type_.Repo_config))
+              | Terrat_comment.Unlock unlocks ->
+                  Abb.Future.return
+                    (Ok
+                       (Some (Tjc.Job.Type_.Unlock (CCList.sort_uniq ~cmp:CCString.compare unlocks))))
+              | Terrat_comment.Index -> Abb.Future.return (Ok (Some Tjc.Job.Type_.Index))
+              | Terrat_comment.Help -> Abb.Future.return (Ok (Some Tjc.Job.Type_.Help))
+              | Terrat_comment.Apply_autoapprove _ | Terrat_comment.Feedback _ ->
+                  raise (Failure "nyi")))
+          >>= fun job_type ->
           match job_type with
           | Some job_type ->
               let comment_id =
@@ -1614,6 +1642,7 @@ struct
     |> Hmap.add (coerce Keys.missing_autoplan_matches) Tasks.missing_autoplan_matches
     |> Hmap.add (coerce Keys.out_of_change_applies) Tasks.out_of_change_applies
     |> Hmap.add (coerce Keys.publish_comment) Tasks.publish_comment
+    |> Hmap.add (coerce Keys.publish_help) Tasks.publish_help
     |> Hmap.add (coerce Keys.publish_index_complete) Tasks.publish_index_complete
     |> Hmap.add (coerce Keys.publish_repo_config) Tasks.publish_repo_config
     |> Hmap.add (coerce Keys.publish_unlock) Tasks.publish_unlock

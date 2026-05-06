@@ -1,0 +1,5 @@
+(library
+ (name minijinja)
+ (libraries yojson)
+ (foreign_stubs (language c) (names minijinja_stubs))
+ (foreign_archives ../minijinja-rs/minijinja_c_wrapper))

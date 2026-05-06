@@ -30,6 +30,7 @@ module Job = struct
       | Autoapply
       | Autoplan
       | Gate_approval of { tokens : string list }
+      | Help
       | Index
       | Plan of {
           tag_query : Terrat_tag_query.t;

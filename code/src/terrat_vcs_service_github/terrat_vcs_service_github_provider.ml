@@ -5766,6 +5766,7 @@ module Job_context = struct
                 }
           | T.Gate_approval { tokens } ->
               Jt.Type.Gate_approval { Jt.Gate_approval.type_ = `Gate_approval; tokens }
+          | T.Help -> Jt.Type.Help { Jt.Help.type_ = `Help }
           | T.Index -> Jt.Type.Index { Jt.Index.type_ = `Index }
           | T.Repo_config -> Jt.Type.Repo_config { Jt.Repo_config.type_ = `Repo_config }
           | T.Unlock unlocks -> Jt.Type.Unlock { Jt.Unlock.type_ = `Unlock; ids = unlocks }
@@ -5801,6 +5802,7 @@ module Job_context = struct
                | Jt.Type.Unlock { Jt.Unlock.type_ = _; ids } -> Some (T.Unlock ids)
                | Jt.Type.Gate_approval { Jt.Gate_approval.type_ = _; tokens } ->
                    Some (T.Gate_approval { tokens })
+               | Jt.Type.Help { Jt.Help.type_ = _ } -> Some T.Help
                | Jt.Type.Index { Jt.Index.type_ = _ } -> Some T.Index
                | Jt.Type.Push { Jt.Push.type_ = _ } -> Some T.Push))
     end

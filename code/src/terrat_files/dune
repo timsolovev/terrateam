@@ -1,0 +1,28 @@
+; terrat_files embeds SQL migrations and github SQL/template files into
+; OCaml modules at build time using ocaml-crunch. The pre-dune Makefile
+; (files.mk) staged the *.sql / *.tmpl into a working dir then ran
+; `ocaml-crunch -m plain` to produce one .ml per resource set; dune does
+; the same here, with (source_tree ...) so the rule reruns when fixtures
+; change.
+;
+; (wrapped false) so consumers reference Terrat_files_migrations and
+; Terrat_files_github_sql directly (matches the pre-dune posture).
+
+(library
+ (name terrat_files)
+ (wrapped false))
+
+(rule
+ (target terrat_files_migrations.ml)
+ (deps (source_tree migrations))
+ (action (with-stdout-to %{target} (run ocaml-crunch -m plain migrations))))
+
+(rule
+ (target terrat_files_github_sql.ml)
+ (deps (source_tree github/sql))
+ (action (with-stdout-to %{target} (run ocaml-crunch -m plain github/sql))))
+
+(rule
+ (target terrat_files_github_tmpl.ml)
+ (deps (source_tree github/tmpl))
+ (action (with-stdout-to %{target} (run ocaml-crunch -m plain github/tmpl))))

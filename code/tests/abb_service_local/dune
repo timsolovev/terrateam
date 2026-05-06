@@ -1,0 +1,3 @@
+(test
+ (name basic)
+ (libraries oth abb_fut abb_channel abb_service_local))

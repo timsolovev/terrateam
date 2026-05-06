@@ -1,0 +1,3 @@
+(library
+ (name terrat_code_idx)
+ (libraries terrat_api))
