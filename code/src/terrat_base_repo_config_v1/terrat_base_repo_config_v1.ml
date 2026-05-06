@@ -943,9 +943,21 @@ module Engine = struct
 end
 
 module Hooks = struct
+  module Drift_create_issue = struct
+    module Group_by = struct
+      type t =
+        [ `All
+        | `Dirspace
+        ]
+      [@@deriving show, yojson, eq]
+    end
+
+    type t = { group_by : Group_by.t [@default `All] } [@@deriving make, show, yojson, eq]
+  end
+
   module Hook_op = struct
     type t =
-      | Drift_create_issue
+      | Drift_create_issue of Drift_create_issue.t
       | Env of Workflow_step.Env.t
       | Oidc of Workflow_step.Oidc.t
       | Run of Workflow_step.Run.t
@@ -1487,7 +1499,15 @@ let of_version_1_visible_on =
 let of_version_1_hook_op =
   let module Op = Terrat_repo_config_hook_op in
   function
-  | Op.Hook_op_drift_create_issue _ -> Ok Hooks.Hook_op.Drift_create_issue
+  | Op.Hook_op_drift_create_issue op ->
+      let module D = Terrat_repo_config_hook_op_drift_create_issue in
+      let { D.group_by; type_ = _ } = op in
+      let group_by =
+        match group_by with
+        | `All -> `All
+        | `Dirspace -> `Dirspace
+      in
+      Ok (Hooks.Hook_op.Drift_create_issue { Hooks.Drift_create_issue.group_by })
   | Op.Hook_op_env_exec op ->
       let module Op = Terrat_repo_config_hook_op_env_exec in
       let { Op.cmd; method_ = _; name; sensitive; trim_trailing_newlines; type_ = _ } = op in
@@ -3023,9 +3043,14 @@ let to_version_1_hooks_op_gates g =
 let to_version_1_hooks_hook_list =
   let module Op = Terrat_repo_config.Hook_op in
   CCList.map (function
-    | Hooks.Hook_op.Drift_create_issue ->
+    | Hooks.Hook_op.Drift_create_issue { Hooks.Drift_create_issue.group_by } ->
         let module D = Terrat_repo_config.Hook_op_drift_create_issue in
-        Op.Hook_op_drift_create_issue { D.type_ = Some `Drift_create_issue }
+        let group_by =
+          match group_by with
+          | `All -> `All
+          | `Dirspace -> `Dirspace
+        in
+        Op.Hook_op_drift_create_issue { D.group_by; type_ = Some `Drift_create_issue }
     | Hooks.Hook_op.Env (Workflow_step.Env.Exec env) ->
         Op.Hook_op_env_exec (to_version_1_hooks_op_env_exec env)
     | Hooks.Hook_op.Env (Workflow_step.Env.Source env) ->

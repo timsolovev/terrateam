@@ -70,6 +70,16 @@ hooks:
 ```
 This configuration ensures that duplicate issues are not created for identical drift findings.
 
+By default Terrateam opens a single issue listing every drifted dirspace. To open one issue per dirspace instead — useful when different dirspaces are owned by different teams or need to be triaged independently — set `group_by: dirspace`:
+```yaml
+hooks:
+  plan:
+    post:
+      - type: drift_create_issue
+        group_by: dirspace
+```
+See the [drift configuration reference](/reference/configuration/drift#grouping) for details.
+
 ### Slack Notifications
 Terrateam integrates with Slack, allowing you to receive real-time notifications when drift is detected. To set up Slack notifications, follow these steps:
 1. Install the official [GitHub integration for Slack](https://github.com/integrations/slack) in your desired Slack workspace and channel.

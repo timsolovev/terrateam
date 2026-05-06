@@ -122,6 +122,22 @@ hooks:
 Duplicate issues for identical changes will not be created.
 ![GitHub Issue Drift Detected](../../../../assets/drift-detection-terrateam-drift-detected.png)
 
+#### Grouping
+By default a single issue is opened that lists every drifted dirspace. To open one issue per drifted dirspace instead, set `group_by: dirspace`:
+```yaml
+hooks:
+  plan:
+    post:
+      - type: drift_create_issue
+        group_by: dirspace
+```
+This is useful when different dirspaces are owned by different teams or need to be triaged, assigned, and closed independently. Each per-dirspace issue is titled `Terrateam: Drift Detected - <dir> (<workspace>)` and is deduplicated independently — re-running drift will not re-open an issue whose plan output is unchanged.
+
+| Value | Behavior |
+|-------|----------|
+| `all` (default) | One aggregated issue per drift run, listing every drifted dirspace. |
+| `dirspace` | One issue per drifted dirspace. |
+
 ### Slack
 You can create Slack notifications using the official [GitHub Integration for Slack](https://github.com/integrations/slack):
 - Install the app in your desired Slack workspace and channel.
