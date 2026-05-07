@@ -141,6 +141,7 @@ export default defineConfig({
                 { label: "Terragrunt", link: "/integrations/iac-tools/terragrunt" },
                 { label: "Pulumi", link: "/integrations/iac-tools/pulumi" },
                 { label: "CDK for Terraform", link: "/integrations/iac-tools/cdktf" },
+                { label: "Stategraph", link: "/integrations/iac-tools/stategraph" },
                 { label: "Migrate from Terraform Cloud", link: "/integrations/iac-tools/terraform-cloud-migration" },
               ],
             },
@@ -332,6 +333,12 @@ export default defineConfig({
     '/self-hosted/aws': '/quickstart/self-hosted/aws',
     '/self-hosted/instructions': '/quickstart/self-hosted/',
     '/self-hosted/editions': '/editions/',
+
+    // Top-level marketing-site landing redirects
+    '/gitops': '/overview/how-it-works',
+    '/workflows': '/workflows/pull-request/',
+    '/scale': '/workflows/advanced/multi-environment',
+    '/security': '/security/best-practices',
     
     // Configuration references
     '/configuration-reference/access-control': '/reference/configuration/access-control',

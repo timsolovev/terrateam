@@ -5,6 +5,7 @@ type t =
   | Engine_terragrunt of Terrat_repo_config_engine_terragrunt.t
   | Engine_pulumi of Terrat_repo_config_engine_pulumi.t
   | Engine_fly of Terrat_repo_config_engine_fly.t
+  | Engine_stategraph of Terrat_repo_config_engine_stategraph.t
   | Engine_custom of Terrat_repo_config_engine_custom.t
   | Engine_other of Terrat_repo_config_engine_other.t
 [@@deriving show, eq]
@@ -21,6 +22,8 @@ let of_yojson =
          map (fun v -> Engine_terragrunt v) (Terrat_repo_config_engine_terragrunt.of_yojson v));
        (fun v -> map (fun v -> Engine_pulumi v) (Terrat_repo_config_engine_pulumi.of_yojson v));
        (fun v -> map (fun v -> Engine_fly v) (Terrat_repo_config_engine_fly.of_yojson v));
+       (fun v ->
+         map (fun v -> Engine_stategraph v) (Terrat_repo_config_engine_stategraph.of_yojson v));
        (fun v -> map (fun v -> Engine_custom v) (Terrat_repo_config_engine_custom.of_yojson v));
        (fun v -> map (fun v -> Engine_other v) (Terrat_repo_config_engine_other.of_yojson v));
      ])
@@ -32,5 +35,6 @@ let to_yojson = function
   | Engine_terragrunt v -> Terrat_repo_config_engine_terragrunt.to_yojson v
   | Engine_pulumi v -> Terrat_repo_config_engine_pulumi.to_yojson v
   | Engine_fly v -> Terrat_repo_config_engine_fly.to_yojson v
+  | Engine_stategraph v -> Terrat_repo_config_engine_stategraph.to_yojson v
   | Engine_custom v -> Terrat_repo_config_engine_custom.to_yojson v
   | Engine_other v -> Terrat_repo_config_engine_other.to_yojson v
