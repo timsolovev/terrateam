@@ -26,10 +26,7 @@ drift_schedule_windows as (
         repository,
         name,
         window_start,
-        (case
-           when window_end < window_start then window_end + interval '1 day'
-           else window_end
-         end) as window_end
+        window_end
     from ds
     where window_start is not null and window_end is not null
 ),
@@ -56,7 +53,12 @@ chosen_drift_schedule as (
     left join drift_schedule_windows as dsw
         on (dsw.repository, dsw.name) = (ds.repository, ds.name)
     where (dsw.window_start is null
-           or (dsw.window_start <= current_timestamp and current_timestamp < dsw.window_end))
+           or (dsw.window_start <= dsw.window_end
+               and dsw.window_start <= current_timestamp
+               and current_timestamp < dsw.window_end)
+           or (dsw.window_start > dsw.window_end
+               and (dsw.window_start <= current_timestamp
+                    or current_timestamp < dsw.window_end)))
           and gi.state = 'installed'
           -- Running a schedule might fail immediately, so force at least 1 minute between tries
           and (drift_schedules.last_tried_at is null
