@@ -3,10 +3,7 @@ let src = Logs.Src.create "vcs_service_github_ep_callback"
 module Logs = (val Logs.src_log src : Logs.LOG)
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let insert_user2 () =
     Pgsql_io.Typed_sql.(
@@ -14,7 +11,7 @@ module Sql = struct
       //
       (* id *)
       Ret.uuid
-      /^ read "insert_user2.sql")
+      /^ read [%blob "sql/insert_user2.sql"])
 
   let select_github_user2 () =
     Pgsql_io.Typed_sql.(
@@ -31,13 +28,13 @@ module Sql = struct
       //
       (* avatar_url *)
       Ret.text
-      /^ read "select_github_user2.sql"
+      /^ read [%blob "sql/select_github_user2.sql"]
       /% Var.text "username")
 
   let insert_github_user2 () =
     Pgsql_io.Typed_sql.(
       sql
-      /^ read "insert_github_user2.sql"
+      /^ read [%blob "sql/insert_github_user2.sql"]
       /% Var.(option (text "avatar_url"))
       /% Var.(option (text "email"))
       /% Var.(option (timestamptz "expiration"))

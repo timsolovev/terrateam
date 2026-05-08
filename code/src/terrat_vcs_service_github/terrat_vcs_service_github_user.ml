@@ -6,10 +6,7 @@ type err =
 [@@deriving show]
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let select_user_token () =
     Pgsql_io.Typed_sql.(
@@ -23,13 +20,13 @@ module Sql = struct
       //
       (* refresh_token *)
       Ret.text
-      /^ read "select_github_user2_tokens.sql"
+      /^ read [%blob "sql/select_github_user2_tokens.sql"]
       /% Var.uuid "user_id")
 
   let update_github_user2_tokens () =
     Pgsql_io.Typed_sql.(
       sql
-      /^ read "update_github_user2_tokens.sql"
+      /^ read [%blob "sql/update_github_user2_tokens.sql"]
       /% Var.uuid "user_id"
       /% Var.text "token"
       /% Var.(option (timestamptz "expiration"))
@@ -42,7 +39,7 @@ module Sql = struct
       //
       (* installation_id *)
       Ret.bigint
-      /^ read "select_user_installation.sql"
+      /^ read [%blob "sql/select_user_installation.sql"]
       /% Var.uuid "user_id"
       /% Var.bigint "installation_id")
 end

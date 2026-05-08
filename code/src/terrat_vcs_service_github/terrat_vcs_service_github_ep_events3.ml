@@ -47,15 +47,12 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
   module Gw = Terrat_github_webhooks
 
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let insert_github_installation =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_installation.sql"
+        /^ read [%blob "sql/insert_installation.sql"]
         /% Var.bigint "id"
         /% Var.text "login"
         /% Var.uuid "org"
@@ -93,7 +90,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
         //
         (* id *)
         Ret.uuid
-        /^ read "insert_org.sql"
+        /^ read [%blob "sql/insert_org.sql"]
         /% Var.text "name")
 
     let select_github_installation =
@@ -107,19 +104,16 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
   end
 
   module Tmpl = struct
-    let read fname =
-      fname
-      |> Terrat_files_github_tmpl.read
-      |> CCOption.get_exn_or fname
+    let read s =
+      s
       |> Snabela.Template.of_utf8_string
       |> CCResult.get_exn
       |> fun tmpl -> Snabela.of_template tmpl []
 
-    let terrateam_comment_tag_query_error = read "terrateam_comment_tag_query_error.tmpl"
+    let terrateam_comment_tag_query_error =
+      read [%blob "tmpl/terrateam_comment_tag_query_error.tmpl"]
 
-    let terrateam_comment_unknown_action =
-      let fname = "terrateam_comment_unknown_action.tmpl" in
-      CCOption.get_exn_or fname (Terrat_files_github_tmpl.read fname)
+    let terrateam_comment_unknown_action = [%blob "tmpl/terrateam_comment_unknown_action.tmpl"]
   end
 
   let target_of_user_type = function

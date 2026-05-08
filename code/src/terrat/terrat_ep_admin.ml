@@ -6,10 +6,7 @@ let admin_token_permission ctx admin_token =
 module Drift = struct
   module List = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_admin_drift_list () =
         Pgsql_io.Typed_sql.(
@@ -38,7 +35,7 @@ module Drift = struct
           //
           (* unlocked *)
           Ret.boolean
-          /^ read "select_admin_drift_list.sql")
+          /^ read [%blob "sql/select_admin_drift_list.sql"])
     end
 
     let make_drift id owner name state run_type created_at completed_at unlocked =

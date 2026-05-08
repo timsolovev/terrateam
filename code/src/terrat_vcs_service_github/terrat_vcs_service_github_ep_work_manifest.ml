@@ -218,10 +218,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
         }
 
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_installation_id () =
         Pgsql_io.Typed_sql.(
@@ -229,7 +226,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
           //
           (* id *)
           Ret.bigint
-          /^ read "select_installation_id_from_work_manifest.sql"
+          /^ read [%blob "sql/select_installation_id_from_work_manifest.sql"]
           /% Var.uuid "id")
     end
 
