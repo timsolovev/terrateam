@@ -2134,6 +2134,7 @@ module Apply_requirements = struct
       approved_reviews : Terrat_pull_request_review.t list;
       missing_reviews : Terrat_base_repo_config_v1.Access_control.Match.t list;
       missing_any_of_count : int;
+      any_of_count : int;
       any_of : Terrat_base_repo_config_v1.Access_control.Match.t list;
       match_ : Terrat_change_match3.Dirspace_config.t;
       merge_conflicts : bool option;
@@ -2256,7 +2257,10 @@ module Apply_requirements = struct
          "all of" and "any of" are empty and the approvals is more than count *)
     Abb.Future.return
       (Ok
-         (all_of_passed && any_of_passed && required_reviews_passed, missing_reviews, missing_any_of))
+         ( all_of_passed && any_of_passed && required_reviews_passed,
+           missing_reviews,
+           missing_any_of,
+           any_of_count ))
 
   let eval ~request_id config user client repo_config pull_request dirspace_configs =
     let max_parallel = 20 in
@@ -2351,7 +2355,7 @@ module Apply_requirements = struct
                   approved
                   approved_reviews
                   requested_reviews
-                >>= fun (approved_result, missing_reviews, missing_any_of_count) ->
+                >>= fun (approved_result, missing_reviews, missing_any_of_count, any_of_count) ->
                 let module Ac = Terrat_base_repo_config_v1.Apply_requirements.Approved in
                 let { Ac.any_of; _ } = approved in
                 let ignore_matching = status_checks.Sc.ignore_matching in
@@ -2423,6 +2427,7 @@ module Apply_requirements = struct
                     approved_reviews;
                     missing_reviews;
                     missing_any_of_count;
+                    any_of_count;
                     any_of;
                   }
                 in
@@ -2465,6 +2470,7 @@ module Apply_requirements = struct
                        approved_reviews = [];
                        missing_reviews = [];
                        missing_any_of_count = 0;
+                       any_of_count = 0;
                        any_of = [];
                      }))
           chunk)
@@ -3663,6 +3669,7 @@ module Comment = struct
                                       (Terrat_base_repo_config_v1.Access_control.Match.to_string m))
                                   ar.Ar.missing_reviews) );
                            ("missing_any_of_count", `Int ar.Ar.missing_any_of_count);
+                           ("any_of_count", `Int ar.Ar.any_of_count);
                            ( "any_of",
                              `List
                                (CCList.map
