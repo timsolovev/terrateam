@@ -59,7 +59,7 @@ module Make (P : Terrat_vcs_provider2_gitlab.S) = struct
     | Some (owner, name) -> (owner, name)
     | None -> raise (Failure "nyi")
 
-  let upsert_installation_repo config storage installation_id =
+  let upsert_installation_repo _config storage installation_id =
     let module E = Gitlab_webhooks.Event in
     let module Pe = Gitlab_webhooks_push_event in
     let module Mre = Gitlab_webhooks_merge_request_event in

@@ -20,7 +20,7 @@ module Refresh = struct
         /% Var.uuid "access_token_id")
   end
 
-  let post config storage =
+  let post _config storage =
     Brtl_ep.run_result_json ~f:(fun ctx ->
         let open Abbs_future_combinators.Infix_result_monad in
         Terrat_session.with_session ~caps:[ Terrat_user.Capability.Access_token_refresh ] ctx

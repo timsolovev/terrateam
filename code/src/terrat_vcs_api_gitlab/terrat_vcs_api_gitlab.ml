@@ -232,10 +232,11 @@ module Client = struct
     account : Account.t;
     client : Openapic_abb.t;
   }
+  [@@warning "-69"]
 
   type native = Openapic_abb.t
 
-  let make ~account ~client ~config () = { account; client }
+  let make ~account ~client ~config:_ () = { account; client }
   let to_native t = t.client
 end
 
@@ -285,7 +286,7 @@ let fetch_file ~request_id client repo ref_ path =
       Logs.err (fun m -> m "%s : FETCH_FILE : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let fetch_remote_repo' ~request_id client repo =
+let fetch_remote_repo' ~request_id:_ client repo =
   let module Gl = Gitlabc_projects.GetApiV4ProjectsId in
   let open Abbs_future_combinators.Infix_result_monad in
   let id = CCInt.to_string @@ Repo.id repo in
@@ -456,7 +457,7 @@ let comment_on_pull_request ~request_id client pull_request body =
   let open Abb.Future.Infix_monad in
   run
   >>= function
-  | Ok id as r -> Abb.Future.return r
+  | Ok _id as r -> Abb.Future.return r
   | Error (#Gl.Responses.t as err) ->
       Logs.err (fun m -> m "%s : COMMENT_ON_PULL_REQUEST : %a" request_id Gl.Responses.pp err);
       Abb.Future.return (Error `Error)
@@ -465,8 +466,11 @@ let comment_on_pull_request ~request_id client pull_request body =
           m "%s : COMMENT_ON_PULL_REQUEST : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let delete_pull_request_comment ~request_id client pull_request comment_id = raise (Failure "nyi")
-let minimize_pull_request_comment ~request_id client pull_request comment_id = raise (Failure "nyi")
+let delete_pull_request_comment ~request_id:_ _client _pull_request _comment_id =
+  raise (Failure "nyi")
+
+let minimize_pull_request_comment ~request_id:_ _client _pull_request _comment_id =
+  raise (Failure "nyi")
 
 let fetch_diff ~request_id ~client ~repo merge_request_iid =
   let module Gl =
@@ -504,7 +508,7 @@ let fetch_diff ~request_id ~client ~repo merge_request_iid =
       Logs.err (fun m -> m "%s : FETCH_DIFF : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let fetch_pull_request' ~request_id ~client ~repo merge_request_iid =
+let fetch_pull_request' ~request_id:_ ~client ~repo merge_request_iid =
   let module Gl = Gitlabc_projects_merge_requests.GetApiV4ProjectsIdMergeRequestsMergeRequestIid in
   let module Mr = Gitlabc_components_api_entities_mergerequest in
   let open Abbs_future_combinators.Infix_result_monad in
@@ -530,7 +534,7 @@ let fetch_pull_request' ~request_id ~client ~repo merge_request_iid =
   | `OK { Mr.diff_refs = None; _ } -> assert false
   | `Not_found -> Abb.Future.return (Error `Not_found)
 
-let fetch_pull_request ~request_id account client repo merge_request_iid =
+let fetch_pull_request ~request_id _account client repo merge_request_iid =
   let run =
     let open Abbs_future_combinators.Infix_result_monad in
     Abbs_future_combinators.Infix_result_app.(
@@ -898,7 +902,7 @@ let fetch_pull_request_requested_reviews ~request_id repo pull_number client =
   let open Abb.Future.Infix_monad in
   run
   >>= function
-  | Ok id as r -> Abb.Future.return r
+  | Ok _id as r -> Abb.Future.return r
   | Error (#Gl.Responses.t as err) ->
       Logs.err (fun m ->
           m "%s : FETCH_PULL_REQUEST_REQUESTED_REVIEWS : %a" request_id Gl.Responses.pp err);
@@ -990,7 +994,7 @@ let delete_branch ~request_id client repo branch =
       Logs.err (fun m -> m "%s : DELETE_BRANCH : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let fetch_member_of_team ~request_id ~team ~user client =
+let fetch_member_of_team ~request_id:_ ~team ~user client =
   let module Glu = Gitlabc_users.GetApiV4Users in
   let module Glg = Gitlabc_groups_members.GetApiV4GroupsIdMembersUserId in
   let run =
@@ -1014,7 +1018,7 @@ let fetch_member_of_team ~request_id ~team ~user client =
   | Ok _ as r -> Abb.Future.return r
   | Error (#Openapic_abb.call_err as err) -> Abb.Future.return (Error err)
 
-let is_member_of_team ~request_id ~team ~user repo client =
+let is_member_of_team ~request_id ~team ~user _repo client =
   let run =
     let open Abbs_future_combinators.Infix_result_monad in
     fetch_member_of_team ~request_id ~team ~user client
@@ -1110,4 +1114,4 @@ let get_org_role ~request_id ~org user client =
       Logs.err (fun m -> m "%s : GET_ORG_ROLE : %a" request_id Openapic_abb.pp_call_err err);
       Abb.Future.return (Error `Error)
 
-let find_workflow_file ~request_id _repo _client = Abb.Future.return (Ok (Some ".gitlab-ci.yml"))
+let find_workflow_file ~request_id:_ _repo _client = Abb.Future.return (Ok (Some ".gitlab-ci.yml"))

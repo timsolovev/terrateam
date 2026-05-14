@@ -2,7 +2,7 @@ module type S = sig
   val vcs : string
 end
 
-module Make (P : Terrat_vcs_provider2.S) (S : S) : sig
+module Make (P : Terrat_vcs_provider2.S) (_ : S) : sig
   val routes :
     P.Api.Config.t ->
     Terrat_storage.t ->

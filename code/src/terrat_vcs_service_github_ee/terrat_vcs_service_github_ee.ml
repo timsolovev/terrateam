@@ -303,7 +303,7 @@ module Provider :
                         CCList.filter_map
                           (function
                             | q, [] -> Some q
-                            | q, _ -> None)
+                            | _q, _ -> None)
                           all_of
                       in
                       let result =

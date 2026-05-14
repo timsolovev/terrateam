@@ -70,7 +70,7 @@ struct
         Abb.Future.return (Error (Brtl_ctx.set_response `Internal_server_error ctx))
 
   module Get = struct
-    let run config storage installation_id key committed idx select =
+    let run _config storage installation_id key committed idx select =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read ] ctx
@@ -94,7 +94,7 @@ struct
   end
 
   module Set = struct
-    let run config storage installation_id key body =
+    let run _config storage installation_id key body =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_write ] ctx
@@ -135,7 +135,7 @@ struct
   end
 
   module Cas = struct
-    let run config storage installation_id key body =
+    let run _config storage installation_id key body =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read; Cap.Kv_store_write ] ctx
@@ -181,7 +181,7 @@ struct
   end
 
   module Delete = struct
-    let run config storage installation_id key idx version =
+    let run _config storage installation_id key idx version =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read; Cap.Kv_store_write ] ctx
@@ -204,7 +204,7 @@ struct
   end
 
   module Count = struct
-    let run config storage installation_id key committed =
+    let run _config storage installation_id key committed =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read ] ctx
@@ -229,7 +229,7 @@ struct
   end
 
   module Size = struct
-    let run config storage installation_id key idx committed =
+    let run _config storage installation_id key idx committed =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read ] ctx
@@ -253,7 +253,7 @@ struct
   end
 
   module Iter = struct
-    let run config storage installation_id key select idx inclusive committed prefix limit =
+    let run _config storage installation_id key select idx inclusive committed prefix limit =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_read ] ctx
@@ -276,7 +276,7 @@ struct
   end
 
   module Commit = struct
-    let run config storage installation_id commit =
+    let run _config storage installation_id commit =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Cap.Kv_store_write ] ctx

@@ -7,7 +7,7 @@ module Cmdline = struct
         over ();
         k ()
       in
-      let with_stamp h tags k ppf fmt =
+      let with_stamp h _tags k ppf fmt =
         (* TODO: Make this use the proper Abb time *)
         let time = Unix.gettimeofday () in
         let time_str = ISO8601.Permissive.string_of_datetime time in

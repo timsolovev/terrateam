@@ -23,7 +23,7 @@ module Output = struct
     let name = CCOption.map_or ~default:name snd (CCString.Split.right ~by:"/" name) in
     { cmd; name; success; text; text_decorator; visible_on }
 
-  let to_kv { cmd; name; success; text; text_decorator; visible_on } =
+  let to_kv { cmd; name; success; text; text_decorator; visible_on = _ } =
     `Assoc
       (CCList.flatten
          [
@@ -51,7 +51,7 @@ let steps_has_changes steps =
   match
     CCList.find_map
       (function
-        | { O.step = "tf/plan" | "pulumi/plan" | "custom/plan" | "fly/plan"; payload; success; _ }
+        | { O.step = "tf/plan" | "pulumi/plan" | "custom/plan" | "fly/plan"; payload; success = _; _ }
           -> (
             match P.of_yojson (O.Payload.to_yojson payload) with
             | Ok { P.has_changes } -> Some has_changes
@@ -191,7 +191,7 @@ let output_of_plan output =
   let module O = Terrat_api_components.Workflow_step_output in
   let open CCResult.Infix in
   P.of_yojson (O.Payload.to_yojson output.O.payload)
-  >>= fun { P.cmd; text; has_changes; plan } ->
+  >>= fun { P.cmd; text; has_changes = _; plan } ->
   if output.O.success then
     Ok
       (Output.make
@@ -221,7 +221,7 @@ let output_of_workflow_output output =
   | "tf/apply" | "pulumi/apply" | "custom/apply" | "fly/apply" ->
       output_of_run ~default_visible_on:Visible_on.Always output
   | "tf/plan" | "pulumi/plan" | "custom/plan" | "fly/plan" -> output_of_plan output
-  | step -> output_of_run output
+  | _step -> output_of_run output
 
 let output_of_raw output =
   let module O = Terrat_api_components.Workflow_step_output in
@@ -260,7 +260,7 @@ let dirspace_compare (dirspace1, steps1) (dirspace2, steps2) =
   Cmp.compare (not has_changes1, success1, dirspace1) (not has_changes2, success2, dirspace2)
 
 module Comment_api = struct
-  let comment_on_pull_request ~request_id client pull_request msg_type body =
+  let comment_on_pull_request ~request_id client pull_request _msg_type body =
     let open Abbs_future_combinators.Infix_result_monad in
     Api.comment_on_pull_request ~request_id client pull_request body
     >>= fun comment_id -> Abb.Future.return (Ok comment_id)

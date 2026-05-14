@@ -185,7 +185,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
     | `Closed -> Abb.Future.return (Error `Closed)
 
   let make_tasks tasks_map =
-    { Bs.Tasks.get = (fun s k -> Abb.Future.return (Hmap.find (coerce_to_task k) tasks_map)) }
+    { Bs.Tasks.get = (fun _s k -> Abb.Future.return (Hmap.find (coerce_to_task k) tasks_map)) }
 
   let eval s k =
     let path =

@@ -9,7 +9,7 @@ module type S = sig
     (unit, [> `Forbidden ]) result Abb.Future.t
 end
 
-module Make (S : S with type Account_id.t = int) : sig
+module Make (_ : S with type Account_id.t = int) : sig
   module Work_manifests : sig
     module Outputs : sig
       val get :

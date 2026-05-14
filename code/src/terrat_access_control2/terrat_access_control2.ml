@@ -56,6 +56,7 @@ module Make (S : S) = struct
       repo : S.repo;
       user : string;
     }
+    [@@warning "-69"]
 
     let make ~request_id ~client ~config ~repo ~user () = { request_id; client; config; repo; user }
     let set_user user t = { t with user }

@@ -53,6 +53,7 @@ type t = {
   headers : (string * string) list;
   call_timeout : float option;
 }
+[@@warning "-69"]
 
 let create ?(user_agent = "Githubc2_abb") ?(base_url = base_url) ?call_timeout auth =
   let base_url =

@@ -108,7 +108,7 @@ module Make (M : M with type db = Pgsql_io.t) = struct
     | { Tcm.Stack_config.paths; _ } :: _ -> CCList.hd @@ CCList.hd paths
 
   let inner_stacks dirspace_configs =
-    CCList.map (fun { Tcm.Stack_config.name; paths; config } ->
+    CCList.map (fun { Tcm.Stack_config.name; paths; config = _ } ->
         let module Tac = Terrat_api_components in
         {
           Tac.Stack_inner.name;
@@ -197,7 +197,7 @@ module Make (M : M with type db = Pgsql_io.t) = struct
         (fun {
                Tac.Stack_inner.Dirspaces.Items.dirspace =
                  { Tac.Dirspace.dir; workspace } as dirspace;
-               state;
+               state = _;
              }
            ->
           {
@@ -248,7 +248,7 @@ module Make (M : M with type db = Pgsql_io.t) = struct
   let enforce_installation_access user installation_id db ctx =
     M.enforce_installation_access ~request_id:(Brtl_ctx.token ctx) user installation_id db
 
-  let get config storage installation_id repo_id pull_request_id =
+  let get _config storage installation_id repo_id pull_request_id =
     Brtl_ep.run_result_json ~f:(fun ctx ->
         let open Abbs_future_combinators.Infix_result_monad in
         Terrat_session.with_session ctx

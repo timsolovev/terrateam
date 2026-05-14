@@ -393,9 +393,9 @@ struct
     fetch Keys.repo
     >>= fun repo ->
     fetch Keys.initiator
-    >>= fun initiator ->
+    >>= fun _initiator ->
     fetch Keys.target
-    >>= fun target ->
+    >>= fun _target ->
     fetch Keys.repo_config
     >>= fun repo_config ->
     fetch Keys.matches
@@ -552,7 +552,7 @@ struct
       fetch Keys.repo
       >>= fun repo ->
       fetch Keys.client
-      >>= fun client ->
+      >>= fun _client ->
       fetch Keys.branch_ref
       >>= fun branch_ref ->
       fetch Keys.create_commit_checks
@@ -570,7 +570,7 @@ struct
       >>= fun () ->
       Abb.Future.return (Ok ())
       >>= fun () ->
-      let { Wm.base_ref; branch_ref; changes; target; _ } = work_manifest in
+      let { Wm.base_ref = _; branch_ref = _; changes; target; _ } = work_manifest in
       let run_kind =
         match target with
         | P2.Target.Pr pr -> `Pull_request pr
@@ -641,7 +641,7 @@ struct
       fetch Keys.repo
       >>= fun repo ->
       fetch Keys.client
-      >>= fun client ->
+      >>= fun _client ->
       fetch Keys.branch_ref
       >>= fun branch_ref ->
       fetch Keys.create_commit_checks
@@ -662,7 +662,7 @@ struct
       match result with
       | Wmr.Work_manifest_tf_operation_result2 result ->
           fetch Keys.client
-          >>= fun client ->
+          >>= fun _client ->
           fetch Keys.matches
           >>= fun matches ->
           let work_manifest_result = S.Work_manifest.result2 result in
@@ -710,7 +710,7 @@ struct
                 (fetch Keys.client)
                 (fetch Keys.repo_config_with_provenance)
                 (fetch Keys.repo_tree_branch)
-              >>= fun (client, (provenance, repo_config), repo_tree) ->
+              >>= fun (_client, (_provenance, repo_config), repo_tree) ->
               fetch Keys.dest_branch_name
               >>= fun dest_branch_name ->
               fetch Keys.branch_name
@@ -839,7 +839,7 @@ struct
       && branch_ref = S.Api.Ref.to_string branch_ref'
       && steps = [ Wm.Step.Apply ]
 
-    let maybe_comment_autoapply_running s { Bs.Fetcher.fetch } =
+    let maybe_comment_autoapply_running _s { Bs.Fetcher.fetch } =
       let module Tjc = Terrat_job_context in
       let open Irm in
       fetch Keys.context
@@ -872,7 +872,7 @@ struct
       fetch Keys.repo
       >>= fun repo ->
       fetch Keys.client
-      >>= fun client ->
+      >>= fun _client ->
       fetch Keys.branch_ref
       >>= fun branch_ref ->
       fetch Keys.create_commit_checks
@@ -888,7 +888,7 @@ struct
         "Running"
         Status.Running
       >>= fun () ->
-      let { Wm.base_ref; branch_ref; changes; target; _ } = work_manifest in
+      let { Wm.base_ref = _; branch_ref = _; changes; target; _ } = work_manifest in
       let run_kind =
         match target with
         | P2.Target.Pr pr -> `Pull_request pr

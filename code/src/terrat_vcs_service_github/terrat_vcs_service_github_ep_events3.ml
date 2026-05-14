@@ -159,7 +159,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
         | Ok () -> f ()
         | Error _ as err -> Abb.Future.return err)
 
-  let process_installation request_id config storage = function
+  let process_installation _request_id config storage = function
     | Gw.Installation_event.Installation_created created ->
         let open Abbs_future_combinators.Infix_result_monad in
         Prmths.Counter.inc_one (Metrics.installation_events_total "created");
@@ -783,7 +783,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
         Abb.Future.return
           (Brtl_ctx.set_response (Brtl_rspnc.create ~status:`Internal_server_error "") ctx)
 
-  let process_event_handler config storage ctx f =
+  let process_event_handler _config _storage ctx f =
     let open Abb.Future.Infix_monad in
     f ()
     >>= function

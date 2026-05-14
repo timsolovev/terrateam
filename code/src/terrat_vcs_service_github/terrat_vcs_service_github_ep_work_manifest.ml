@@ -83,7 +83,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
   end
 
   module Plans = struct
-    let post config storage work_manifest_id plan =
+    let post _config storage work_manifest_id plan =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           (* TODO: Uncomment once all runs are on new work manifest access tokens *)
@@ -118,7 +118,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
           | Error `Error ->
               Abb.Future.return (Error (Brtl_ctx.set_response `Internal_server_error ctx)))
 
-    let get config storage work_manifest_id dir workspace =
+    let get _config storage work_manifest_id dir workspace =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           (* TODO: Uncomment once all runs are on new work manifest access tokens *)
@@ -323,7 +323,7 @@ module Make (P : Terrat_vcs_provider2_github.S) = struct
           /% Var.uuid "id")
     end
 
-    let get config storage work_manifest_id =
+    let get _config storage work_manifest_id =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           (* TODO: Uncomment once all runs are on new work manifest access tokens *)

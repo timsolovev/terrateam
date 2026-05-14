@@ -1,6 +1,6 @@
 module Make
     (S : Terrat_vcs_provider2.S)
-    (Keys : module type of Terrat_vcs_event_evaluator2_targets.Make (S)) : sig
+    (_ : module type of Terrat_vcs_event_evaluator2_targets.Make (S)) : sig
   module Builder : module type of Terrat_vcs_event_evaluator2_builder.Make (S)
 
   type existing_wm =

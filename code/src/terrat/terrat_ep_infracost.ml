@@ -51,7 +51,7 @@ let api_call = Exec.create ~slots:10 (fun f -> f ())
 let api_call_timeout = Duration.to_f (Duration.of_sec 10)
 let header_replace k v h = Cohttp.Header.replace h k v
 
-let post' config storage api_key infracost_uri path ctx =
+let post' _config storage api_key infracost_uri path ctx =
   let open Abb.Future.Infix_monad in
   let request = Brtl_ctx.request ctx in
   let request_id = Brtl_ctx.token ctx in

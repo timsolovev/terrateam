@@ -140,7 +140,7 @@ module Bearer = struct
         Logs.err (fun m -> m "%a" Terrat_user.Token.pp_of_token_err err);
         Abb.Future.return None
 
-  let store storage keys _ = raise (Failure "nyi")
+  let store _storage _keys _ = raise (Failure "nyi")
 end
 
 module Sql = struct

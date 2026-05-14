@@ -651,7 +651,7 @@ module Make (S : Terrat_vcs_provider2.S) = struct
     in
     let add_work_manifest_keys work_manifest store =
       let module Wm = Terrat_work_manifest3 in
-      let { Wm.id; account; target; _ } = work_manifest in
+      let { Wm.id = _; account; target; _ } = work_manifest in
       match target with
       | Terrat_vcs_provider2.Target.Pr pr ->
           store

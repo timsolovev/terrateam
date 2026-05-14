@@ -112,7 +112,7 @@ let match_plan_after_dependency ~dependent ~dependency =
    "modified_by" configuration. *)
 let rec collect_depends_on_dependents topology dirspaces matches =
   CCList.flat_map
-    (fun ({ Dirspace_config.dirspace; stack_name; _ } as dirspace_config) ->
+    (fun ({ Dirspace_config.dirspace; stack_name = _; _ } as dirspace_config) ->
       dirspace_config
       :: collect_depends_on_dependents
            topology
@@ -132,7 +132,7 @@ let rec collect_modified_by_dependents ~path modifies_lookup dirspaces matches =
   let module S = R.Stacks.Stack in
   let module Rules = R.Stacks.Rules in
   CCList.flat_map
-    (fun ({ Dirspace_config.dirspace; stack_name; _ } as dirspace_config) ->
+    (fun ({ Dirspace_config.dirspace = _; stack_name; _ } as dirspace_config) ->
       if not (CCList.mem ~eq:CCString.equal stack_name path) then
         dirspace_config
         :: collect_modified_by_dependents
@@ -422,7 +422,7 @@ let build_modifies_lookup dirspace_configs =
     ~f:(fun
         acc
         ({
-           Dirspace_config.stack_name;
+           Dirspace_config.stack_name = _;
            stack_config = { S.Stack.rules = { S.Rules.modified_by; _ }; _ };
            _;
          } as dc)
@@ -697,7 +697,7 @@ let files_of_diff = function
 let match_dir_map dirspaces dir_map =
   snd
     (Sln_map.String.fold
-       (fun _ files ((dirspaces, matches) as acc) ->
+       (fun _ files ((dirspaces, _matches) as acc) ->
          Dirspace_map.fold
            (fun dirspace
                 ({ Dirspace_config.file_pattern_matcher; _ } as dirspace_config)

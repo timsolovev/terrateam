@@ -54,7 +54,7 @@ struct
 
   let add_work_manifest_keys work_manifest store =
     let module Wm = Terrat_work_manifest3 in
-    let { Wm.id; account; target; _ } = work_manifest in
+    let { Wm.id = _; account; target; _ } = work_manifest in
     match target with
     | Terrat_vcs_provider2.Target.Pr pr ->
         store
@@ -177,7 +177,7 @@ struct
         ~repo_tree
         ~repo_config_raw
         s
-        { Bs.Fetcher.fetch } =
+        { Bs.Fetcher.fetch = _ } =
       let open Irm in
       Builder.run_db s ~f:(load ~cache_key)
       >>= function
@@ -255,7 +255,7 @@ struct
       | Error #Builder.err as err -> Abb.Future.return err
 
     let target =
-      run ~name:"target" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"target" (fun _s { Bs.Fetcher.fetch } ->
           let module C = Terrat_job_context.Context in
           let open Irm in
           fetch Keys.context
@@ -277,7 +277,7 @@ struct
                    (Terrat_vcs_provider2.Target.Drift { repo; branch = S.Api.Ref.to_string branch })))
 
     let initiator =
-      run ~name:"initiator" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"initiator" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.job
           >>= function
@@ -288,7 +288,7 @@ struct
               Abb.Future.return (Ok Terrat_work_manifest3.Initiator.System))
 
     let user =
-      run ~name:"user" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"user" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.job >>= fun { Tjc.Job.initiator; _ } -> Abb.Future.return (Ok initiator))
 
@@ -303,7 +303,7 @@ struct
     let commit_checks = run ~name:"commit_checks" (fun _s _ -> Abb.Future.return (Ok []))
 
     let context_id =
-      run ~name:"context_id" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"context_id" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.job >>= fun job -> Abb.Future.return (Ok job.Tjc.Job.context.Tjc.Context.id))
 
@@ -323,7 +323,7 @@ struct
           | None -> assert false)
 
     let work_manifest_event =
-      run ~name:"work_manifest_event" (fun _s { Bs.Fetcher.fetch } ->
+      run ~name:"work_manifest_event" (fun _s { Bs.Fetcher.fetch = _ } ->
           (* This is a default value in case no work manifest event is set in the store
              by the runner. *)
           Abb.Future.return (Ok None))
@@ -386,13 +386,13 @@ struct
     let matches =
       run ~name:"matches" (fun s { Bs.Fetcher.fetch } ->
           let compute_matches
-              ~repo_config
+              ~repo_config:_
               ~tag_query
               ~out_of_change_applies
               ~applied_dirspaces
               ~diff
               ~repo_tree
-              ~index
+              ~index:_
               () =
             let module Dc = Terrat_change_match3.Dirspace_config in
             let module Dir_set = CCSet.Make (CCString) in
@@ -550,15 +550,15 @@ struct
               (fetch Keys.repo_config)
               (fetch Keys.repo_tree_branch)
               (fetch Keys.repo_index_branch)
-            >>= fun (repo_config, repo_tree, repo_index) ->
+            >>= fun (_repo_config, repo_tree, _repo_index) ->
             fetch Keys.out_of_change_applies
             >>= fun out_of_change_applies ->
             fetch Keys.applied_dirspaces
             >>= fun applied_dirspaces ->
             fetch Keys.dest_branch_name
-            >>= fun dest_branch_name ->
+            >>= fun _dest_branch_name ->
             fetch Keys.branch_name
-            >>= fun branch_name ->
+            >>= fun _branch_name ->
             fetch Keys.job
             >>= fun job ->
             let tag_query =
@@ -707,34 +707,34 @@ struct
           Abb.Future.return (Ok matches))
 
     let working_set_matches =
-      run ~name:"working_set_matches" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"working_set_matches" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.matches
           >>= fun { Keys.Matches.working_set_matches; _ } ->
           Abb.Future.return (Ok working_set_matches))
 
     let all_matches =
-      run ~name:"all_matches" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"all_matches" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.matches
           >>= fun { Keys.Matches.all_matches; _ } -> Abb.Future.return (Ok all_matches))
 
     let all_unapplied_matches =
-      run ~name:"all_unapplied_matches" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"all_unapplied_matches" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.matches
           >>= fun { Keys.Matches.all_unapplied_matches; _ } ->
           Abb.Future.return (Ok all_unapplied_matches))
 
     let all_tag_query_matches =
-      run ~name:"all_tag_query_matches" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"all_tag_query_matches" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.matches
           >>= fun { Keys.Matches.all_tag_query_matches; _ } ->
           Abb.Future.return (Ok all_tag_query_matches))
 
     let working_layer =
-      run ~name:"working_layer" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"working_layer" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.matches
           >>= fun { Keys.Matches.working_layer; _ } -> Abb.Future.return (Ok working_layer))
@@ -1304,17 +1304,17 @@ struct
           >>= fun repo_config -> Abb.Future.return (Ok (provenance, repo_config)))
 
     let repo_config_with_provenance =
-      run ~name:"repo_config_with_provenance" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_config_with_provenance" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.derived_repo_config
           >>= fun repo_config ->
           fetch Keys.synthesized_config >>= fun _ -> Abb.Future.return (Ok repo_config))
 
     let synthesized_config_empty_index =
-      run ~name:"synthesized_config_empty_index" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"synthesized_config_empty_index" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_tree_branch
-          >>= fun repo_tree ->
+          >>= fun _repo_tree ->
           fetch Keys.derived_repo_config_empty_index
           >>= fun (_provenance, repo_config) ->
           match
@@ -1327,10 +1327,10 @@ struct
               Abb.Future.return (Error err))
 
     let synthesized_config =
-      run ~name:"synthesized_config" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"synthesized_config" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_tree_branch
-          >>= fun repo_tree ->
+          >>= fun _repo_tree ->
           fetch Keys.repo_index_branch
           >>= fun index ->
           fetch Keys.derived_repo_config
@@ -1341,7 +1341,7 @@ struct
               Abb.Future.return (Error err))
 
     let repo_config =
-      run ~name:"repo_config" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_config" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_config_with_provenance
           >>= fun (_, repo_config) -> Abb.Future.return (Ok repo_config))
@@ -1476,17 +1476,17 @@ struct
           >>= fun repo_config -> Abb.Future.return (Ok (provenance, repo_config)))
 
     let repo_config_dest_branch_with_provenance =
-      run ~name:"repo_config_dest_branch_with_provenance" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_config_dest_branch_with_provenance" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.derived_repo_config_dest_branch
           >>= fun repo_config ->
           fetch Keys.synthesized_config_dest_branch >>= fun _ -> Abb.Future.return (Ok repo_config))
 
     let synthesized_config_dest_branch_empty_index =
-      run ~name:"synthesized_config_dest_branch_empty_index" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"synthesized_config_dest_branch_empty_index" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_tree_dest_branch
-          >>= fun repo_tree ->
+          >>= fun _repo_tree ->
           fetch Keys.derived_repo_config_dest_branch_empty_index
           >>= fun (_provenance, repo_config) ->
           match
@@ -1499,10 +1499,10 @@ struct
               Abb.Future.return (Error err))
 
     let synthesized_config_dest_branch =
-      run ~name:"synthesized_config_dest_branch" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"synthesized_config_dest_branch" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_tree_dest_branch
-          >>= fun repo_tree ->
+          >>= fun _repo_tree ->
           fetch Keys.repo_index_dest_branch
           >>= fun index ->
           fetch Keys.derived_repo_config_dest_branch
@@ -1513,7 +1513,7 @@ struct
               Abb.Future.return (Error err))
 
     let repo_config_dest_branch =
-      run ~name:"repo_config_dest_branch" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_config_dest_branch" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.repo_config_dest_branch_with_provenance
           >>= fun (_, repo_config) -> Abb.Future.return (Ok repo_config))
@@ -1539,14 +1539,14 @@ struct
           fetch Keys.working_branch_ref
           >>= fun working_branch_ref ->
           fetch Keys.dest_branch_ref
-          >>= fun dest_branch_ref ->
+          >>= fun _dest_branch_ref ->
           fetch Keys.branch_ref
-          >>= fun branch_ref ->
+          >>= fun _branch_ref ->
           Fc.Result.all3
             (fetch Keys.repo_config_raw)
             (fetch Keys.repo_tree_branch)
             (fetch Keys.synthesized_config_empty_index)
-          >>= fun ((_, repo_config_raw), repo_tree, config) ->
+          >>= fun ((_, _repo_config_raw), repo_tree, config) ->
           Abbs_time_it.run
             (fun t -> Logs.info (fun m -> m "%s : MATCH_DIFF_LIST : time=%f" (Builder.log_id s) t))
             (fun () ->
@@ -1584,7 +1584,7 @@ struct
                     (Error (`Msg_err "MISSING_REPO_CONFIG_INDEX_DESPITE_WM_COMPLETED"))))
 
     let repo_index_branch =
-      run ~name:"repo_index_branch" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_index_branch" (fun _s { Bs.Fetcher.fetch } ->
           let module V1 = Terrat_base_repo_config_v1 in
           let open Irm in
           fetch Keys.dest_branch_name
@@ -1631,7 +1631,7 @@ struct
             (fetch Keys.repo_config_dest_branch_raw)
             (fetch Keys.repo_tree_dest_branch)
             (fetch Keys.synthesized_config_empty_index)
-          >>= fun ((_, repo_config_raw), repo_tree, config) ->
+          >>= fun ((_, _repo_config_raw), repo_tree, config) ->
           Abbs_time_it.run
             (fun t -> Logs.info (fun m -> m "%s : MATCH_DIFF_LIST : time=%f" (Builder.log_id s) t))
             (fun () ->
@@ -1669,7 +1669,7 @@ struct
                   Abb.Future.return (Error `Error)))
 
     let repo_index_dest_branch =
-      run ~name:"repo_index_dest_branch" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"repo_index_dest_branch" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           let module V1 = Terrat_base_repo_config_v1 in
           fetch Keys.repo_config_dest_branch_raw
@@ -1975,7 +1975,7 @@ struct
               >>= fun () -> Abb.Future.return (Error `Noop))
 
     let publish_dest_branch_no_match =
-      run ~name:"publish_dest_branch_no_match" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"publish_dest_branch_no_match" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
@@ -2194,7 +2194,7 @@ struct
           let open Abb.Future.Infix_monad in
           Tf_op_wm.Plan.run ~dest_branch_ref ~branch_ref ~branch ~name:"plan_wm" s fetcher
           >>= function
-          | Ok wms -> maybe_finalize_when_all_applied s fetcher
+          | Ok _wms -> maybe_finalize_when_all_applied s fetcher
           | Error (#Str_template.err as err) ->
               let open Irm in
               fetch Keys.publish_comment
@@ -2211,7 +2211,7 @@ struct
           fetch Keys.working_branch_name
           >>= fun branch ->
           Tf_op_wm.Apply.run ~dest_branch_ref ~branch_ref ~branch ~name:"apply_wm" s fetcher
-          >>= fun wms -> maybe_finalize_when_all_applied s fetcher)
+          >>= fun _wms -> maybe_finalize_when_all_applied s fetcher)
 
     let maybe_complete_job =
       run ~name:"maybe_complete_job" (fun s { Bs.Fetcher.fetch } ->
@@ -2374,7 +2374,7 @@ struct
         let open Irm in
         time_it
           s
-          (fun m log_id time ->
+          (fun m log_id _time ->
             m
               "%s : WM : UPDATE_STATE : work_manifest_id = %a : run_id = %s : state = aborted"
               log_id
@@ -2846,7 +2846,7 @@ struct
           fetch Keys.job >>= fun job -> H.complete_job s job @@ run)
 
     let run_missing_drift_schedules =
-      run ~name:"run_missing_drift_schedules" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"run_missing_drift_schedules" (fun s { Bs.Fetcher.fetch = _ } ->
           let open Irm in
           Builder.run_db s ~f:(fun db ->
               time_it
@@ -3042,7 +3042,7 @@ struct
           | _ -> Abb.Future.return (Ok ()))
 
     let finalize_unfinished_terrateam_checks =
-      run ~name:"finalize_unfinished_terrateam_checks" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"finalize_unfinished_terrateam_checks" (fun _s { Bs.Fetcher.fetch } ->
           let module Ch = Terrat_commit_check in
           let module Status = Ch.Status in
           let open Irm in

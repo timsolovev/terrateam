@@ -46,7 +46,7 @@ module Make (P : Terrat_vcs_provider2.S) (S : S) = struct
 
   module List = struct
     (* Not implementing pagination now, but the API is designed for it. *)
-    let run config storage _page _limit =
+    let run _config storage _page _limit =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Terrat_user.Capability.Access_token_create ] ctx
@@ -85,7 +85,7 @@ module Make (P : Terrat_vcs_provider2.S) (S : S) = struct
   end
 
   module Create = struct
-    let run config storage body =
+    let run _config storage body =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let module C = Terrat_api_components.Access_token_create in
           let open Abbs_future_combinators.Infix_result_monad in
@@ -161,7 +161,7 @@ module Make (P : Terrat_vcs_provider2.S) (S : S) = struct
   end
 
   module Delete = struct
-    let run config storage access_token_id =
+    let run _config storage access_token_id =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ~caps:[ Terrat_user.Capability.Access_token_create ] ctx

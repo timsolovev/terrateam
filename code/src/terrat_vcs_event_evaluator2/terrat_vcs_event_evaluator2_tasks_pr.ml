@@ -336,7 +336,7 @@ struct
           fetch Keys.client
           >>= fun client ->
           fetch Keys.pull_request
-          >>= fun pull_request ->
+          >>= fun _pull_request ->
           fetch Keys.repo
           >>= fun repo ->
           Abb.Future.return
@@ -369,28 +369,28 @@ struct
           S.Api.fetch_commit_checks ~request_id:(Builder.log_id s) client repo branch_ref)
 
     let branch_name =
-      run ~name:"branch_name" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"branch_name" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
           Abb.Future.return (Ok (S.Api.Pull_request.branch_name pull_request)))
 
     let branch_ref =
-      run ~name:"branch_ref" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"branch_ref" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
           Abb.Future.return (Ok (S.Api.Pull_request.branch_ref pull_request)))
 
     let dest_branch_name =
-      run ~name:"dest_branch_name" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"dest_branch_name" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
           Abb.Future.return (Ok (S.Api.Pull_request.base_branch_name pull_request)))
 
     let dest_branch_ref =
-      run ~name:"dest_branch_ref" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"dest_branch_ref" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request -> Abb.Future.return (Ok (S.Api.Pull_request.base_ref pull_request)))
@@ -425,7 +425,7 @@ struct
           | None -> Abb.Future.return (Error `Error))
 
     let working_branch_ref =
-      run ~name:"working_branch_ref" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"working_branch_ref" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
@@ -435,7 +435,7 @@ struct
           | Terrat_pull_request.State.Merged _ -> fetch Keys.working_dest_branch_ref)
 
     let working_branch_name =
-      run ~name:"working_branch_name" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"working_branch_name" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.pull_request
           >>= fun pull_request ->
@@ -558,7 +558,7 @@ struct
                         | None -> Error (`Invalid_unlock_id s)))
                   unlock_ids
           in
-          let run client pull_request unlock_ids =
+          let run _client _pull_request unlock_ids =
             let open Irm in
             fetch Keys.repo
             >>= fun repo ->
@@ -600,7 +600,7 @@ struct
           | _ -> assert false)
 
     let publish_repo_config =
-      run ~name:"publish_repo_config" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"publish_repo_config" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.all2 (fetch Keys.repo_config_with_provenance) (fetch Keys.store_stacks)
           >>= fun (repo_config_with_provenance, ()) ->
@@ -609,13 +609,13 @@ struct
           publish_comment' publish_comment (Msg.Repo_config repo_config_with_provenance))
 
     let publish_help =
-      run ~name:"publish_help" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"publish_help" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.publish_comment
           >>= fun publish_comment -> publish_comment' publish_comment Msg.Help)
 
     let comment_id =
-      run ~name:"comment_id" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"comment_id" (fun _s { Bs.Fetcher.fetch = _ } ->
           (* This is a default value in case no comment id is set in the store
              by the runner. *)
           Abb.Future.return (Ok None))
@@ -798,7 +798,7 @@ struct
           >>= fun pull_request -> fetch_pull_request_reviews s client repo pull_request)
 
     let access_control_eval_plan =
-      run ~name:"access_control_eval_plan" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"access_control_eval_plan" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.access_control
           >>= fun access_control ->
@@ -809,7 +809,7 @@ struct
           >>= fun ret -> Abb.Future.return (Ok ret))
 
     let access_control_eval_apply =
-      run ~name:"access_control_eval_apply" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"access_control_eval_apply" (fun _s { Bs.Fetcher.fetch } ->
           let module Rr = Terrat_pull_request_review in
           let open Irm in
           fetch Keys.access_control
@@ -817,9 +817,9 @@ struct
           fetch Keys.working_set_matches
           >>= fun working_set_matches ->
           fetch Keys.client
-          >>= fun client ->
+          >>= fun _client ->
           fetch Keys.repo
-          >>= fun repo ->
+          >>= fun _repo ->
           fetch Keys.pull_request_reviews
           >>= fun reviews ->
           let reviews =
@@ -847,7 +847,7 @@ struct
           >>= fun ret -> Abb.Future.return (Ok ret))
 
     let check_access_control_plan =
-      run ~name:"check_access_control_plan" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_access_control_plan" (fun _s { Bs.Fetcher.fetch } ->
           let module R = Terrat_access_control2.R in
           let open Irm in
           fetch Keys.access_control
@@ -863,7 +863,7 @@ struct
                 (Msg.Access_control_denied
                    ( S.Api.Ref.to_string access_control.Keys.Access_control_engine.policy_branch,
                      `All_dirspaces deny ))
-          | Ok { R.pass; deny }
+          | Ok { R.pass = _; deny }
             when CCList.is_empty deny
                  || not (Access_control.plan_require_all_dirspace_access access_control) ->
               Abb.Future.return (Ok ())
@@ -931,13 +931,13 @@ struct
           | None -> assert false)
 
     let check_access_control_apply =
-      run ~name:"check_access_control_apply" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_access_control_apply" (fun _s { Bs.Fetcher.fetch } ->
           let module R = Terrat_access_control2.R in
           let open Irm in
           fetch Keys.job
-          >>= fun job ->
+          >>= fun _job ->
           fetch Keys.check_apply_requirements
-          >>= fun apply_requirements ->
+          >>= fun _apply_requirements ->
           Fc.Result.all6
             (fetch Keys.access_control)
             (fetch Keys.matches)
@@ -945,7 +945,7 @@ struct
             (fetch Keys.pull_request)
             (fetch Keys.access_control_eval_apply)
             (fetch Keys.user)
-          >>= fun (access_control, matches, client, pull_request, access_control_result, user) ->
+          >>= fun (access_control, _matches, _client, _pull_request, access_control_result, _user) ->
           Abb.Future.return
             (access_control_result
               : (R.t, Terrat_access_control2.err) result
@@ -962,7 +962,7 @@ struct
                    ( S.Api.Ref.to_string access_control.Keys.Access_control_engine.policy_branch,
                      `All_dirspaces deny ))
               >>= fun () -> Abb.Future.return (Error `Noop)
-          | { Terrat_access_control2.R.pass; deny }
+          | { Terrat_access_control2.R.pass = _; deny }
             when CCList.is_empty deny
                  || not (Access_control.apply_require_all_dirspace_access access_control) ->
               (* This is the success path *)
@@ -982,7 +982,7 @@ struct
           let module R = Terrat_access_control2.R in
           let open Irm in
           fetch Keys.pull_request
-          >>= fun pull_request ->
+          >>= fun _pull_request ->
           fetch Keys.access_control_eval_apply
           >>= fun access_control_eval ->
           Abb.Future.return
@@ -1079,7 +1079,7 @@ struct
                   fetch Keys.account
                   >>= fun account ->
                   fetch Keys.client
-                  >>= fun client ->
+                  >>= fun _client ->
                   fetch Keys.working_branch_ref
                   >>= fun working_branch_ref ->
                   let checks =
@@ -1099,7 +1099,7 @@ struct
           | _ -> Abb.Future.return (Ok ()))
 
     let check_dirspaces_to_apply =
-      run ~name:"check_dirspaces_to_apply" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_dirspaces_to_apply" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.job
           >>= function
@@ -1162,7 +1162,7 @@ struct
               >>= fun () -> Abb.Future.return (Error `Noop))
 
     let check_access_control_repo_config =
-      run ~name:"check_access_control_repo_config" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_access_control_repo_config" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.all2 (fetch Keys.access_control) (fetch Keys.changes)
           >>= fun (access_control, diff) ->
@@ -1192,7 +1192,7 @@ struct
               >>= fun () -> Abb.Future.return (Error `Noop))
 
     let check_access_control_files =
-      run ~name:"check_access_control_files" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_access_control_files" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.all2 (fetch Keys.access_control) (fetch Keys.changes)
           >>= fun (access_control, diff) ->
@@ -1222,7 +1222,7 @@ struct
               >>= fun () -> Abb.Future.return (Error `Noop))
 
     let check_access_control_ci_change =
-      run ~name:"check_access_control_ci_change" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"check_access_control_ci_change" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.all2 (fetch Keys.access_control) (fetch Keys.changes)
           >>= fun (access_control, diff) ->
@@ -1265,7 +1265,7 @@ struct
           Builder.run_db s ~f:(fun db -> store_stacks s db account repo pull_request config))
 
     let can_run_plan =
-      run ~name:"can_run_plan" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"can_run_plan" (fun _s { Bs.Fetcher.fetch } ->
           let maybe_publish_msg msg =
             let open Irm in
             fetch Keys.publish_comment
@@ -1552,7 +1552,7 @@ struct
                 fetch Keys.client
                 >>= fun client ->
                 fetch Keys.user
-                >>= fun user ->
+                >>= fun _user ->
                 fetch Keys.pull_request
                 >>= fun pull_request ->
                 let open Abb.Future.Infix_monad in

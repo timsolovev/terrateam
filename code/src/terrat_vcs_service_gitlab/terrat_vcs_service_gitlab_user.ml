@@ -88,7 +88,7 @@ module Oauth = struct
         match Response.of_yojson (Yojson.Safe.from_string body) with
         | Ok value -> Ok value
         | Error _ -> Error (`Authorize_err body))
-    | Ok (resp, body) -> Error (`Authorize_err body)
+    | Ok (_resp, body) -> Error (`Authorize_err body)
     | Error err -> Error err
 
   let refresh ~config refresh_token =
@@ -121,7 +121,7 @@ module Oauth = struct
         match Response.of_yojson (Yojson.Safe.from_string body) with
         | Ok value -> Ok value
         | Error err -> Error (`Refresh_err err))
-    | Ok (resp, body) -> Error (`Refresh_err body)
+    | Ok (_resp, body) -> Error (`Refresh_err body)
     | Error err -> Error err
 
   let access_token ~config db user =

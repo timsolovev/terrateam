@@ -14,7 +14,7 @@ end
 
 module Make
     (P : Terrat_vcs_provider2.S)
-    (S : S with type Installation_id.t = P.Api.Account.Id.t) : sig
+    (_ : S with type Installation_id.t = P.Api.Account.Id.t) : sig
   val routes :
     P.Api.Config.t ->
     Terrat_storage.t ->

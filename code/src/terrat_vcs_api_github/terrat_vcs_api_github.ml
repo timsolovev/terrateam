@@ -381,7 +381,7 @@ let create_client' config { Account.installation_id } =
   let github_client = Terrat_github.create config.Config.github (`Token access_token) in
   Abb.Future.return (Ok github_client)
 
-let create_client ~request_id config account db =
+let create_client ~request_id config account _db =
   let open Abb.Future.Infix_monad in
   let fetch () =
     create_client' config account
@@ -524,7 +524,7 @@ let fetch_diff ~client ~owner ~repo pull_number =
   let diff = diff_of_github_diff github_diff in
   Abb.Future.return (Ok diff)
 
-let fetch_pull_request' request_id account client repo pull_request_id =
+let fetch_pull_request' request_id _account client repo pull_request_id =
   let owner = repo.Repo.owner in
   let repo_name = repo.Repo.name in
   let open Abbs_future_combinators.Infix_result_monad in

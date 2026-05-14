@@ -33,7 +33,7 @@ struct
     | [], _ :: _ -> true
     | _, [] -> false
 
-  let is_key_prefix = is_prefix ~eq:(fun a b -> 0 = Key.compare a b)
+  let _is_key_prefix = is_prefix ~eq:(fun a b -> 0 = Key.compare a b)
 
   module Task = struct
     type t = Task : (Name.t * (unit -> 'a Fut.t) * 'a Fut.Promise.t * float) -> t
@@ -184,7 +184,7 @@ struct
           maybe_exec_task w t
           >>= fun t ->
           CCOption.iter
-            (fun { Logger.running_tasks = log; exec_task; _ } ->
+            (fun { Logger.running_tasks = log; exec_task = _; _ } ->
               log (Name_map.cardinal t.running_tasks))
             t.logger;
           CCOption.iter

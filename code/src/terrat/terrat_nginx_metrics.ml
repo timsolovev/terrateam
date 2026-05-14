@@ -86,7 +86,7 @@ let rec start uri =
   | Ok (resp, body) when Http.Response.status resp = `OK ->
       parse_and_update_metrics body;
       start uri
-  | Ok (resp, _) ->
+  | Ok (_resp, _) ->
       Logs.err (fun m -> m "NGINX_METRICS : FAILED");
       start uri
   | Error (#Cohttp_abb.request_err as err) ->

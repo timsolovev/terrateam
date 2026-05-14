@@ -85,7 +85,7 @@ let tenv_cache =
                  if not (Sys.file_exists body_path) then None else Some v));
     }
 
-let get config storage _origin work_manifest_id path ctx =
+let get _config storage _origin work_manifest_id path ctx =
   let open Abb.Future.Infix_monad in
   Pgsql_pool.with_conn storage ~f:(fun db ->
       Pgsql_io.Prepared_stmt.fetch db Sql.validate_work_manifest ~f:CCFun.id work_manifest_id)

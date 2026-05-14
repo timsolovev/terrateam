@@ -210,7 +210,7 @@ struct
     fetch Keys.repo
     >>= fun repo ->
     fetch Keys.client
-    >>= fun client ->
+    >>= fun _client ->
     fetch Keys.branch_ref
     >>= fun branch_ref ->
     fetch Keys.branch_name

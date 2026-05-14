@@ -30,7 +30,7 @@ struct
     let run = Tasks_base.run
 
     let branch_name =
-      run ~name:"branch_name" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"branch_name" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.context
           >>= function
@@ -69,7 +69,7 @@ struct
        care if the dest branch adn the branch name are the same, it just checks
        there and does the right thing. *)
     let dest_branch_name =
-      run ~name:"dest_branch_name" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"dest_branch_name" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           fetch Keys.context
           >>= function
@@ -159,7 +159,7 @@ struct
           Abb.Future.return (Ok (fun matches -> Abb.Future.return (Ok matches))))
 
     let is_draft_pr =
-      run ~name:"is_draft_pr" (fun s { Bs.Fetcher.fetch } -> Abb.Future.return (Ok false))
+      run ~name:"is_draft_pr" (fun _s { Bs.Fetcher.fetch = _ } -> Abb.Future.return (Ok false))
 
     let check_conflicting_apply_work_manifests =
       run ~name:"check_conflicting_apply_work_manifests" (fun s { Bs.Fetcher.fetch } ->
@@ -196,13 +196,13 @@ struct
           | Some (P2.Conflicting_work_manifests.Maybe_stale _) -> Abb.Future.return (Error `Noop))
 
     let can_run_plan =
-      run ~name:"can_run_plan" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"can_run_plan" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.all2 (fetch Keys.branch_dirspaces) (fetch Keys.dest_branch_dirspaces)
           >>= fun (_, _) -> Abb.Future.return (Ok ()))
 
     let can_run_apply =
-      run ~name:"can_run_apply" (fun s { Bs.Fetcher.fetch } ->
+      run ~name:"can_run_apply" (fun _s { Bs.Fetcher.fetch } ->
           let open Irm in
           Fc.Result.ignore
           @@ Fc.Result.all3
