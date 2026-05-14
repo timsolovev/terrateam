@@ -90,7 +90,7 @@ struct
     eval' access_control change_matches (fun { P.apply_with_superapproval; _ } ->
         apply_with_superapproval)
     >>= function
-    | { Terrat_access_control2.R.pass = _ :: _ as pass; deny } ->
+    | { Terrat_access_control2.R.pass = _ :: _ as pass; deny = _ } ->
         (* Now, of those that passed, let's see if any have been approved by a
              super approver.  To do this we'll iterate over the approvers. *)
         let pass_with_superapproval =

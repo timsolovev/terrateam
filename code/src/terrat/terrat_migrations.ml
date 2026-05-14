@@ -74,7 +74,7 @@ end
 
 module Mig = Data_mig.Make (Migrate)
 
-let run_sql ?(mode = `Tx) sql_contents { Migrate.config; storage; tx = db } =
+let run_sql ?(mode = `Tx) sql_contents { Migrate.config = _; storage; tx = db } =
   let conn ~f =
     let open Abbs_future_combinators.Infix_result_monad in
     match mode with
@@ -101,7 +101,7 @@ let run_sql ?(mode = `Tx) sql_contents { Migrate.config; storage; tx = db } =
           Prepared_stmt.execute db stmt_sql)
         stmts)
 
-let add_encryption_key { Migrate.config; storage = _; tx = db } =
+let add_encryption_key { Migrate.config = _; storage = _; tx = db } =
   let open Abbs_future_combinators.Infix_result_monad in
   let key = Mirage_crypto_rng.generate 64 in
   let insert_encryption_key =

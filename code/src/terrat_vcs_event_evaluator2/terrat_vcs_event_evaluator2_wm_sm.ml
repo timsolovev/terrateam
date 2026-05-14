@@ -216,7 +216,7 @@ struct
       | { Wm.state = Wm.State.Aborted; _ } -> false
       | _ -> true)
 
-  let publish_fail s { Builder.Bs.Fetcher.fetch } = function
+  let publish_fail _s { Builder.Bs.Fetcher.fetch } = function
     | (`Failed_to_start_with_msg_err _ | `Failed_to_start | `Missing_workflow) as err ->
         let open Irm in
         fetch Keys.publish_comment

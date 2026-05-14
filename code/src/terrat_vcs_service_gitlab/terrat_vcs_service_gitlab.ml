@@ -45,6 +45,7 @@ struct
     storage : Terrat_storage.t;
     exec : Terrat_vcs_event_evaluator2.Exec.t;
   }
+  [@@warning "-69"]
 
   module Kv_store =
     Terrat_vcs_kv_store.Make
@@ -286,7 +287,7 @@ struct
       Abb.Future.return
         (Ok { config; drift; flow_state_cleanup; plan_cleanup; repo_config_cleanup; storage; exec })
 
-    let stop t = raise (Failure "nyi")
+    let stop _t = raise (Failure "nyi")
     let routes t = Routes.routes t
 
     let get_user t user_id =

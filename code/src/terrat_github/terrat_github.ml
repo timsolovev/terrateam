@@ -495,7 +495,7 @@ let delete_comment ~owner ~repo ~comment_id client =
   | Ok resp -> (
       match Openapi.Response.value resp with
       | `No_content -> Abb.Future.return (Ok ()))
-  | Error err ->
+  | Error _err ->
       (* TODO #561: Handle this properly later *)
       Abb.Future.return (Ok ())
 
@@ -846,7 +846,7 @@ module Oauth = struct
         match Response.of_yojson (Yojson.Safe.from_string body) with
         | Ok value -> Ok value
         | Error _ -> Error (`Authorize_err body))
-    | Ok (resp, body) -> Error (`Authorize_err body)
+    | Ok (_resp, body) -> Error (`Authorize_err body)
     | Error err -> Error err
 
   let refresh ~config refresh_token =
@@ -884,6 +884,6 @@ module Oauth = struct
             match Response_err.of_yojson (Yojson.Safe.from_string body) with
             | Ok { Response_err.error = "bad_refresh_token"; _ } -> Error `Bad_refresh_token
             | _ -> Error (`Refresh_err body)))
-    | Ok (resp, body) -> Error (`Refresh_err body)
+    | Ok (_resp, body) -> Error (`Refresh_err body)
     | Error err -> Error err
 end

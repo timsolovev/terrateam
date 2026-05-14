@@ -41,19 +41,19 @@ module S = struct
     type t = bool * bool * Terrat_dirspace.t [@@deriving ord]
   end
 
-  let create_el t dirspace steps =
-    (* TODO: Once proper tables for GitLab exist, replace this function 
+  let create_el _t dirspace steps =
+    (* TODO: Once proper tables for GitLab exist, replace this function
        with a similar implementation that is used in GITLAB *)
     let module St = Terrat_vcs_comment.Strategy in
     let compact = false in
     let strategy = St.Append in
     Some { dirspace; steps; strategy; compact }
 
-  let query_comment_id t el = raise (Failure "nyi")
-  let query_els_for_comment_id t cid = raise (Failure "nyi")
-  let upsert_comment_id t els cid = Abb.Future.return (Ok ())
-  let delete_comment t comment_id = raise (Failure "nyi")
-  let minimize_comment t comment_id = raise (Failure "nyi")
+  let query_comment_id _t _el = raise (Failure "nyi")
+  let query_els_for_comment_id _t _cid = raise (Failure "nyi")
+  let upsert_comment_id _t _els _cid = Abb.Future.return (Ok ())
+  let delete_comment _t _comment_id = raise (Failure "nyi")
+  let minimize_comment _t _comment_id = raise (Failure "nyi")
 
   let post_comment t els =
     let open Abb.Future.Infix_monad in
@@ -154,7 +154,7 @@ module S = struct
 
   let dirspace el = el.dirspace
   (* TODO: Remove this once proper GitLab migrations are also merged *)
-  let strategy el = Terrat_vcs_comment.Strategy.Append
+  let strategy _el = Terrat_vcs_comment.Strategy.Append
   let compact el = { el with compact = true }
 
   let compare_el el1 el2 =

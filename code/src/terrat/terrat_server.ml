@@ -12,7 +12,7 @@ module Metrics = struct
       ~namespace:"terrat"
       "http_request_duration_seconds"
 
-  let observe uri meth duration =
+  let observe _uri meth duration =
     let meth_str = Cohttp.Code.string_of_method meth in
     Histogram.observe (Histogram.labels request_duration [ meth_str ]) duration
 end

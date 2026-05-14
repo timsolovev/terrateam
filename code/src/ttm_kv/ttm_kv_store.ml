@@ -192,8 +192,8 @@ let delete ?idx ?version ~key t =
   | `OK { Terrat_api_components_kv_delete.result } -> Abb.Future.return (Ok result)
   | `Forbidden -> Abb.Future.return (Error `Refresh_token_err)
 
-let count ?committed ~key t = raise (Failure "nyi")
-let size ?idx ?committed ~key t = raise (Failure "nyi")
+let count ?committed:_ ~key:_ _t = raise (Failure "nyi")
+let size ?idx:_ ?committed:_ ~key:_ _t = raise (Failure "nyi")
 
 let iter ?select ?idx ?inclusive ?prefix ?committed ?limit ~key t =
   let open Abbs_future_combinators.Infix_result_monad in

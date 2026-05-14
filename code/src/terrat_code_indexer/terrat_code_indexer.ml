@@ -89,7 +89,7 @@ let rec process_path base path =
                   else [])
                 (Opentofu_mods.collect_modules ast)
           | Error (`Error (pos, _, err)) -> [ `Error (path, pos, err) ])
-      | path -> [])
+      | _path -> [])
     files
 
 let index paths =

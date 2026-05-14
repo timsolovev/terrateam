@@ -9,7 +9,7 @@ module type S = sig
     (unit, [> `Forbidden ]) result Abb.Future.t
 end
 
-module Make (S : S with type Account_id.t = int) : sig
+module Make (_ : S with type Account_id.t = int) : sig
   module List : sig
     val get :
       Terrat_vcs_service_gitlab_provider.Api.Config.t -> Terrat_storage.t -> Brtl_rtng.Handler.t

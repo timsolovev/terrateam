@@ -123,7 +123,7 @@ let perform_auth config storage code =
                 (CCInt64.of_int gitlab_user_id)
               >>= fun () -> Abb.Future.return (Ok (Terrat_user.make ~id:user_id ()))))
 
-let get config storage code state =
+let get config storage code _state =
   let open Abb.Future.Infix_monad in
   Brtl_ep.run ~content_type:"text/plain" ~f:(fun ctx ->
       perform_auth config storage code

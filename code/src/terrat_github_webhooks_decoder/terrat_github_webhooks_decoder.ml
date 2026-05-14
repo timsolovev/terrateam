@@ -7,7 +7,7 @@ type err =
   ]
 [@@deriving show]
 
-let decode headers body =
+let decode _headers body =
   try
     let json = Yojson.Safe.from_string body in
     match Terrat_github_webhooks.Event.of_yojson json with

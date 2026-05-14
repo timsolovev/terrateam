@@ -3135,7 +3135,7 @@ let to_version_1_indexer indexer =
 
 let to_version_1_integrations integrations =
   let module I = Terrat_repo_config.Integrations in
-  let { Integrations.resourcely = { Integrations.Resourcely.enabled; extra_args } } =
+  let { Integrations.resourcely = { Integrations.Resourcely.enabled; extra_args = _ } } =
     integrations
   in
   { I.resourcely = Some { I.Resourcely.enabled; extra_args = Some [] } }

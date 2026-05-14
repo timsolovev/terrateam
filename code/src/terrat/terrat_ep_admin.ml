@@ -54,7 +54,7 @@ module Drift = struct
         unlocked;
       }
 
-    let get admin_token config storage =
+    let get admin_token _config storage =
       Brtl_ep.run_json ~f:(fun ctx ->
           Brtl_permissions.with_permissions [ admin_token_permission ] ctx admin_token (fun () ->
               let open Abb.Future.Infix_monad in

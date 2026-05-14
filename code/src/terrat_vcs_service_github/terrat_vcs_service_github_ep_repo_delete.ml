@@ -51,7 +51,7 @@ module Make (P : Terrat_vcs_provider2_github.S) (S : S) = struct
     if P.Api.Remote_repo.is_archived remote_repo then Abb.Future.return (Ok ())
     else Abb.Future.return (Error `Not_archived)
 
-  let perform_delete ~request_id config storage installation_id repo_id user db =
+  let perform_delete ~request_id config _storage installation_id repo_id user db =
     let open Abbs_future_combinators.Infix_result_monad in
     P.Db.query_repo_by_id ~request_id db installation_id repo_id
     >>= function

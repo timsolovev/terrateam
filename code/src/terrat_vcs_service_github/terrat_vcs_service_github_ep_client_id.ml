@@ -1,4 +1,4 @@
-let get config storage =
+let get config _storage =
   Brtl_ep.run_json ~f:(fun ctx ->
       let body =
         Terrat_api_api_v1.Client_id.Responses.OK.(

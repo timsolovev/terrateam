@@ -396,7 +396,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
     module Paginate = Brtl_ep_paginate.Make (Page)
 
-    let get' config storage user installation_id page limit ctx =
+    let get' _config storage user installation_id page limit ctx =
       let open Abbs_future_combinators.Infix_result_monad in
       Pgsql_pool.with_conn storage ~f:(fun db ->
           enforce_installation_access user installation_id db ctx)

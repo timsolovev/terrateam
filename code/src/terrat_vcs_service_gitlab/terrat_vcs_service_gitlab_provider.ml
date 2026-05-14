@@ -833,7 +833,7 @@ module Db = struct
                     state
                     tag_query
                     user
-                    run_kind
+                    _run_kind
                     installation_id
                     owner
                     name
@@ -1063,7 +1063,7 @@ module Db = struct
         Logs.err (fun m -> m "%s : ERROR : %a" request_id Pgsql_io.pp_err err);
         Abb.Future.return (Error `Error)
 
-  let lock_repository ~request_id db account repo =
+  let lock_repository ~request_id db _account repo =
     let open Abb.Future.Infix_monad in
     Metrics.Psql_query_time.time (Metrics.psql_query_time "select_repository_for_update") (fun () ->
         Pgsql_io.Prepared_stmt.fetch
@@ -1340,7 +1340,7 @@ module Db = struct
               gates
         | Some _ | None -> Abb.Future.return (Ok ()))
 
-  let store_tf_operation_result ~request_id db work_manifest_id result =
+  let store_tf_operation_result ~request_id:_ _db _work_manifest_id _result =
     raise (Failure "NOT SUPPORTED")
 
   let store_tf_operation_result2 ~request_id db work_manifest_id result =
@@ -1587,7 +1587,7 @@ module Db = struct
         Logs.err (fun m -> m "%s : ERROR : %a" request_id Pgsql_io.pp_err err);
         Abb.Future.return (Error `Error)
 
-  let query_next_pending_work_manifest ?(new_age = false) ~request_id db =
+  let query_next_pending_work_manifest ?new_age:(_ = false) ~request_id db =
     let run =
       let open Abbs_future_combinators.Infix_result_monad in
       Metrics.Psql_query_time.time (Metrics.psql_query_time "select_next_work_manifest") (fun () ->
@@ -2197,7 +2197,7 @@ module Apply_requirements = struct
     let open Abbs_future_combinators.Infix_result_monad in
     let module Tprr = Terrat_pull_request_review in
     let module Ac = Terrat_base_repo_config_v1.Apply_requirements.Approved in
-    let { Ac.all_of; any_of; any_of_count; enabled; require_completed_reviews } = approved in
+    let { Ac.all_of; any_of; any_of_count; enabled = _; require_completed_reviews } = approved in
     let combined_queries = Match_set.(to_list (of_list (all_of @ any_of))) in
     Abbs_future_combinators.List_result.fold_left
       ~init:Match_map.empty
@@ -2261,7 +2261,7 @@ module Apply_requirements = struct
            missing_any_of,
            any_of_count ))
 
-  let eval ~request_id config user client repo_config pull_request dirspace_configs =
+  let eval ~request_id _config _user client repo_config pull_request dirspace_configs =
     let max_parallel = 20 in
     let module R = Terrat_base_repo_config_v1 in
     let module Ar = R.Apply_requirements in
@@ -2577,10 +2577,10 @@ module Tier = struct
 end
 
 module Gate = struct
-  let add_approval ~request_id ~token ~approver pull_request db =
+  let add_approval ~request_id:_ ~token:_ ~approver:_ _pull_request _db =
     Abb.Future.return (Error (`Premium_feature_err `Gatekeeping))
 
-  let eval ~request_id _ _ _ _ = Abb.Future.return (Ok [])
+  let eval ~request_id:_ _ _ _ _ = Abb.Future.return (Ok [])
 end
 
 module Comment = struct
@@ -2657,7 +2657,7 @@ module Comment = struct
       Tmpl.repo_config_generic_failure
       kv
 
-  let repo_config_err ~request_id ~client ~pull_request ~title err =
+  let repo_config_err ~request_id ~client ~pull_request ~title:_ err =
     let module Gcm_api = Terrat_vcs_gitlab_comment_publishers.Comment_api in
     match err with
     | `Access_control_ci_config_update_match_parse_err m ->
@@ -2867,7 +2867,7 @@ module Comment = struct
              "NOTIFICATION_POLICY_TAG_QUERY_ERR"
              Tmpl.notification_policy_tag_query_err
              kv
-    | `Stack_config_tag_query_err err -> raise (Failure "nyi")
+    | `Stack_config_tag_query_err _err -> raise (Failure "nyi")
 
   let publish_comment ~request_id client user pull_request =
     let module Gcm_api = Terrat_vcs_gitlab_comment_publishers.Comment_api in
@@ -3158,7 +3158,7 @@ module Comment = struct
           "AUTO_APPLY_RUNNING"
           Tmpl.auto_apply_running
           kv
-    | Msg.Automerge_failure (pr, msg) ->
+    | Msg.Automerge_failure (_pr, msg) ->
         let kv = Snabela.Kv.(Map.of_list [ ("msg", string msg) ]) in
         Gcm_api.apply_template_and_publish
           ~request_id
@@ -4072,15 +4072,15 @@ module Access_control = struct
   (* Access control is an enterprise feature, so always return success on
        any requests. *)
 
-  let query ~request_id _ _ _ _ = Abb.Future.return (Ok true)
-  let is_ci_changed ~request_id _ _ _ = Abb.Future.return (Ok false)
+  let query ~request_id:_ _ _ _ _ = Abb.Future.return (Ok true)
+  let is_ci_changed ~request_id:_ _ _ _ = Abb.Future.return (Ok false)
 end
 
 module Commit_check = struct
   let make_dirspace_title ~run_type { Terrat_dirspace.dir; workspace } =
     Printf.sprintf "terrateam %s: %s %s" run_type dir workspace
 
-  let make ?work_manifest ~config ~description ~title ~status ~repo ~account () =
+  let make ?work_manifest:_ ~config:_ ~description ~title ~status ~repo:_ ~account:_ () =
     Terrat_commit_check.make ~details_url:"" ~description ~title ~status
 
   let make_str ?work_manifest ~config ~description ~status ~repo ~account s =
@@ -4435,7 +4435,7 @@ module Work_manifest = struct
                        Terrat_vcs_provider2.Target.Pr
                          (Terrat_pull_request.set_diff () @@ Terrat_pull_request.set_checks () pr);
                    })
-          | Terrat_vcs_provider2.Target.Drift { repo; branch } ->
+          | Terrat_vcs_provider2.Target.Drift { repo = _; branch } ->
               Pgsql_io.Prepared_stmt.execute db (Sql.insert_drift_work_manifest ()) id branch
               >>= fun () -> Abb.Future.return (Ok work_manifest))
     in
@@ -4586,7 +4586,7 @@ module Work_manifest = struct
         Logs.err (fun m -> m "%s : ERROR : %a" request_id Pgsql_io.pp_err err);
         Abb.Future.return (Error `Error)
 
-  let result rest = raise (Failure "NOT SUPPORTED")
+  let result _rest = raise (Failure "NOT SUPPORTED")
 
   let result2 result =
     let module O = Terrat_api_components.Workflow_step_output in
@@ -5177,7 +5177,7 @@ module Job_context = struct
           initiator
         >>= function
         | [] -> assert false
-        | (id, created_at, updated_at) :: _ ->
+        | (id, created_at, _updated_at) :: _ ->
             Abb.Future.return
               (Ok
                  {
@@ -5239,8 +5239,8 @@ module Job_context = struct
           Logs.err (fun m -> m "%s : JOB : QUERY : %a" request_id Pgsql_io.pp_err err);
           Abb.Future.return (Error `Error)
 
-    let query_all_by_context_id ~request_id db ~context_id () = raise (Failure "nyi")
-    let query_pending_by_context_id ~request_id db ~context_id () = raise (Failure "nyi")
+    let query_all_by_context_id ~request_id:_ _db ~context_id:_ () = raise (Failure "nyi")
+    let query_pending_by_context_id ~request_id:_ _db ~context_id:_ () = raise (Failure "nyi")
 
     let query_by_work_manifest_id ~request_id db ~work_manifest_id () =
       let run =

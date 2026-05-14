@@ -268,37 +268,37 @@ let while' sql db =
   | [] -> Abb.Future.return (Ok `Done)
   | _ :: _ -> Abb.Future.return (Ok `Cont)
 
-let fill_in_change_dirspace (config, storage) =
+let fill_in_change_dirspace (_config, storage) =
   fill_in storage (update' Sql.change_dirspaces_update) (while' Sql.change_dirspaces_while_)
 
-let fill_in_code_indexes (config, storage) =
+let fill_in_code_indexes (_config, storage) =
   fill_in storage (update' Sql.code_indexes_update) (while' Sql.code_indexes_while_)
 
-let fill_in_drift_schedules (config, storage) =
+let fill_in_drift_schedules (_config, storage) =
   fill_in storage (update' Sql.drift_schedules_update) (while' Sql.drift_schedules_while_)
 
-let fill_in_drift_unlocks (config, storage) =
+let fill_in_drift_unlocks (_config, storage) =
   fill_in storage (update' Sql.drift_unlocks_update) (while' Sql.drift_unlocks_while_)
 
-let fill_in_gate_approvals (config, storage) =
+let fill_in_gate_approvals (_config, storage) =
   fill_in storage (update' Sql.gate_approvals_update) (while' Sql.gate_approvals_while_)
 
-let fill_in_gates (config, storage) =
+let fill_in_gates (_config, storage) =
   fill_in storage (update' Sql.gates_update) (while' Sql.gates_while_)
 
-let fill_in_pull_request_unlocks (config, storage) =
+let fill_in_pull_request_unlocks (_config, storage) =
   fill_in storage (update' Sql.pull_request_unlocks_update) (while' Sql.pull_request_unlocks_while_)
 
-let fill_in_repo_configs (config, storage) =
+let fill_in_repo_configs (_config, storage) =
   fill_in storage (update' Sql.repo_configs_update) (while' Sql.repo_configs_while_)
 
-let fill_in_repo_trees (config, storage) =
+let fill_in_repo_trees (_config, storage) =
   fill_in storage (update' Sql.repo_trees_update) (while' Sql.repo_trees_while_)
 
-let fill_in_work_manifests_repos (config, storage) =
+let fill_in_work_manifests_repos (_config, storage) =
   fill_in storage (update' Sql.work_manifests_repos_update) (while' Sql.work_manifests_repos_while_)
 
-let fill_in_work_manifests_pull_requests (config, storage) =
+let fill_in_work_manifests_pull_requests (_config, storage) =
   fill_in
     storage
     (update' Sql.work_manifests_pull_requests_update)

@@ -207,5 +207,5 @@ module Tmpl = struct
 end
 
 module Ui = struct
-  let work_manifest_url config account = raise (Failure "nyi")
+  let work_manifest_url _config _account = raise (Failure "nyi")
 end

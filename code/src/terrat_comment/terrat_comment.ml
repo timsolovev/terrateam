@@ -70,7 +70,7 @@ let parse s =
                { tokens = CCList.map CCString.trim @@ CCString.split_on_char ' ' tokens })
       | Some (action, _) -> Error (`Unknown_action action)
       | None -> Error (`Unknown_action s))
-  | Some (action, rest) -> Error (`Unknown_action action)
+  | Some (action, _rest) -> Error (`Unknown_action action)
   | None -> Error `Not_terrateam
 
 let to_string = function

@@ -385,7 +385,7 @@ module Commit = struct
 end
 
 module Delete = struct
-  let run api_base vcs installation version idx output key () =
+  let run api_base vcs installation version idx _output key () =
     let f () =
       let open Abbs_future_combinators.Infix_result_monad in
       Ttm_client.create ~base_url:(Uri.of_string api_base) ()

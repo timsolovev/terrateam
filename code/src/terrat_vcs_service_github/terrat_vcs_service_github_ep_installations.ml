@@ -1157,7 +1157,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
     module Paginate = Brtl_ep_paginate.Make (Page)
 
-    let get config storage installation_id pr_opt page limit =
+    let get _config storage installation_id pr_opt page limit =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ctx
@@ -1274,7 +1274,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
     module Paginate = Brtl_ep_paginate.Make (Page)
 
-    let get config storage installation_id page limit =
+    let get _config storage installation_id page limit =
       Brtl_ep.run_result_json ~f:(fun ctx ->
           let open Abbs_future_combinators.Infix_result_monad in
           Terrat_session.with_session ctx
