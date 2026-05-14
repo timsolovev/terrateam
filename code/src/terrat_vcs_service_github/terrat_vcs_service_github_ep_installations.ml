@@ -52,16 +52,11 @@ module Make (S : S with type Account_id.t = int) = struct
       module T = Terrat_api_components.Installation_workflow_step_output
 
       module Sql = struct
-        let read fname =
-          CCOption.get_exn_or
-            fname
-            (CCOption.map
-               (fun s ->
-                 s
-                 |> CCString.split_on_char '\n'
-                 |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-                 |> CCString.concat "\n")
-               (Terrat_files_github_sql.read fname))
+        let read s =
+          s
+          |> CCString.split_on_char '\n'
+          |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+          |> CCString.concat "\n"
 
         let scope =
           let module T = Terrat_api_components.Workflow_step_output_scope in
@@ -95,7 +90,7 @@ module Make (S : S with type Account_id.t = int) = struct
             //
             (* status *)
             Ret.text
-            /^ replace_where (read "select_workflow_outputs_page.sql") where
+            /^ replace_where (read [%blob "sql/select_workflow_outputs_page.sql"]) where
             /% Var.uuid "user"
             /% Var.bigint "installation_id"
             /% Var.uuid "work_manifest_id"
@@ -303,16 +298,11 @@ module Make (S : S with type Account_id.t = int) = struct
     end
 
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_github_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let dirspaces =
         let module T = struct
@@ -383,7 +373,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* environment *)
           Ret.(option text)
-          /^ replace_where (read "select_work_manifests_page.sql") where
+          /^ replace_where (read [%blob "sql/select_work_manifests_page.sql"]) where
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.text "tz"
@@ -651,16 +641,11 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module Dirspaces = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_github_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let select_dirspaces where =
         Pgsql_io.Typed_sql.(
@@ -725,7 +710,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* environment *)
           Ret.(option text)
-          /^ replace_where (read "select_dirspaces_page.sql") where
+          /^ replace_where (read [%blob "sql/select_dirspaces_page.sql"]) where
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.text "tz"
@@ -1008,16 +993,11 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module Pull_requests = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_github_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let select_pull_requests () =
         Pgsql_io.Typed_sql.(
@@ -1064,7 +1044,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* username *)
           Ret.(option text)
-          /^ read "select_pull_requests_page.sql"
+          /^ read [%blob "sql/select_pull_requests_page.sql"]
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.(option (bigint "pull_number"))
@@ -1194,10 +1174,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module Repos = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_installation_repos_page () =
         Pgsql_io.Typed_sql.(
@@ -1217,7 +1194,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* setup *)
           Ret.boolean
-          /^ read "select_installation_repos_page.sql"
+          /^ read [%blob "sql/select_installation_repos_page.sql"]
           /% Var.uuid "user_id"
           /% Var.bigint "installation_id"
           /% Var.(option (text "prev_name")))

@@ -4,10 +4,7 @@ module Logs = (val Logs.src_log src : Logs.LOG)
 
 module Whoami = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let select_gitlab_user () =
       Pgsql_io.Typed_sql.(
@@ -27,7 +24,7 @@ module Whoami = struct
         //
         (* gitlab user id *)
         Ret.bigint
-        /^ read "select_gitlab_user2_by_user_id.sql"
+        /^ read [%blob "sql/select_gitlab_user2_by_user_id.sql"]
         /% Var.uuid "user_id")
   end
 

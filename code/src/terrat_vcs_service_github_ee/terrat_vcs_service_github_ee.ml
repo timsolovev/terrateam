@@ -56,23 +56,18 @@ module Provider :
 
   module Gate = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_github_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let gate = CCFun.(Terrat_gate.of_yojson %> CCResult.to_opt)
 
       let insert_gate_approval =
         Pgsql_io.Typed_sql.(
           sql
-          /^ read "insert_gate_approval.sql"
+          /^ read [%blob "sql/insert_gate_approval.sql"]
           /% Var.text "approver"
           /% Var.text "token"
           /% Var.bigint "repository"
@@ -88,7 +83,7 @@ module Provider :
           //
           (* approver *)
           Ret.text
-          /^ read "select_gate_approvals.sql"
+          /^ read [%blob "sql/select_gate_approvals.sql"]
           /% Var.bigint "repository"
           /% Var.bigint "pull_number")
 
@@ -110,7 +105,7 @@ module Provider :
           //
           (* workspace *)
           Ret.text
-          /^ read "select_gates.sql"
+          /^ read [%blob "sql/select_gates.sql"]
           /% Var.bigint "repository"
           /% Var.bigint "pull_number"
           /% Var.(str_array (text "dirs"))

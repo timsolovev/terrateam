@@ -12,10 +12,7 @@ module type S = sig
 end
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let select_username () =
     Pgsql_io.Typed_sql.(
@@ -23,7 +20,7 @@ module Sql = struct
       //
       (* username *)
       Ret.text
-      /^ read "select_username_for_repo_delete.sql"
+      /^ read [%blob "sql/select_username_for_repo_delete.sql"]
       /% Var.uuid "user_id")
 end
 

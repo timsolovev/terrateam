@@ -11,10 +11,7 @@ let src = Logs.Src.create "vcs_github_comment"
 module Logs = (val Logs.src_log src : Logs.LOG)
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let select_comment_id =
     Pgsql_io.Typed_sql.(
@@ -22,7 +19,7 @@ module Sql = struct
       //
       (* comment_id *)
       Ret.bigint
-      /^ read "select_comment_id.sql"
+      /^ read [%blob "sql/select_comment_id.sql"]
       /% Var.uuid "work_manifest"
       /% Var.text "dir"
       /% Var.text "workspace")
@@ -61,7 +58,7 @@ module Sql = struct
       //
       (* steps.step *)
       Ret.text
-      /^ read "select_comment_elements.sql"
+      /^ read [%blob "sql/select_comment_elements.sql"]
       /% Var.bigint "comment_id"
       /% Var.uuid "work_manifest")
 
@@ -71,7 +68,7 @@ module Sql = struct
       //
       (* comment_id *)
       Ret.bigint
-      /^ read "upsert_github_work_manifest_comment.sql"
+      /^ read [%blob "sql/upsert_github_work_manifest_comment.sql"]
       /% Var.bigint "comment_id"
       /% Var.uuid "work_manifest"
       /% Var.text "dir"

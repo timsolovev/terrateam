@@ -2,15 +2,12 @@ let terrateam_github_action_workflow_path = ".github/workflows/terrateam.yml"
 let chunk_size = 500
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let insert_installation_repos () =
     Pgsql_io.Typed_sql.(
       sql
-      /^ read "upsert_installation_repos.sql"
+      /^ read [%blob "sql/upsert_installation_repos.sql"]
       /% Var.(array (bigint "id"))
       /% Var.(array (bigint "installation_id"))
       /% Var.(str_array (text "owner"))

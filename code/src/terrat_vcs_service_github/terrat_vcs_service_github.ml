@@ -319,10 +319,7 @@ struct
 
   module Service = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_github_user2_exists =
         Pgsql_io.Typed_sql.(
@@ -330,7 +327,7 @@ struct
           //
           (* created_at *)
           Ret.text
-          /^ read "select_github_user2_exists.sql"
+          /^ read [%blob "sql/select_github_user2_exists.sql"]
           /% Var.uuid "user_id")
     end
 

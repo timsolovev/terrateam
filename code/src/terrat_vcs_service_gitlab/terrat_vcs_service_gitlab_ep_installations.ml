@@ -37,10 +37,7 @@ let set_timeout timeout =
   Pgsql_io.Typed_sql.(sql /^ Printf.sprintf "set local statement_timeout = '%s'" timeout)
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let upsert_user_installations () =
     Pgsql_io.Typed_sql.(
@@ -57,7 +54,7 @@ module Sql = struct
       //
       (* created_at *)
       Ret.text
-      /^ read "upsert_user_installations.sql"
+      /^ read [%blob "sql/upsert_user_installations.sql"]
       /% Var.uuid "user_id"
       /% Var.(array (bigint "installation_ids")))
 end
@@ -141,10 +138,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module Webhook = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let insert_or_select_installation =
         Pgsql_io.Typed_sql.(
@@ -155,7 +149,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* state *)
           Ret.text
-          /^ read "insert_or_select_installation.sql"
+          /^ read [%blob "sql/insert_or_select_installation.sql"]
           /% Var.bigint "id"
           /% Var.text "name")
     end
@@ -302,10 +296,7 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module List_repos = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_installation_repos_page () =
         Pgsql_io.Typed_sql.(
@@ -325,7 +316,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* setup *)
           Ret.boolean
-          /^ read "select_installation_repos_page.sql"
+          /^ read [%blob "sql/select_installation_repos_page.sql"]
           /% Var.uuid "user_id"
           /% Var.bigint "installation_id"
           /% Var.(option (text "prev_name")))
@@ -442,16 +433,11 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module List_dirspaces = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_gitlab_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let select_dirspaces where =
         Pgsql_io.Typed_sql.(
@@ -516,7 +502,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* environment *)
           Ret.(option text)
-          /^ replace_where (read "select_dirspaces_page.sql") where
+          /^ replace_where (read [%blob "sql/select_dirspaces_page.sql"]) where
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.text "tz"
@@ -832,16 +818,11 @@ module Make (S : S with type Account_id.t = int) = struct
     module T = Terrat_api_components.Installation_workflow_step_output
 
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_gitlab_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let scope =
         let module T = Terrat_api_components.Workflow_step_output_scope in
@@ -875,7 +856,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* status *)
           Ret.text
-          /^ replace_where (read "select_workflow_outputs_page.sql") where
+          /^ replace_where (read [%blob "sql/select_workflow_outputs_page.sql"]) where
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.uuid "work_manifest_id"
@@ -1104,16 +1085,11 @@ module Make (S : S with type Account_id.t = int) = struct
 
   module List_work_manifests = struct
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map
-             (fun s ->
-               s
-               |> CCString.split_on_char '\n'
-               |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-               |> CCString.concat "\n")
-             (Terrat_files_gitlab_sql.read fname))
+      let read s =
+        s
+        |> CCString.split_on_char '\n'
+        |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+        |> CCString.concat "\n"
 
       let dirspaces =
         let module T = struct
@@ -1184,7 +1160,7 @@ module Make (S : S with type Account_id.t = int) = struct
           //
           (* environment *)
           Ret.(option text)
-          /^ replace_where (read "select_work_manifests_page.sql") where
+          /^ replace_where (read [%blob "sql/select_work_manifests_page.sql"]) where
           /% Var.uuid "user"
           /% Var.bigint "installation_id"
           /% Var.text "tz"

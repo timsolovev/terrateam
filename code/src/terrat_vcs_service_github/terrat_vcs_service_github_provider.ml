@@ -46,10 +46,7 @@ module Metrics = struct
 end
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let select_user_installation () =
     Pgsql_io.Typed_sql.(
@@ -57,7 +54,7 @@ module Sql = struct
       //
       (* installation_id *)
       Ret.bigint
-      /^ read "select_user_installation.sql"
+      /^ read [%blob "sql/select_user_installation.sql"]
       /% Var.uuid "user_id"
       /% Var.bigint "installation_id")
 end
@@ -101,10 +98,7 @@ end
 
 module Db = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let policy =
       let module P = struct
@@ -126,7 +120,7 @@ module Db = struct
       | All -> "all"
       | Dest_branch -> "dest_branch"
 
-    let select_work_manifests_batch_query = read "select_work_manifests_batch.sql"
+    let select_work_manifests_batch_query = read [%blob "sql/select_work_manifests_batch.sql"]
 
     let select_work_manifests_batch () =
       Pgsql_io.Typed_sql.(
@@ -206,7 +200,7 @@ module Db = struct
         //
         (* workspace *)
         Ret.text
-        /^ read "select_work_manifest_dirspaceflows_batch.sql"
+        /^ read [%blob "sql/select_work_manifest_dirspaceflows_batch.sql"]
         /% Var.(str_array (uuid "ids")))
 
     let select_work_manifest_access_control_denied_dirspaces_batch =
@@ -224,11 +218,11 @@ module Db = struct
         //
         (* policy *)
         Ret.(option (u json policy))
-        /^ read "select_work_manifest_access_control_denied_dirspaces_batch.sql"
+        /^ read [%blob "sql/select_work_manifest_access_control_denied_dirspaces_batch.sql"]
         /% Var.(str_array (uuid "ids")))
 
     let select_work_manifest_pull_requests_batch_query =
-      read "select_work_manifest_pull_requests_batch.sql"
+      read [%blob "sql/select_work_manifest_pull_requests_batch.sql"]
 
     let select_work_manifest_pull_requests_batch () =
       Pgsql_io.Typed_sql.(
@@ -269,7 +263,8 @@ module Db = struct
         /^ select_work_manifest_pull_requests_batch_query
         /% Var.(str_array (uuid "ids")))
 
-    let select_drift_work_manifests_batch_query = read "select_drift_work_manifests_batch.sql"
+    let select_drift_work_manifests_batch_query =
+      read [%blob "sql/select_drift_work_manifests_batch.sql"]
 
     let select_drift_work_manifests_batch () =
       Pgsql_io.Typed_sql.(
@@ -289,7 +284,7 @@ module Db = struct
     let insert_github_installation_repository =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_installation_repository.sql"
+        /^ read [%blob "sql/insert_installation_repository.sql"]
         /% Var.bigint "id"
         /% Var.bigint "installation_id"
         /% Var.text "owner"
@@ -301,13 +296,13 @@ module Db = struct
         //
         (* id *)
         Ret.bigint
-        /^ read "select_repository_for_update.sql"
+        /^ read [%blob "sql/select_repository_for_update.sql"]
         /% Var.bigint "id")
 
     let insert_pull_request =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_pull_request.sql"
+        /^ read [%blob "sql/insert_pull_request.sql"]
         /% Var.text "base_branch"
         /% Var.text "base_sha"
         /% Var.text "branch"
@@ -320,7 +315,7 @@ module Db = struct
         /% Var.(option (text "title"))
         /% Var.(option (text "username")))
 
-    let insert_index_query = read "insert_code_index.sql"
+    let insert_index_query = read [%blob "sql/insert_code_index.sql"]
 
     let insert_index () =
       Pgsql_io.Typed_sql.(sql /^ insert_index_query /% Var.uuid "work_manifest" /% Var.json "index")
@@ -328,7 +323,7 @@ module Db = struct
     let insert_github_work_manifest_result =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_work_manifest_result.sql"
+        /^ read [%blob "sql/insert_work_manifest_result.sql"]
         /% Var.(str_array (uuid "work_manifest"))
         /% Var.(str_array (text "path"))
         /% Var.(str_array (text "workspace"))
@@ -337,7 +332,7 @@ module Db = struct
     let insert_repo_config =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_repo_config.sql"
+        /^ read [%blob "sql/insert_repo_config.sql"]
         /% Var.bigint "installation_id"
         /% Var.text "sha"
         /% Var.json "data")
@@ -345,14 +340,14 @@ module Db = struct
     let insert_repo_tree =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_repo_tree.sql"
+        /^ read [%blob "sql/insert_repo_tree.sql"]
         /% Var.(array (bigint "installation_ids"))
         /% Var.(str_array (text "shas"))
         /% Var.(str_array (text "paths"))
         /% Var.(array (option (boolean "changed")))
         /% Var.(str_array (option (text "id"))))
 
-    let upsert_flow_state_query = read "update_flow_state.sql"
+    let upsert_flow_state_query = read [%blob "sql/update_flow_state.sql"]
 
     let upsert_flow_state () =
       Pgsql_io.Typed_sql.(sql /^ upsert_flow_state_query /% Var.uuid "id" /% Var.text "data")
@@ -360,7 +355,7 @@ module Db = struct
     let insert_dirspace =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_dirspaces.sql"
+        /^ read [%blob "sql/insert_dirspaces.sql"]
         /% Var.(str_array (text "base_sha"))
         /% Var.(str_array (text "path"))
         /% Var.(array (bigint "repository"))
@@ -370,7 +365,7 @@ module Db = struct
         /% Var.(str_array (ud (text "branch_target") branch_target)))
 
     let insert_workflow_step_output =
-      let query = read "insert_workflow_step_output.sql" in
+      let query = read [%blob "sql/insert_workflow_step_output.sql"] in
       Pgsql_io.Typed_sql.(
         sql
         /^ query
@@ -385,7 +380,7 @@ module Db = struct
     let upsert_drift_schedule =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "upsert_drift_schedule.sql"
+        /^ read [%blob "sql/upsert_drift_schedule.sql"]
         /% Var.bigint "repo"
         /% Var.(ud (text "schedule") Terrat_base_repo_config_v1.Drift.Schedule.Sched.to_string)
         /% Var.boolean "reconcile"
@@ -397,11 +392,11 @@ module Db = struct
     let delete_drift_schedules =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "delete_drift_schedules.sql"
+        /^ read [%blob "sql/delete_drift_schedules.sql"]
         /% Var.bigint "repo_id"
         /% Var.(str_array (text "names")))
 
-    let select_installation_account_status_query = read "select_account_status.sql"
+    let select_installation_account_status_query = read [%blob "sql/select_account_status.sql"]
 
     let select_installation_account_status () =
       Pgsql_io.Typed_sql.(
@@ -422,7 +417,7 @@ module Db = struct
         //
         (* Index *)
         Ret.(u json index)
-        /^ read "select_index.sql"
+        /^ read [%blob "sql/select_index.sql"]
         /% Var.bigint "installation_id"
         /% Var.text "sha")
 
@@ -432,7 +427,7 @@ module Db = struct
         //
         (* repo_config *)
         Ret.json
-        /^ read "select_repo_config.sql"
+        /^ read [%blob "sql/select_repo_config.sql"]
         /% Var.bigint "installation_id"
         /% Var.text "sha")
 
@@ -445,7 +440,7 @@ module Db = struct
         //
         (* changed *)
         Ret.(option boolean)
-        /^ read "select_repo_tree.sql"
+        /^ read [%blob "sql/select_repo_tree.sql"]
         /% Var.bigint "installation_id"
         /% Var.text "sha"
         /% Var.(option (text "base_sha")))
@@ -456,10 +451,10 @@ module Db = struct
         //
         (* id *)
         Ret.uuid
-        /^ read "select_next_work_manifest.sql"
+        /^ read [%blob "sql/select_next_work_manifest.sql"]
         /% Var.boolean "new_age")
 
-    let select_flow_state_query = read "select_flow_data.sql"
+    let select_flow_state_query = read [%blob "sql/select_flow_data.sql"]
 
     let select_flow_state () =
       Pgsql_io.Typed_sql.(
@@ -470,7 +465,7 @@ module Db = struct
         /^ select_flow_state_query
         /% Var.uuid "id")
 
-    let delete_flow_state_query = read "delete_flow_state.sql"
+    let delete_flow_state_query = read [%blob "sql/delete_flow_state.sql"]
     let delete_flow_state () = Pgsql_io.Typed_sql.(sql /^ delete_flow_state_query /% Var.uuid "id")
 
     let select_out_of_diff_applies =
@@ -482,7 +477,7 @@ module Db = struct
         //
         (* workspace *)
         Ret.text
-        /^ read "select_out_of_diff_applies.sql"
+        /^ read [%blob "sql/select_out_of_diff_applies.sql"]
         /% Var.bigint "repository"
         /% Var.bigint "pull_number")
 
@@ -495,7 +490,7 @@ module Db = struct
         //
         (* workspace *)
         Ret.text
-        /^ read "select_dirspace_applies_for_pull_request.sql"
+        /^ read [%blob "sql/select_dirspace_applies_for_pull_request.sql"]
         /% Var.bigint "repo_id"
         /% Var.bigint "pull_number")
 
@@ -508,7 +503,7 @@ module Db = struct
         //
         (* workspace *)
         Ret.text
-        /^ read "select_dirspace_applies_for_context.sql"
+        /^ read [%blob "sql/select_dirspace_applies_for_context.sql"]
         /% Var.(ud (uuid "context_id") (fun c -> c.Terrat_job_context.Context.id)))
 
     let select_dirspaces_without_valid_plans =
@@ -520,7 +515,7 @@ module Db = struct
         //
         (* workspace *)
         Ret.text
-        /^ read "select_dirspaces_without_valid_plans.sql"
+        /^ read [%blob "sql/select_dirspaces_without_valid_plans.sql"]
         /% Var.bigint "repository"
         /% Var.bigint "pull_number"
         /% Var.(str_array (text "dirs"))
@@ -528,7 +523,8 @@ module Db = struct
         /% Var.(ud (text "base_ref") Api.Ref.to_string)
         /% Var.(ud (text "branch_ref") Api.Ref.to_string))
 
-    let update_abort_duplicate_work_manifests_query = read "abort_duplicate_work_manifests.sql"
+    let update_abort_duplicate_work_manifests_query =
+      read [%blob "sql/abort_duplicate_work_manifests.sql"]
 
     let update_abort_duplicate_work_manifests () =
       Pgsql_io.Typed_sql.(
@@ -544,7 +540,7 @@ module Db = struct
         /% Var.(str_array (text "workspaces")))
 
     let update_abort_duplicate_work_manifests_for_context_query =
-      read "abort_duplicate_work_manifests_for_context.sql"
+      read [%blob "sql/abort_duplicate_work_manifests_for_context.sql"]
 
     let update_abort_duplicate_work_manifests_for_context () =
       Pgsql_io.Typed_sql.(
@@ -559,7 +555,7 @@ module Db = struct
         /% Var.(str_array (text "workspaces")))
 
     let select_conflicting_work_manifests_in_repo_query =
-      read "select_conflicting_work_manifests_in_repo2.sql"
+      read [%blob "sql/select_conflicting_work_manifests_in_repo2.sql"]
 
     let select_conflicting_work_manifests_in_repo () =
       Pgsql_io.Typed_sql.(
@@ -578,7 +574,7 @@ module Db = struct
         /% Var.(str_array (text "workspaces")))
 
     let select_conflicting_work_manifests_in_repo_for_context_query =
-      read "select_conflicting_work_manifests_in_repo_for_context.sql"
+      read [%blob "sql/select_conflicting_work_manifests_in_repo_for_context.sql"]
 
     let select_conflicting_work_manifests_in_repo_for_context () =
       Pgsql_io.Typed_sql.(
@@ -596,7 +592,7 @@ module Db = struct
         /% Var.(str_array (text "workspaces")))
 
     let select_dirspaces_owned_by_other_pull_requests_query =
-      read "select_dirspaces_owned_by_other_pull_requests.sql"
+      read [%blob "sql/select_dirspaces_owned_by_other_pull_requests.sql"]
 
     let select_dirspaces_owned_by_other_pull_requests () =
       Pgsql_io.Typed_sql.(
@@ -643,7 +639,8 @@ module Db = struct
         /% Var.(str_array (text "dirs"))
         /% Var.(str_array (text "workspaces")))
 
-    let select_missing_drift_scheduled_runs_query = read "select_missing_drift_scheduled_runs.sql"
+    let select_missing_drift_scheduled_runs_query =
+      read [%blob "sql/select_missing_drift_scheduled_runs.sql"]
 
     let select_missing_drift_scheduled_runs () =
       Pgsql_io.Typed_sql.(
@@ -677,8 +674,10 @@ module Db = struct
         Ret.(option text)
         /^ select_missing_drift_scheduled_runs_query)
 
-    let cleanup_repo_configs = Pgsql_io.Typed_sql.(sql /^ read "cleanup_repo_configs.sql")
-    let delete_stale_flow_states_query = read "delete_stale_flow_states.sql"
+    let cleanup_repo_configs =
+      Pgsql_io.Typed_sql.(sql /^ read [%blob "sql/cleanup_repo_configs.sql"])
+
+    let delete_stale_flow_states_query = read [%blob "sql/delete_stale_flow_states.sql"]
     let delete_stale_flow_states () = Pgsql_io.Typed_sql.(sql /^ delete_stale_flow_states_query)
 
     let delete_old_plans =
@@ -687,9 +686,9 @@ module Db = struct
         //
         (* count *)
         Ret.integer
-        /^ read "delete_old_terraform_plans.sql")
+        /^ read [%blob "sql/delete_old_terraform_plans.sql"])
 
-    let insert_pull_request_unlock_query = read "insert_pull_request_unlock.sql"
+    let insert_pull_request_unlock_query = read [%blob "sql/insert_pull_request_unlock.sql"]
 
     let insert_pull_request_unlock () =
       Pgsql_io.Typed_sql.(
@@ -698,7 +697,7 @@ module Db = struct
         /% Var.bigint "repository"
         /% Var.bigint "pull_number")
 
-    let insert_drift_unlock_query = read "insert_drift_unlock.sql"
+    let insert_drift_unlock_query = read [%blob "sql/insert_drift_unlock.sql"]
 
     let insert_drift_unlock () =
       Pgsql_io.Typed_sql.(sql /^ insert_drift_unlock_query /% Var.bigint "repository")
@@ -709,12 +708,12 @@ module Db = struct
         //
         (* data *)
         Ret.text
-        /^ read "select_recent_plan.sql"
+        /^ read [%blob "sql/select_recent_plan.sql"]
         /% Var.uuid "id"
         /% Var.text "dir"
         /% Var.text "workspace")
 
-    let delete_plan_query = read "delete_terraform_plan.sql"
+    let delete_plan_query = read [%blob "sql/delete_terraform_plan.sql"]
 
     let delete_plan () =
       Pgsql_io.Typed_sql.(
@@ -723,7 +722,7 @@ module Db = struct
     let upsert_plan =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "upsert_terraform_plan.sql"
+        /^ read [%blob "sql/upsert_terraform_plan.sql"]
         /% Var.uuid "work_manifest"
         /% Var.text "path"
         /% Var.text "workspace"
@@ -733,7 +732,7 @@ module Db = struct
     let insert_gate =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_gate.sql"
+        /^ read [%blob "sql/insert_gate.sql"]
         /% Var.(option (text "name"))
         /% Var.(option (text "token"))
         /% Var.json "gate"
@@ -746,7 +745,7 @@ module Db = struct
     let upsert_branch_hash =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "upsert_branch_hash.sql"
+        /^ read [%blob "sql/upsert_branch_hash.sql"]
         /% Var.(ud (bigint "repo_id") CCFun.(Api.Repo.id %> CCInt64.of_int))
         /% Var.(ud (text "branch") Api.Ref.to_string)
         /% Var.(ud (text "hash") Api.Ref.to_string))
@@ -757,14 +756,14 @@ module Db = struct
         // Ret.bigint
         // Ret.text
         // Ret.text
-        /^ read "select_repo_by_id.sql"
+        /^ read [%blob "sql/select_repo_by_id.sql"]
         /% Var.bigint "repo_id"
         /% Var.bigint "installation_id")
 
     let delete_repo () =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "delete_repo.sql"
+        /^ read [%blob "sql/delete_repo.sql"]
         /% Var.(ud (bigint "repo_id") CCInt64.of_int)
         /% Var.(ud (bigint "installation_id") CCInt64.of_int))
   end
@@ -2536,16 +2535,11 @@ end
 
 module Tier = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map
-           (fun s ->
-             s
-             |> CCString.split_on_char '\n'
-             |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-             |> CCString.concat "\n")
-           (Terrat_files_github_sql.read fname))
+    let read s =
+      s
+      |> CCString.split_on_char '\n'
+      |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+      |> CCString.concat "\n"
 
     let tier = CCFun.(Terrat_tier.of_yojson %> CCResult.to_opt)
 
@@ -2561,7 +2555,7 @@ module Tier = struct
         //
         (* tier *)
         Ret.(u json tier)
-        /^ read "select_tier.sql"
+        /^ read [%blob "sql/select_tier.sql"]
         /% Var.bigint "installation_id")
 
     let select_users_this_month =
@@ -2573,7 +2567,7 @@ module Tier = struct
         //
         (* created_at *)
         Ret.text
-        /^ read "select_users_this_month.sql"
+        /^ read [%blob "sql/select_users_this_month.sql"]
         /% Var.bigint "installation_id")
   end
 
@@ -4860,18 +4854,13 @@ end
 
 module Work_manifest = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map
-           (fun s ->
-             s
-             |> CCString.split_on_char '\n'
-             |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
-             |> CCString.concat "\n")
-           (Terrat_files_github_sql.read fname))
+    let read s =
+      s
+      |> CCString.split_on_char '\n'
+      |> CCList.filter CCFun.(CCString.prefix ~pre:"--" %> not)
+      |> CCString.concat "\n"
 
-    let insert_work_manifest_query = read "insert_work_manifest.sql"
+    let insert_work_manifest_query = read [%blob "sql/insert_work_manifest.sql"]
 
     let insert_work_manifest () =
       Pgsql_io.Typed_sql.(
@@ -4902,13 +4891,14 @@ module Work_manifest = struct
     let insert_work_manifest_access_control_denied_dirspace =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "insert_work_manifest_access_control_denied_dirspace.sql"
+        /^ read [%blob "sql/insert_work_manifest_access_control_denied_dirspace.sql"]
         /% Var.(str_array (text "path"))
         /% Var.(str_array (text "workspace"))
         /% Var.(str_array (option (json "policy")))
         /% Var.(str_array (uuid "work_manifest")))
 
-    let insert_work_manifest_dirspaceflow_query = read "insert_work_manifest_dirspaceflow.sql"
+    let insert_work_manifest_dirspaceflow_query =
+      read [%blob "sql/insert_work_manifest_dirspaceflow.sql"]
 
     let insert_work_manifest_dirspaceflow () =
       Pgsql_io.Typed_sql.(
@@ -4919,35 +4909,39 @@ module Work_manifest = struct
         /% Var.(str_array (text "workspace"))
         /% Var.(array (option (smallint "workflow_idx"))))
 
-    let insert_drift_work_manifest_query = read "insert_drift_work_manifest.sql"
+    let insert_drift_work_manifest_query = read [%blob "sql/insert_drift_work_manifest.sql"]
 
     let insert_drift_work_manifest () =
       Pgsql_io.Typed_sql.(
         sql /^ insert_drift_work_manifest_query /% Var.uuid "work_manifest" /% Var.text "branch")
 
-    let update_work_manifest_state_running_query = read "update_work_manifest_state_running.sql"
+    let update_work_manifest_state_running_query =
+      read [%blob "sql/update_work_manifest_state_running.sql"]
 
     let update_work_manifest_state_running () =
       Pgsql_io.Typed_sql.(sql /^ update_work_manifest_state_running_query /% Var.uuid "id")
 
-    let update_work_manifest_state_completed_query = read "update_work_manifest_state_completed.sql"
+    let update_work_manifest_state_completed_query =
+      read [%blob "sql/update_work_manifest_state_completed.sql"]
 
     let update_work_manifest_state_completed () =
       Pgsql_io.Typed_sql.(sql /^ update_work_manifest_state_completed_query /% Var.uuid "id")
 
-    let update_work_manifest_state_aborted_query = read "update_work_manifest_state_aborted.sql"
+    let update_work_manifest_state_aborted_query =
+      read [%blob "sql/update_work_manifest_state_aborted.sql"]
 
     let update_work_manifest_state_aborted () =
       Pgsql_io.Typed_sql.(sql /^ update_work_manifest_state_aborted_query /% Var.uuid "id")
 
-    let update_work_manifest_run_id_query = read "update_work_manifest_run_id.sql"
+    let update_work_manifest_run_id_query = read [%blob "sql/update_work_manifest_run_id.sql"]
 
     let update_work_manifest_run_id () =
       Pgsql_io.Typed_sql.(
         sql /^ update_work_manifest_run_id_query /% Var.uuid "id" /% Var.(option (text "run_id")))
 
     let update_run_type =
-      Pgsql_io.Typed_sql.(sql /^ read "update_run_type.sql" /% Var.uuid "id" /% Var.text "run_type")
+      Pgsql_io.Typed_sql.(
+        sql /^ read [%blob "sql/update_run_type.sql"] /% Var.uuid "id" /% Var.text "run_type")
 
     let select_work_manifest_by_run_id () =
       Pgsql_io.Typed_sql.(
@@ -5561,10 +5555,7 @@ module Stacks = struct
     let route_root () = Brtl_rtng.Route.(rel / "api" / "v1")
 
     module Sql = struct
-      let read fname =
-        CCOption.get_exn_or
-          fname
-          (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+      let read s = Pgsql_io.clean_string s
 
       let select_stacks () =
         Pgsql_io.Typed_sql.(
@@ -5572,14 +5563,14 @@ module Stacks = struct
           //
           (* stacks *)
           Ret.u Ret.json CCFun.(Terrat_api_components.Stacks.of_yojson %> CCOption.of_result)
-          /^ read "select_stacks.sql"
+          /^ read [%blob "sql/select_stacks.sql"]
           /% Var.bigint "repo_id"
           /% Var.bigint "pull_number")
 
       let upsert_stacks () =
         Pgsql_io.Typed_sql.(
           sql
-          /^ read "upsert_stacks.sql"
+          /^ read [%blob "sql/upsert_stacks.sql"]
           /% Var.bigint "repo_id"
           /% Var.bigint "pull_number"
           /% Var.json "stacks")
@@ -5596,7 +5587,7 @@ module Stacks = struct
           //
           (* state *)
           Ret.text
-          /^ read "select_dirspace_stack_states.sql"
+          /^ read [%blob "sql/select_dirspace_stack_states.sql"]
           /% Var.bigint "repo_id"
           /% Var.bigint "pull_number")
     end
@@ -5655,10 +5646,7 @@ module Job_context = struct
   module Tjc = Terrat_job_context
 
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let select_or_insert_pull_request_context =
       Pgsql_io.Typed_sql.(
@@ -5672,7 +5660,7 @@ module Job_context = struct
         //
         (* updated_at *)
         Ret.text
-        /^ read "select_or_insert_pull_request_context.sql"
+        /^ read [%blob "sql/select_or_insert_pull_request_context.sql"]
         /% Var.bigint "repo_id"
         /% Var.bigint "pull_number")
 
@@ -5688,7 +5676,7 @@ module Job_context = struct
         //
         (* updated_at *)
         Ret.text
-        /^ read "select_or_insert_branch_context.sql"
+        /^ read [%blob "sql/select_or_insert_branch_context.sql"]
         /% Var.bigint "repo_id"
         /% Var.text "branch")
 
@@ -5719,7 +5707,7 @@ module Job_context = struct
         //
         (* updated_at *)
         Ret.text
-        /^ read "select_context_by_id.sql"
+        /^ read [%blob "sql/select_context_by_id.sql"]
         /% Var.uuid "id")
 
     let string_of_state = function
@@ -5829,7 +5817,7 @@ module Job_context = struct
         //
         (* updated_at *)
         Ret.text
-        /^ read "insert_job.sql"
+        /^ read [%blob "sql/insert_job.sql"]
         /% Var.uuid "context_id"
         /% Var.ud (Var.text "state") string_of_state
         /% Var.ud (Var.json "parameters") Type_.to_json
@@ -5862,7 +5850,7 @@ module Job_context = struct
         //
         (* completed_at *)
         Ret.(option text)
-        /^ read "select_job_by_id.sql"
+        /^ read [%blob "sql/select_job_by_id.sql"]
         /% Var.uuid "id")
 
     let select_job_by_work_manifest_id =
@@ -5892,19 +5880,22 @@ module Job_context = struct
         //
         (* completed_at *)
         Ret.(option text)
-        /^ read "select_job_by_work_manifest_id.sql"
+        /^ read [%blob "sql/select_job_by_work_manifest_id.sql"]
         /% Var.uuid "work_manifest")
 
     let update_job_state =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "update_job_state.sql"
+        /^ read [%blob "sql/update_job_state.sql"]
         /% Var.uuid "job"
         /% Var.ud (Var.text "state") string_of_state)
 
     let upsert_job_work_manifest =
       Pgsql_io.Typed_sql.(
-        sql /^ read "upsert_job_work_manifest.sql" /% Var.uuid "job" /% Var.uuid "work_manifest")
+        sql
+        /^ read [%blob "sql/upsert_job_work_manifest.sql"]
+        /% Var.uuid "job"
+        /% Var.uuid "work_manifest")
 
     let select_job_work_manifests =
       Pgsql_io.Typed_sql.(
@@ -5912,7 +5903,7 @@ module Job_context = struct
         //
         (* work_manifest_id *)
         Ret.uuid
-        /^ read "select_job_work_manifests.sql"
+        /^ read [%blob "sql/select_job_work_manifests.sql"]
         /% Var.uuid "job")
 
     let to_compute_node_state =
@@ -5934,7 +5925,7 @@ module Job_context = struct
         // Ret.text
         (* updated_at *)
         // Ret.text
-        /^ read "insert_compute_node.sql"
+        /^ read [%blob "sql/insert_compute_node.sql"]
         /% Var.uuid "id"
         /% Var.(ud (json "capabilities") Tjc.Compute_node.Capabilities.to_yojson))
 
@@ -5956,7 +5947,7 @@ module Job_context = struct
         //
         (* updated_at *)
         Ret.text
-        /^ read "select_compute_node.sql"
+        /^ read [%blob "sql/select_compute_node.sql"]
         /% Var.uuid "id")
 
     let state_of_string =
@@ -5984,7 +5975,7 @@ module Job_context = struct
         //
         (* work_manifest *)
         Ret.uuid
-        /^ read "select_compute_node_work.sql"
+        /^ read [%blob "sql/select_compute_node_work.sql"]
         /% Var.uuid "compute_node_id")
 
     let string_of_state =
@@ -5997,14 +5988,14 @@ module Job_context = struct
     let update_compute_node_state =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "update_compute_node_state.sql"
+        /^ read [%blob "sql/update_compute_node_state.sql"]
         /% Var.uuid "compute_node_id"
         /% Var.(ud (text "state") string_of_state))
 
     let upsert_compute_node_work =
       Pgsql_io.Typed_sql.(
         sql
-        /^ read "upsert_compute_node_work.sql"
+        /^ read [%blob "sql/upsert_compute_node_work.sql"]
         /% Var.uuid "compute_node_id"
         /% Var.uuid "work_manifest"
         /% Var.ud (Var.json "work") Terrat_api_components.Work_manifest.to_yojson)

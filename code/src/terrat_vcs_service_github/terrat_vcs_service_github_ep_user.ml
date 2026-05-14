@@ -4,10 +4,7 @@ module Logs = (val Logs.src_log src : Logs.LOG)
 
 module Whoami = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let select_github_user () =
       Pgsql_io.Typed_sql.(
@@ -24,7 +21,7 @@ module Whoami = struct
         //
         (* avatar_url *)
         Ret.(option text)
-        /^ read "select_github_user2_by_user_id.sql"
+        /^ read [%blob "sql/select_github_user2_by_user_id.sql"]
         /% Var.uuid "user_id")
   end
 
@@ -72,10 +69,7 @@ end
 
 module Installations = struct
   module Sql = struct
-    let read fname =
-      CCOption.get_exn_or
-        fname
-        (CCOption.map Pgsql_io.clean_string (Terrat_files_github_sql.read fname))
+    let read s = Pgsql_io.clean_string s
 
     let tier_features =
       let module P = struct
@@ -107,7 +101,7 @@ module Installations = struct
         //
         (* tier features *)
         Ret.u Ret.json tier_features
-        /^ read "select_user_installations.sql"
+        /^ read [%blob "sql/select_user_installations.sql"]
         /% Var.(array (bigint "installation_ids")))
 
     let upsert_user_installations () =
@@ -122,7 +116,7 @@ module Installations = struct
         //
         (* state *)
         Ret.text
-        /^ read "upsert_user_installations.sql"
+        /^ read [%blob "sql/upsert_user_installations.sql"]
         /% Var.(uuid "user_id")
         /% Var.(array (bigint "installation_ids")))
   end

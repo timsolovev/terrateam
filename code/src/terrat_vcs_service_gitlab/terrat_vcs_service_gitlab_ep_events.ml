@@ -20,10 +20,7 @@ module Metrics = struct
 end
 
 module Sql = struct
-  let read fname =
-    CCOption.get_exn_or
-      fname
-      (CCOption.map Pgsql_io.clean_string (Terrat_files_gitlab_sql.read fname))
+  let read s = Pgsql_io.clean_string s
 
   let select_installation_by_webhook_secret () =
     Pgsql_io.Typed_sql.(
@@ -34,17 +31,17 @@ module Sql = struct
       //
       (* state *)
       Ret.text
-      /^ read "select_installation_by_webhook_secret.sql"
+      /^ read [%blob "sql/select_installation_by_webhook_secret.sql"]
       /% Var.text "webhook_secret")
 
   let update_installation_to_installed () =
     Pgsql_io.Typed_sql.(
-      sql /^ read "update_installation_to_installed.sql" /% Var.bigint "installation_id")
+      sql /^ read [%blob "sql/update_installation_to_installed.sql"] /% Var.bigint "installation_id")
 
   let insert_installation_repository () =
     Pgsql_io.Typed_sql.(
       sql
-      /^ read "insert_installation_repository.sql"
+      /^ read [%blob "sql/insert_installation_repository.sql"]
       /% Var.bigint "id"
       /% Var.bigint "installation_id"
       /% Var.text "owner"
